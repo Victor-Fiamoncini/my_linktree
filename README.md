@@ -1,6 +1,6 @@
 # My Linktree
 
-Lnading page with my contact links.
+Landing page with my contact links.
 
 ----------
 Released in 2021. This project is under the MIT license.
