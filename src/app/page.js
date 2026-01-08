@@ -5,7 +5,7 @@ import ExternalLink from '@/components/external-link'
 import { startYearOfWork } from '@/use-cases/GetYearsOfXpUseCase'
 
 export default function Home() {
-	const brandingText = `I've been working since ${startYearOfWork} on both company and freelance projects. Currently, I focus on back-end development using PHP (Laravel/Symfony) and Node.js, while also building personal projects with React and Next.js.`
+	const brandingText = `I've been working since ${startYearOfWork} on both company and freelance projects. Currently, I focus on back-end development using PHP (Laravel/Symfony) and Node.js, while also building personal projects with React and Next.js`
 
 	return (
 		<main className="flex flex-col justify-center items-center px-4 min-h-screen">
