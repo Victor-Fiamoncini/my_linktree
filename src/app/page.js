@@ -12,9 +12,9 @@ export default function Home() {
 	return (
 		<motion.div
 			className="flex flex-col justify-center items-center px-4 py-10"
-			initial={{ opacity: 0 }}
+			initial={{ opacity: 0.2 }}
 			animate={{ opacity: 1 }}
-			transition={{ duration: 0.8, ease: 'easeOut' }}
+			transition={{ duration: 1, ease: 'easeOut' }}
 		>
 			<section className="text-center mb-12">
 				<Image
@@ -41,34 +41,17 @@ export default function Home() {
 
 			<section className="text-center mb-12">
 				<ul className="flex flex-row justify-center align-middle">
-					<motion.li
-						className="mr-6"
-						title="Linkedin"
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						transition={{ duration: 1.2, ease: 'easeOut' }}
-					>
+					<li className="mr-6" title="Linkedin">
 						<ExternalLink link="https://www.linkedin.com/in/victor-fiamoncini-b74b72159" icon={FaLinkedin} />
-					</motion.li>
+					</li>
 
-					<motion.li
-						className="mr-6"
-						title="Github"
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						transition={{ duration: 1.4, ease: 'easeOut' }}
-					>
+					<li className="mr-6" title="Github">
 						<ExternalLink link="https://github.com/Victor-Fiamoncini" icon={FaGithub} />
-					</motion.li>
+					</li>
 
-					<motion.li
-						title="Instagram"
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						transition={{ duration: 1.6, ease: 'easeOut' }}
-					>
+					<li title="Instagram">
 						<ExternalLink link="https://www.instagram.com/victorfiamon" icon={FaInstagram} />
-					</motion.li>
+					</li>
 				</ul>
 			</section>
 
