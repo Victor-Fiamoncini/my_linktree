@@ -1,10 +1,10 @@
 import { Geist, Geist_Mono } from 'next/font/google'
 
 import '@/app/globals.css'
-import GetYearsOfXpUseCase from '@/use-cases/GetYearsOfXpUseCase'
+import { GetXpYearsUseCase } from '@/core/application/use-cases/get-xp-years-use-case'
 
-const getYearsOfXpUseCase = new GetYearsOfXpUseCase()
-const description = `Software Engineer with ${getYearsOfXpUseCase.execute()} years of experience in both companies and freelance projects. Currently focused on back-end development using PHP (Laravel/Symfony) and NodeJS, while also building personal projects with React and Next.js.`
+const getXpYearsUseCase = new GetXpYearsUseCase()
+const description = `Software Engineer with ${getXpYearsUseCase.execute()} years of experience in both companies and freelance projects. Currently focused on back-end development using PHP (Laravel/Symfony) and NodeJS, while also building personal projects with React and Next.js.`
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',

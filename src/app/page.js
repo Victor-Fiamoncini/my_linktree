@@ -3,11 +3,11 @@ import { FaLinkedin, FaGithub, FaInstagram } from 'react-icons/fa'
 
 import ContactForm from '@/components/contact-form'
 import ExternalLink from '@/components/external-link'
-import GetYearsOfXpUseCase from '@/use-cases/GetYearsOfXpUseCase'
+import { GetXpYearsUseCase } from '@/core/application/use-cases/get-xp-years-use-case'
 
 const BrandSection = () => {
-	const getYearsOfXpUseCase = new GetYearsOfXpUseCase()
-	const brandingText = `I've been working since ${getYearsOfXpUseCase.startYearOfWork} on both company and freelance projects. Currently, I focus on back-end development using PHP (Laravel/Symfony) and Node.js, while also building personal projects with React and Next.js`
+	const getXpYearsUseCase = new GetXpYearsUseCase()
+	const brandingText = `I've been working since ${getXpYearsUseCase.startYearOfWork} on both company and freelance projects. Currently, I focus on back-end development using PHP (Laravel/Symfony) and Node.js, while also building personal projects with React and Next.js`
 
 	return (
 		<section className="text-center">

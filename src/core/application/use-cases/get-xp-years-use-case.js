@@ -1,4 +1,4 @@
-class GetYearsOfXpUseCase {
+export class GetXpYearsUseCase {
 	#startYearOfWork
 
 	constructor() {
@@ -15,5 +15,3 @@ class GetYearsOfXpUseCase {
 		return currentYear - this.#startYearOfWork
 	}
 }
-
-export default GetYearsOfXpUseCase
