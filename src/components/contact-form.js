@@ -76,24 +76,24 @@ export default function ContactForm() {
 				/>
 			</div>
 
-			<button
-				className="w-full sm:w-96 px-4 py-2 text-white font-semibold rounded-lg bg-blue-400 cursor-pointer disabled:opacity-80 transition-colors"
-				type="submit"
-				disabled={status === 'sending' || !formData.name || !formData.email || !formData.message}
-			>
-				{status === 'sending' ? 'Sending...' : 'Send Message'}
-			</button>
-
-			{status === 'success' && (
+			{status !== 'success' || status === 'error' ? (
+				<button
+					className="w-full sm:w-96 px-4 py-2 text-white font-semibold rounded-lg bg-blue-400 cursor-pointer disabled:opacity-80 transition-colors"
+					type="submit"
+					disabled={status === 'sending' || !formData.name || !formData.email || !formData.message}
+				>
+					{status === 'sending' ? 'Sending...' : 'Send Message'}
+				</button>
+			) : status === 'success' ? (
 				<p className="text-green-500 text-sm font-semibold w-64">
 					Thank you for your message! I’ll get back to you as soon as possible.
 				</p>
-			)}
-
-			{status === 'error' && (
-				<p className="text-red-600 text-sm font-semibold w-64">
-					Oops! Something went wrong while sending your message. Please try again later.
-				</p>
+			) : (
+				status === 'error' && (
+					<p className="text-red-600 text-sm font-semibold w-64">
+						Oops! Something went wrong while sending your message. Please try again later.
+					</p>
+				)
 			)}
 		</form>
 	)
