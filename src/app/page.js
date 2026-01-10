@@ -34,7 +34,7 @@ export default function Home() {
 					<span className="text-blue-400">&nbsp;/&gt;</span>
 				</div>
 
-				<p className="text-gray-100 font-semibold mb-4">Hey 👋 What's up?</p>
+				<p className="text-gray-100 font-semibold mb-4">Hey 👋 What&#39;s up?</p>
 
 				<p className="text-gray-100 font-semibold w-full max-w-96">{brandingText}</p>
 			</section>
