@@ -32,8 +32,8 @@ export const metadata = {
 		'React',
 		'Next.js',
 	],
-	metadataBase: new URL('https://victorfiamon.com.br'),
-	authors: [{ name: 'Victor Fiamoncini', url: 'https://victorfiamon.com.br' }],
+	metadataBase: new URL('https://www.victorfiamon.com.br'),
+	authors: [{ name: 'Victor Fiamoncini', url: 'https://www.victorfiamon.com.br' }],
 	creator: 'Victor Fiamoncini',
 	publisher: 'Victor Fiamoncini',
 	icons: {
@@ -55,13 +55,13 @@ export const metadata = {
 	openGraph: {
 		type: 'website',
 		locale: 'en_US',
-		url: 'https://victorfiamon.com.br',
+		url: 'https://www.victorfiamon.com.br',
 		siteName: 'Victor Fiamoncini',
 		title: 'Victor Fiamoncini',
 		description,
 		images: [
 			{
-				url: 'https://victorfiamon.com.br/photo.jpg',
+				url: 'https://www.victorfiamon.com.br/photo.jpg',
 				width: 1200,
 				height: 630,
 				alt: "Victor's photo",
@@ -72,7 +72,7 @@ export const metadata = {
 		card: 'summary_large_image',
 		title: 'Victor Fiamoncini',
 		description,
-		images: ['https://victorfiamon.com.br/photo.jpg'],
+		images: ['https://www.victorfiamon.com.br/photo.jpg'],
 	},
 	other: {
 		'X-UA-Compatible': 'ie=edge',
