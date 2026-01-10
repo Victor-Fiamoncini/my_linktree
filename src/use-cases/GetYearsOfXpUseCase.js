@@ -1,10 +1,18 @@
-export const startYearOfWork = 2019
-
 class GetYearsOfXpUseCase {
-	execute(startYear = startYearOfWork) {
+	#startYearOfWork
+
+	constructor() {
+		this.#startYearOfWork = 2019
+	}
+
+	get startYearOfWork() {
+		return this.#startYearOfWork
+	}
+
+	execute() {
 		const currentYear = new Date().getFullYear()
 
-		return currentYear - startYear
+		return currentYear - this.#startYearOfWork
 	}
 }
 
