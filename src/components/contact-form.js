@@ -80,6 +80,7 @@ export default function ContactForm() {
 				<button
 					className="w-full sm:w-96 px-4 py-2 text-white font-semibold rounded-lg bg-blue-400 cursor-pointer disabled:opacity-80 transition-colors disabled:cursor-not-allowed"
 					type="submit"
+					title="Send Message"
 					disabled={status === 'sending' || !formData.name || !formData.email || !formData.message}
 				>
 					{status === 'sending' ? 'Sending...' : 'Send Message'}
