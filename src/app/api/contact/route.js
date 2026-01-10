@@ -1,28 +1,27 @@
-import { Resend } from 'resend'
+import {
+	MissingRequiredFieldsError,
+	SendContactEmailUseCase,
+} from '@/core/application/use-cases/send-contact-email-use-case'
+import { ResendMailer } from '@/core/infrastructure/resend-mailer'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const sendContactEmailUseCase = new SendContactEmailUseCase({
+	mailer: new ResendMailer({ resendApiKey: process.env.RESEND_API_KEY }),
+	senderEmail: process.env.SENDER_EMAIL,
+	recipientEmail: process.env.RECIPIENT_EMAIL,
+})
 
 export async function POST(request, response) {
 	try {
 		const { name, email, message } = await request.json()
 
-		if (!name || !email || !message) {
-			return Response.json({ success: false, error: 'Missing required fields' }, { status: 400 })
-		}
-
-		await resend.emails.send({
-			from: 'mylinktree@victorfiamon.com.br',
-			to: process.env.RECIPIENT_EMAIL,
-			subject: `My Linktree - New contact from ${name}`,
-			html: `
-        <p>Name: ${name}</p>
-        <p>Email: ${email}</p>
-        <p>Message: ${message}</p>
-      `,
-		})
+		await sendContactEmailUseCase.execute({ name, email, message })
 
 		return Response.json({ success: true }, { status: 200 })
-	} catch {
+	} catch (error) {
+		if (error instanceof MissingRequiredFieldsError) {
+			return Response.json({ success: false, error: error.message }, { status: 400 })
+		}
+
 		return Response.json({ success: false, error: 'Something went wrong, try again later' }, { status: 500 })
 	}
 }
