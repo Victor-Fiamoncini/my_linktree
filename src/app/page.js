@@ -2,6 +2,7 @@ import * as motion from 'motion/react-client'
 import Image from 'next/image'
 import { FaLinkedin, FaGithub, FaInstagram } from 'react-icons/fa'
 
+import ContactForm from '@/components/contact-form'
 import ExternalLink from '@/components/external-link'
 import { startYearOfWork } from '@/use-cases/GetYearsOfXpUseCase'
 
@@ -10,12 +11,12 @@ export default function Home() {
 
 	return (
 		<motion.div
-			className="flex flex-col justify-center items-center px-4 min-h-screen"
+			className="flex flex-col justify-center items-center px-4 py-10"
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
 			transition={{ duration: 0.8, ease: 'easeOut' }}
 		>
-			<section className="text-center mb-10">
+			<section className="text-center mb-12">
 				<Image
 					className="inline-block mb-8 rounded-4xl w-40 h-40 object-center object-cover border-4 border-blue-400"
 					src="/photo.jpg"
@@ -33,12 +34,12 @@ export default function Home() {
 					<span className="text-blue-400">&nbsp;/&gt;</span>
 				</div>
 
-				<p className="text-gray-100 font-semibold mb-4">Hi there! I&#39;m a fullstack developer</p>
+				<p className="text-gray-100 font-semibold mb-4">Hey 👋 What's up?</p>
 
 				<p className="text-gray-100 font-semibold w-full max-w-96">{brandingText}</p>
 			</section>
 
-			<section>
+			<section className="text-center mb-12">
 				<ul className="flex flex-row justify-center align-middle">
 					<motion.li
 						className="mr-6"
@@ -69,6 +70,14 @@ export default function Home() {
 						<ExternalLink link="https://www.instagram.com/victorfiamon" icon={FaInstagram} />
 					</motion.li>
 				</ul>
+			</section>
+
+			<section className="text-center">
+				<div className="bg-white h-1 w-24 m-auto mb-10" />
+
+				<h2 className="mb-6 text-gray-100 font-bold text-2xl sm:text-3xl">Reach Out</h2>
+
+				<ContactForm />
 			</section>
 		</motion.div>
 	)
