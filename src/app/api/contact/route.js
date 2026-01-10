@@ -7,7 +7,7 @@ export async function POST(request, response) {
 		const { name, email, message } = await request.json()
 
 		if (!name || !email || !message) {
-			return response.status(400).json({ success: false, error: 'Missing required fields' })
+			return Response.json({ success: false, error: 'Missing required fields' }, { status: 400 })
 		}
 
 		await resend.emails.send({
@@ -21,8 +21,8 @@ export async function POST(request, response) {
       `,
 		})
 
-		return response.status(200).json({ success: true })
+		return Response.json({ success: true }, { status: 200 })
 	} catch {
-		return response.status(500).json({ success: false, error: 'Something went wrong, try again later' })
+		return Response.json({ success: false, error: 'Something went wrong, try again later' }, { status: 500 })
 	}
 }

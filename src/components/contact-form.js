@@ -30,15 +30,15 @@ export default function ContactForm() {
 	}
 
 	return (
-		<form onSubmit={handleSubmit} className="space-y-4 w-full sm:w-96">
-			<div className="text-left">
+		<form onSubmit={handleSubmit} className="flex flex-col items-center gap-4 w-full max-w-96">
+			<div className="text-left w-full">
 				<label htmlFor="name" className="block text-sm mb-1 text-gray-100 font-bold">
 					Name
 				</label>
 
 				<input
 					id="name"
-					className="w-full px-4 py-2 text-white font-semibold rounded-lg border-4 border-blue-400 focus:border-white transition-colors"
+					className="w-full sm:w-96 px-4 py-2 text-white font-semibold rounded-lg border-4 border-blue-400 focus:border-white transition-colors"
 					type="text"
 					value={formData.name}
 					onChange={event => setFormData({ ...formData, name: event.target.value })}
@@ -46,14 +46,14 @@ export default function ContactForm() {
 				/>
 			</div>
 
-			<div className="text-left">
+			<div className="text-left w-full">
 				<label htmlFor="email" className="block text-sm mb-1 text-gray-100 font-bold">
 					Email
 				</label>
 
 				<input
 					id="email"
-					className="w-full px-4 py-2 text-white font-semibold rounded-lg border-4 border-blue-400 focus:border-white transition-colors"
+					className="w-full sm:w-96 px-4 py-2 text-white font-semibold rounded-lg border-4 border-blue-400 focus:border-white transition-colors"
 					type="email"
 					value={formData.email}
 					onChange={event => setFormData({ ...formData, email: event.target.value })}
@@ -61,14 +61,14 @@ export default function ContactForm() {
 				/>
 			</div>
 
-			<div className="text-left">
+			<div className="text-left w-full">
 				<label htmlFor="message" className="block text-sm mb-1 text-gray-100 font-bold">
 					Message
 				</label>
 
 				<textarea
 					id="message"
-					className="w-full px-4 py-2 text-white font-semibold rounded-lg border-4 border-blue-400 focus:border-white transition-colors"
+					className="w-full sm:w-96 px-4 py-2 text-white font-semibold rounded-lg border-4 border-blue-400 focus:border-white transition-colors"
 					rows="4"
 					value={formData.message}
 					onChange={event => setFormData({ ...formData, message: event.target.value })}
@@ -77,7 +77,7 @@ export default function ContactForm() {
 			</div>
 
 			<button
-				className="w-full px-4 py-2 text-white font-semibold rounded-lg bg-blue-400 cursor-pointer disabled:opacity-80 transition-colors"
+				className="w-full sm:w-96 px-4 py-2 text-white font-semibold rounded-lg bg-blue-400 cursor-pointer disabled:opacity-80 transition-colors"
 				type="submit"
 				disabled={status === 'sending' || !formData.name || !formData.email || !formData.message}
 			>
@@ -85,13 +85,13 @@ export default function ContactForm() {
 			</button>
 
 			{status === 'success' && (
-				<p className="text-green-500 text-sm font-semibold">
+				<p className="text-green-500 text-sm font-semibold w-64">
 					Thank you for your message! I’ll get back to you as soon as possible.
 				</p>
 			)}
 
 			{status === 'error' && (
-				<p className="text-red-600 text-sm font-semibold">
+				<p className="text-red-600 text-sm font-semibold w-64">
 					Oops! Something went wrong while sending your message. Please try again later.
 				</p>
 			)}
