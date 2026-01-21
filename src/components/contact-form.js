@@ -38,7 +38,7 @@ export default function ContactForm() {
 
 				<input
 					id="name"
-					className="w-full sm:w-96 px-4 py-2 text-white font-semibold rounded-lg border-4 border-blue-400 focus:border-white transition-colors"
+					className="w-full sm:w-96 px-4 py-2 text-white font-semibold rounded-2xl border-4 border-blue-400 focus:border-white transition-colors"
 					type="text"
 					value={formData.name}
 					onChange={event => setFormData({ ...formData, name: event.target.value })}
@@ -53,7 +53,7 @@ export default function ContactForm() {
 
 				<input
 					id="email"
-					className="w-full sm:w-96 px-4 py-2 text-white font-semibold rounded-lg border-4 border-blue-400 focus:border-white transition-colors"
+					className="w-full sm:w-96 px-4 py-2 text-white font-semibold rounded-2xl border-4 border-blue-400 focus:border-white transition-colors"
 					type="email"
 					value={formData.email}
 					onChange={event => setFormData({ ...formData, email: event.target.value })}
@@ -68,7 +68,7 @@ export default function ContactForm() {
 
 				<textarea
 					id="message"
-					className="w-full sm:w-96 px-4 py-2 text-white font-semibold rounded-lg border-4 border-blue-400 focus:border-white transition-colors"
+					className="w-full sm:w-96 px-4 py-2 text-white font-semibold rounded-2xl border-4 border-blue-400 focus:border-white transition-colors"
 					rows="4"
 					value={formData.message}
 					onChange={event => setFormData({ ...formData, message: event.target.value })}
@@ -78,7 +78,7 @@ export default function ContactForm() {
 
 			{status !== 'success' || status === 'error' ? (
 				<button
-					className="w-full sm:w-96 px-4 py-2 text-white font-semibold rounded-lg bg-blue-400 cursor-pointer disabled:opacity-80 transition-colors disabled:cursor-not-allowed"
+					className="w-full sm:w-96 px-4 py-2 text-white font-semibold rounded-2xl bg-blue-400 cursor-pointer disabled:opacity-80 transition-colors disabled:cursor-not-allowed"
 					type="submit"
 					title="Send Message"
 					disabled={status === 'sending' || !formData.name || !formData.email || !formData.message}

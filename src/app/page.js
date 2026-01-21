@@ -12,7 +12,7 @@ const BrandSection = () => {
 	return (
 		<section className="text-center">
 			<Image
-				className="inline-block mb-8 rounded-4xl w-40 h-40 object-center object-cover border-4 border-blue-400"
+				className="inline-block mb-8 rounded-2xl w-40 h-40 object-center object-cover border-4 border-blue-400"
 				src="/photo.jpg"
 				alt="Victor Fiamoncini Foto"
 				title="Victor Fiamoncini"

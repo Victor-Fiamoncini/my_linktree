@@ -2,7 +2,7 @@ import React from 'react'
 
 const ExternalLink = ({ icon: Icon, link }) => (
 	<a
-		className="block bg-gray-600 p-4 rounded-3xl border-4 border-blue-400 transform transition-all hover:-translate-y-0.5 hover:border-gray-100"
+		className="block bg-gray-600 p-4 rounded-2xl border-4 border-blue-400 transform transition-all hover:-translate-y-0.5 hover:border-gray-100"
 		href={link}
 		target="_blank"
 		rel="noopener noreferrer"
