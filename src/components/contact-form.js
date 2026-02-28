@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 export default function ContactForm() {
 	const [formData, setFormData] = useState({ name: '', email: '', message: '' })
-	const [status, setStatus] = useState('')
+	const [status, setStatus] = useState('neutral') // 'neutral', 'sending', 'success', 'error'
 
 	const handleSubmit = async event => {
 		event.preventDefault()
@@ -76,7 +76,7 @@ export default function ContactForm() {
 				/>
 			</div>
 
-			{status !== 'success' || status === 'error' ? (
+			{status === 'neutral' || status === 'sending' ? (
 				<button
 					className="w-full px-4 py-3 text-black font-bold bg-blue-400 border-4 border-black shadow-[4px_4px_0px_0px_#000000] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none disabled:opacity-60 disabled:translate-x-0 disabled:translate-y-0 disabled:shadow-[4px_4px_0px_0px_#000000] disabled:cursor-not-allowed cursor-pointer"
 					type="submit"
