@@ -1,7 +1,9 @@
+import { Analytics } from '@vercel/analytics/next'
 import { Geist, Geist_Mono } from 'next/font/google'
 
-import '@/app/globals.css'
 import { GetXpYearsUseCase } from '@/core/application/use-cases/get-xp-years-use-case'
+
+import '@/app/globals.css'
 
 const getXpYearsUseCase = new GetXpYearsUseCase()
 const description = `Software Engineer with ${getXpYearsUseCase.execute()} years of experience in both companies and freelance projects. Currently focused on back-end development using PHP (Laravel/Symfony) and NodeJS, while also building personal projects with React and Next.js.`
@@ -92,7 +94,11 @@ export const viewport = {
 export default function RootLayout({ children }) {
 	return (
 		<html lang="en">
-			<body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-stone-400`}>{children}</body>
+			<body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-stone-400`}>
+				{children}
+
+				<Analytics />
+			</body>
 		</html>
 	)
 }
