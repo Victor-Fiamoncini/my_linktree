@@ -17,7 +17,7 @@ export async function POST(request) {
 
 		await sendContactEmailUseCase.execute({ name, email, message })
 
-		return Response.json({ success: true }, { status: 200 })
+		return new Response(null, { status: 204 })
 	} catch (error) {
 		if (error instanceof MissingRequiredFieldsError) {
 			return Response.json(error, { status: 400 })
