@@ -3,6 +3,15 @@ export class MissingRequiredFieldsError extends Error {
 		super('Missing required fields')
 
 		this.name = 'MissingRequiredFieldsError'
+		this.action = 'Check if all required fields are provided and try again.'
+	}
+
+	toJSON() {
+		return {
+			name: this.name,
+			message: this.message,
+			action: this.action,
+		}
 	}
 }
 
