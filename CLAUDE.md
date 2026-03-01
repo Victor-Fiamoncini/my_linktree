@@ -90,9 +90,11 @@ Vitest 4 requires `function` or `class` syntax (not arrow functions) for mocks u
 const mockSendEmail = vi.hoisted(() => vi.fn())
 
 vi.mock('@/core/infrastructure/mailer/resend-mailer', () => ({
-  ResendMailer: class {
-    constructor() { this.sendEmail = mockSendEmail }
-  },
+	ResendMailer: class {
+		constructor() {
+			this.sendEmail = mockSendEmail
+		}
+	},
 }))
 ```
 

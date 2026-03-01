@@ -94,7 +94,7 @@ export const viewport = {
 export default function RootLayout({ children }) {
 	return (
 		<html lang="en">
-			<body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-stone-400`}>
+			<body className={`${geistSans.variable} ${geistMono.variable} bg-stone-400 antialiased`}>
 				{children}
 
 				<Analytics />

@@ -40,7 +40,7 @@ describe('ResendMailer', () => {
 		mockSend.mockRejectedValueOnce(apiError)
 
 		await expect(
-			mailer.sendEmail({ from: 'a@example.com', to: 'b@example.com', subject: 'Test', html: '<p>Test</p>' }),
+			mailer.sendEmail({ from: 'a@example.com', to: 'b@example.com', subject: 'Test', html: '<p>Test</p>' })
 		).rejects.toThrow(apiError)
 	})
 })
