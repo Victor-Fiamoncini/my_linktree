@@ -80,7 +80,7 @@ const ExperiencesSection = ({ experiences }) => {
 					<h2 className="mb-6 flex items-center justify-center gap-2 px-8 pt-8 text-2xl font-bold tracking-widest text-black uppercase sm:text-3xl">
 						<span>Experience</span>
 
-						<span className="translate-y-0.5">💼</span>
+						<span className="-translate-y-1">💼</span>
 					</h2>
 
 					<div className="flex">
@@ -91,6 +91,7 @@ const ExperiencesSection = ({ experiences }) => {
 								className={`flex-1 cursor-pointer border-t-2 border-r-2 border-black px-4 py-2 text-sm font-bold transition-colors duration-100 last:border-r-0 ${
 									activeTab === group.company ? 'bg-black text-white' : 'bg-gray-100 text-black hover:bg-gray-200'
 								}`}
+								title={group.company}
 							>
 								{group.company}
 							</button>
