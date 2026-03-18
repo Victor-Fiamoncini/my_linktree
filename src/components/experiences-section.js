@@ -55,7 +55,9 @@ const ExperienceEntry = ({ experience }) => (
 
 		<p className="mb-3 text-sm text-gray-500">{experience.location}</p>
 
-		<p className="mb-2 text-xs font-bold tracking-widest text-gray-500 uppercase">Technologies used</p>
+		{TECH_CATEGORIES.some(cat => experience[cat.key]?.length > 0) && (
+			<p className="mb-2 text-xs font-bold tracking-widest text-gray-500 uppercase">Technologies used</p>
+		)}
 
 		<div className="flex flex-col gap-3">
 			{TECH_CATEGORIES.filter(cat => experience[cat.key]?.length > 0).map(cat => (
