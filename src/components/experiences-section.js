@@ -12,6 +12,23 @@ const formatDate = dateStr => {
 	return `${MONTH_NAMES[parseInt(month, 10) - 1]} ${year}`
 }
 
+const calcDuration = (startDate, endDate) => {
+	const [startYear, startMonth] = startDate.split('-').map(Number)
+	const end = endDate ? endDate.split('-').map(Number) : [new Date().getFullYear(), new Date().getMonth() + 1]
+	const [endYear, endMonth] = end
+
+	let months = (endYear - startYear) * 12 + (endMonth - startMonth)
+	const years = Math.floor(months / 12)
+	months = months % 12
+
+	const parts = []
+
+	if (years > 0) parts.push(`${years} year${years > 1 ? 's' : ''}`)
+	if (months > 0) parts.push(`${months} month${months > 1 ? 's' : ''}`)
+
+	return parts.join(' ') || 'Less than a month'
+}
+
 const TECH_CATEGORIES = [
 	{ key: 'backend', label: 'Backend', color: 'bg-blue-400' },
 	{ key: 'frontend', label: 'Frontend', color: 'bg-green-400' },
@@ -33,7 +50,7 @@ const ExperienceEntry = ({ experience }) => (
 
 		<p className="mb-1 text-sm font-semibold text-gray-600">
 			{formatDate(experience.startDate)} — {formatDate(experience.endDate)}
-			<span className="ml-2 text-gray-400">({experience.durationLabel})</span>
+			<span className="ml-2 text-gray-400">({calcDuration(experience.startDate, experience.endDate)})</span>
 		</p>
 
 		<p className="mb-3 text-sm text-gray-500">{experience.location}</p>
@@ -100,9 +117,9 @@ const ExperiencesSection = ({ experiences }) => {
 				</div>
 
 				<div className="p-8">
-					{activeCompany?.entries.map((exp, idx) => (
+					{activeCompany?.entries.map((exp, index) => (
 						<div key={exp.id}>
-							{idx > 0 && <hr className="my-4 border-t-2 border-dashed border-gray-300" />}
+							{index > 0 && <hr className="my-4 border-t-2 border-dashed border-gray-300" />}
 
 							<ExperienceEntry experience={exp} />
 						</div>
