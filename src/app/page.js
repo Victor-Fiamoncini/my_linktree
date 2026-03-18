@@ -3,7 +3,10 @@ import { FaLinkedin, FaGithub, FaInstagram } from 'react-icons/fa'
 
 import ContactForm from '@/components/contact-form'
 import ExternalLink from '@/components/external-link'
+import ExperiencesSection from '@/components/experiences-section'
 import { GetXpYearsUseCase } from '@/core/application/use-cases/get-xp-years-use-case'
+import { GetProfileUseCase } from '@/core/application/use-cases/get-profile-use-case'
+import { MemoryDatabase } from '@/core/infrastructure/database/memory-database'
 
 const BrandSection = () => {
 	const getXpYearsUseCase = new GetXpYearsUseCase()
@@ -66,14 +69,21 @@ const ContactFormSection = () => (
 	</section>
 )
 
-const HomePage = () => (
-	<main className="flex flex-col items-center justify-center gap-12 px-4 py-10">
-		<BrandSection />
+const HomePage = async () => {
+	const getProfileUseCase = new GetProfileUseCase({ database: new MemoryDatabase() })
+	const profile = await getProfileUseCase.execute()
 
-		<ContactLinksSection />
+	return (
+		<main className="flex flex-col items-center justify-center gap-12 px-4 py-10">
+			<BrandSection />
 
-		<ContactFormSection />
-	</main>
-)
+			<ExperiencesSection experiences={profile.experiences} />
+
+			<ContactLinksSection />
+
+			<ContactFormSection />
+		</main>
+	)
+}
 
 export default HomePage
