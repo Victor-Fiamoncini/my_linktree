@@ -12,8 +12,17 @@ const formatDate = dateStr => {
 	return `${MONTH_NAMES[parseInt(month, 10) - 1]} ${year}`
 }
 
-const TechBadge = ({ tech }) => (
-	<span className="border-2 border-black bg-blue-400 px-2 py-1 text-xs font-bold text-black shadow-[2px_2px_0px_0px_#000]">
+const TECH_CATEGORIES = [
+	{ key: 'backend', label: 'Backend', color: 'bg-blue-400' },
+	{ key: 'frontend', label: 'Frontend', color: 'bg-green-400' },
+	{ key: 'infra', label: 'Infra', color: 'bg-orange-400' },
+	{ key: 'otherTools', label: 'Tools', color: 'bg-purple-400' },
+]
+
+const TechBadge = ({ tech, color }) => (
+	<span
+		className={`border-2 border-black ${color} px-2 py-1 text-xs font-bold text-black shadow-[2px_2px_0px_0px_#000]`}
+	>
 		{tech}
 	</span>
 )
@@ -24,7 +33,6 @@ const ExperienceEntry = ({ experience }) => (
 
 		<p className="mb-1 text-sm font-semibold text-gray-600">
 			{formatDate(experience.startDate)} — {formatDate(experience.endDate)}
-
 			<span className="ml-2 text-gray-400">({experience.durationLabel})</span>
 		</p>
 
@@ -32,9 +40,17 @@ const ExperienceEntry = ({ experience }) => (
 
 		<p className="mb-2 text-xs font-bold tracking-widest text-gray-500 uppercase">Technologies used</p>
 
-		<div className="flex flex-wrap gap-2">
-			{experience.stack.map(tech => (
-				<TechBadge key={tech} tech={tech} />
+		<div className="flex flex-col gap-3">
+			{TECH_CATEGORIES.filter(cat => experience[cat.key]?.length > 0).map(cat => (
+				<div key={cat.key}>
+					<span className="mb-1 block text-xs font-bold tracking-wider text-gray-400 uppercase">{cat.label}</span>
+
+					<div className="flex flex-wrap gap-2">
+						{experience[cat.key].map(tech => (
+							<TechBadge key={tech} tech={tech} color={cat.color} />
+						))}
+					</div>
+				</div>
 			))}
 		</div>
 	</div>
