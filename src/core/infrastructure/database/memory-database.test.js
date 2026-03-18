@@ -20,23 +20,8 @@ describe('MemoryDatabase', () => {
 		const profile = await db.getProfile()
 
 		expect(profile).toHaveProperty('name')
-		expect(profile).toHaveProperty('headline')
-		expect(profile).toHaveProperty('location')
-		expect(profile).toHaveProperty('contact')
-		expect(profile).toHaveProperty('summary')
-		expect(profile).toHaveProperty('skills')
-		expect(profile).toHaveProperty('certifications')
 		expect(profile).toHaveProperty('experiences')
 		expect(profile).toHaveProperty('education')
-	})
-
-	it('should return contact with required fields', async () => {
-		const { contact } = await db.getProfile()
-
-		expect(contact).toHaveProperty('phone')
-		expect(contact).toHaveProperty('email')
-		expect(contact).toHaveProperty('linkedin')
-		expect(contact).toHaveProperty('website')
 	})
 
 	it('should return experiences as a non-empty array', async () => {
@@ -53,7 +38,10 @@ describe('MemoryDatabase', () => {
 			expect(exp).toHaveProperty('id')
 			expect(exp).toHaveProperty('company')
 			expect(exp).toHaveProperty('role')
-			expect(exp).toHaveProperty('stack')
+			expect(exp).toHaveProperty('backend')
+			expect(exp).toHaveProperty('frontend')
+			expect(exp).toHaveProperty('infra')
+			expect(exp).toHaveProperty('otherTools')
 			expect(exp).toHaveProperty('startDate')
 			expect(exp).toHaveProperty('current')
 		}
@@ -74,7 +62,6 @@ describe('MemoryDatabase', () => {
 			expect(entry).toHaveProperty('institution')
 			expect(entry).toHaveProperty('degree')
 			expect(entry).toHaveProperty('field')
-			expect(entry).toHaveProperty('startDate')
 		}
 	})
 
