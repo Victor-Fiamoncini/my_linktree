@@ -1,0 +1,87 @@
+import { describe, it, expect, beforeEach } from 'vitest'
+
+import { MemoryDatabase } from '@/core/infrastructure/database/memory-database'
+
+describe('MemoryDatabase', () => {
+	let db
+
+	beforeEach(() => {
+		db = new MemoryDatabase()
+	})
+
+	it('should return a profile object', async () => {
+		const profile = await db.getProfile()
+
+		expect(profile).toBeDefined()
+		expect(typeof profile).toBe('object')
+	})
+
+	it('should include required top-level fields', async () => {
+		const profile = await db.getProfile()
+
+		expect(profile).toHaveProperty('name')
+		expect(profile).toHaveProperty('headline')
+		expect(profile).toHaveProperty('location')
+		expect(profile).toHaveProperty('contact')
+		expect(profile).toHaveProperty('summary')
+		expect(profile).toHaveProperty('skills')
+		expect(profile).toHaveProperty('certifications')
+		expect(profile).toHaveProperty('experiences')
+		expect(profile).toHaveProperty('education')
+	})
+
+	it('should return contact with required fields', async () => {
+		const { contact } = await db.getProfile()
+
+		expect(contact).toHaveProperty('phone')
+		expect(contact).toHaveProperty('email')
+		expect(contact).toHaveProperty('linkedin')
+		expect(contact).toHaveProperty('website')
+	})
+
+	it('should return experiences as a non-empty array', async () => {
+		const { experiences } = await db.getProfile()
+
+		expect(Array.isArray(experiences)).toBe(true)
+		expect(experiences.length).toBeGreaterThan(0)
+	})
+
+	it('should return each experience with required fields', async () => {
+		const { experiences } = await db.getProfile()
+
+		for (const exp of experiences) {
+			expect(exp).toHaveProperty('id')
+			expect(exp).toHaveProperty('company')
+			expect(exp).toHaveProperty('role')
+			expect(exp).toHaveProperty('stack')
+			expect(exp).toHaveProperty('startDate')
+			expect(exp).toHaveProperty('current')
+		}
+	})
+
+	it('should return education as a non-empty array', async () => {
+		const { education } = await db.getProfile()
+
+		expect(Array.isArray(education)).toBe(true)
+		expect(education.length).toBeGreaterThan(0)
+	})
+
+	it('should return each education entry with required fields', async () => {
+		const { education } = await db.getProfile()
+
+		for (const entry of education) {
+			expect(entry).toHaveProperty('id')
+			expect(entry).toHaveProperty('institution')
+			expect(entry).toHaveProperty('degree')
+			expect(entry).toHaveProperty('field')
+			expect(entry).toHaveProperty('startDate')
+		}
+	})
+
+	it('should return the same profile on repeated calls', async () => {
+		const first = await db.getProfile()
+		const second = await db.getProfile()
+
+		expect(first).toEqual(second)
+	})
+})
