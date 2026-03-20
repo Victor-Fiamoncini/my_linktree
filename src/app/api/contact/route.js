@@ -2,10 +2,21 @@ import {
 	MissingRequiredFieldsError,
 	SendContactEmailUseCase,
 } from '@/core/application/use-cases/send-contact-email-use-case'
-import { InternalServerError } from '@/core/infrastructure/errors'
+import { InternalServerError, TooManyRequestsError } from '@/core/infrastructure/errors'
 import { ResendMailer } from '@/core/infrastructure/mailer/resend-mailer'
+import { UpstashRateLimiter } from '@/core/infrastructure/rate-limiter/upstash-rate-limiter'
+
+const rateLimiter = new UpstashRateLimiter({ maxRequests: 2, window: '10 m' })
 
 export async function POST(request) {
+	const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')
+
+	const isAllowed = await rateLimiter.isAllowed(ip)
+
+	if (!isAllowed) {
+		return Response.json(new TooManyRequestsError(), { status: 429 })
+	}
+
 	const { name, email, message } = await request.json()
 
 	try {
