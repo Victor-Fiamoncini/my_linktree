@@ -6,7 +6,10 @@ export class UpstashRateLimiter {
 
 	constructor({ maxRequests, window }) {
 		this.#limiter = new Ratelimit({
-			redis: Redis.fromEnv(),
+			redis: new Redis({
+				url: process.env.STORAGE_KV_REST_API_URL,
+				token: process.env.STORAGE_KV_REST_API_TOKEN,
+			}),
 			limiter: Ratelimit.slidingWindow(maxRequests, window),
 		})
 	}

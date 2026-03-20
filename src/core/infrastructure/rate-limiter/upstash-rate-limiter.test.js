@@ -12,7 +12,7 @@ vi.mock('@upstash/ratelimit', () => ({
 }))
 
 vi.mock('@upstash/redis', () => ({
-	Redis: { fromEnv: () => ({}) },
+	Redis: class {},
 }))
 
 import { UpstashRateLimiter } from '@/core/infrastructure/rate-limiter/upstash-rate-limiter'
