@@ -1,3 +1,20 @@
+export class TooManyRequestsError extends Error {
+	constructor() {
+		super('Too many requests')
+
+		this.name = 'TooManyRequestsError'
+		this.action = 'Please wait a moment before trying again.'
+	}
+
+	toJSON() {
+		return {
+			name: this.name,
+			message: this.message,
+			action: this.action,
+		}
+	}
+}
+
 export class InternalServerError extends Error {
 	constructor({ cause }) {
 		super('Internal Server Error', { cause })

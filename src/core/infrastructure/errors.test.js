@@ -1,6 +1,44 @@
 import { describe, it, expect } from 'vitest'
 
-import { InternalServerError } from '@/core/infrastructure/errors'
+import { InternalServerError, TooManyRequestsError } from '@/core/infrastructure/errors'
+
+describe('TooManyRequestsError', () => {
+	it('is an instance of Error', () => {
+		const error = new TooManyRequestsError()
+
+		expect(error).toBeInstanceOf(Error)
+	})
+
+	it('has the correct message', () => {
+		const error = new TooManyRequestsError()
+
+		expect(error.message).toBe('Too many requests')
+	})
+
+	it('has the correct name', () => {
+		const error = new TooManyRequestsError()
+
+		expect(error.name).toBe('TooManyRequestsError')
+	})
+
+	it('has the correct action', () => {
+		const error = new TooManyRequestsError()
+
+		expect(error.action).toBe('Please wait a moment before trying again.')
+	})
+
+	describe('toJSON()', () => {
+		it('returns name, message and action', () => {
+			const error = new TooManyRequestsError()
+
+			expect(error.toJSON()).toEqual({
+				name: 'TooManyRequestsError',
+				message: 'Too many requests',
+				action: 'Please wait a moment before trying again.',
+			})
+		})
+	})
+})
 
 describe('InternalServerError', () => {
 	it('is an instance of Error', () => {
