@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { POST } from '@/app/api/contact/route'
 
 const mockSendEmail = vi.hoisted(() => vi.fn())
+const mockIsAllowed = vi.hoisted(() => vi.fn())
 
 vi.mock('@/core/infrastructure/mailer/resend-mailer', () => ({
 	ResendMailer: class {
@@ -12,10 +13,18 @@ vi.mock('@/core/infrastructure/mailer/resend-mailer', () => ({
 	},
 }))
 
-const makeRequest = body =>
+vi.mock('@/core/infrastructure/rate-limiter/upstash-rate-limiter', () => ({
+	UpstashRateLimiter: class {
+		constructor() {
+			this.isAllowed = mockIsAllowed
+		}
+	},
+}))
+
+const makeRequest = (body, headers = {}) =>
 	new Request('http://localhost/api/contact', {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
+		headers: { 'Content-Type': 'application/json', ...headers },
 		body: JSON.stringify(body),
 	})
 
@@ -23,6 +32,9 @@ describe('POST /api/contact', () => {
 	beforeEach(() => {
 		mockSendEmail.mockReset()
 		mockSendEmail.mockResolvedValue(undefined)
+
+		mockIsAllowed.mockReset()
+		mockIsAllowed.mockResolvedValue(true)
 
 		process.env.RESEND_API_KEY = 'test-api-key'
 		process.env.SENDER_EMAIL = 'sender@example.com'
@@ -133,6 +145,75 @@ describe('POST /api/contact', () => {
 				name: 'InternalServerError',
 				message: 'Internal Server Error',
 			})
+		})
+	})
+
+	describe('rate limiting (429)', () => {
+		it('returns 429 when the rate limiter blocks the request', async () => {
+			mockIsAllowed.mockResolvedValue(false)
+
+			const request = makeRequest(
+				{ name: 'John Doe', email: 'john@example.com', message: 'Hello!' },
+				{ 'x-forwarded-for': '1.2.3.4' }
+			)
+			const response = await POST(request)
+
+			expect(response.status).toBe(429)
+		})
+
+		it('returns a TooManyRequestsError body when rate limited', async () => {
+			mockIsAllowed.mockResolvedValue(false)
+
+			const request = makeRequest(
+				{ name: 'John Doe', email: 'john@example.com', message: 'Hello!' },
+				{ 'x-forwarded-for': '1.2.3.4' }
+			)
+			const response = await POST(request)
+			const body = await response.json()
+
+			expect(body).toMatchObject({
+				name: 'TooManyRequestsError',
+				message: 'Too many requests',
+			})
+		})
+
+		it('does not call sendEmail when rate limited', async () => {
+			mockIsAllowed.mockResolvedValue(false)
+
+			const request = makeRequest(
+				{ name: 'John Doe', email: 'john@example.com', message: 'Hello!' },
+				{ 'x-forwarded-for': '1.2.3.4' }
+			)
+			await POST(request)
+
+			expect(mockSendEmail).not.toHaveBeenCalled()
+		})
+
+		it('calls isAllowed with the x-forwarded-for header value', async () => {
+			const request = makeRequest(
+				{ name: 'John Doe', email: 'john@example.com', message: 'Hello!' },
+				{ 'x-forwarded-for': '203.0.113.42' }
+			)
+			await POST(request)
+
+			expect(mockIsAllowed).toHaveBeenCalledWith('203.0.113.42')
+		})
+
+		it('falls back to x-real-ip when x-forwarded-for is absent', async () => {
+			const request = makeRequest(
+				{ name: 'John Doe', email: 'john@example.com', message: 'Hello!' },
+				{ 'x-real-ip': '203.0.113.99' }
+			)
+			await POST(request)
+
+			expect(mockIsAllowed).toHaveBeenCalledWith('203.0.113.99')
+		})
+
+		it('does not call isAllowed when no IP header is present', async () => {
+			const request = makeRequest({ name: 'John Doe', email: 'john@example.com', message: 'Hello!' })
+			await POST(request)
+
+			expect(mockIsAllowed).not.toHaveBeenCalled()
 		})
 	})
 })

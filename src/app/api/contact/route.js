@@ -11,9 +11,7 @@ const rateLimiter = new UpstashRateLimiter({ maxRequests: 2, window: '10 m' })
 export async function POST(request) {
 	const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')
 
-	const isAllowed = await rateLimiter.isAllowed(ip)
-
-	if (!isAllowed) {
+	if (ip && !(await rateLimiter.isAllowed(ip))) {
 		return Response.json(new TooManyRequestsError(), { status: 429 })
 	}
 
