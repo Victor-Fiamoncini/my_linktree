@@ -19,9 +19,9 @@ export async function POST(request) {
 
 	try {
 		const sendContactEmailUseCase = new SendContactEmailUseCase({
-			mailer: new ResendMailer({ resendApiKey: process.env.RESEND_API_KEY }),
-			senderEmail: process.env.SENDER_EMAIL,
-			recipientEmail: process.env.RECIPIENT_EMAIL,
+			mailer: new ResendMailer({ resendApiKey: process.env.MAILER_RESEND_API_KEY }),
+			senderEmail: process.env.MAILER_SENDER_EMAIL,
+			recipientEmail: process.env.MAILER_RECIPIENT_EMAIL,
 		})
 
 		await sendContactEmailUseCase.execute({ name, email, message })

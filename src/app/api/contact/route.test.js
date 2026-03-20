@@ -36,9 +36,9 @@ describe('POST /api/contact', () => {
 		mockIsAllowed.mockReset()
 		mockIsAllowed.mockResolvedValue(true)
 
-		process.env.RESEND_API_KEY = 'test-api-key'
-		process.env.SENDER_EMAIL = 'sender@example.com'
-		process.env.RECIPIENT_EMAIL = 'recipient@example.com'
+		process.env.MAILER_RESEND_API_KEY = 'test-api-key'
+		process.env.MAILER_SENDER_EMAIL = 'sender@example.com'
+		process.env.MAILER_RECIPIENT_EMAIL = 'recipient@example.com'
 	})
 
 	describe('successful submission', () => {
