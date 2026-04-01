@@ -110,14 +110,14 @@ const ExperiencesSection = ({ experiences }) => {
 						<span className="-translate-y-1">💼</span>
 					</h2>
 
-					<div className="flex overflow-x-auto overflow-y-hidden">
+					<div className="flex overflow-x-auto">
 						{companies.map(group => (
 							<button
 								key={group.company}
 								onClick={() => setActiveTab(group.company)}
 								className={`min-w-max flex-1 cursor-pointer border-t-2 border-r-2 border-black px-4 py-2 text-sm font-bold whitespace-nowrap transition-all duration-150 last:border-r-0 ${
 									activeTab === group.company
-										? 'translate-y-[2px] bg-blue-400 text-black shadow-none'
+										? 'bg-blue-400 text-black shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.2)]'
 										: 'bg-gray-100 text-black shadow-[2px_2px_0px_0px_#000] hover:bg-gray-200'
 								}`}
 								title={group.company}
