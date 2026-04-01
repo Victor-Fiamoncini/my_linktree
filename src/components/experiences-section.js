@@ -46,7 +46,11 @@ const TechBadge = ({ tech, color }) => (
 
 const ExperienceEntry = ({ experience }) => (
 	<div className="mb-4 last:mb-0">
-		<p className="text-lg font-bold text-black">{experience.role}</p>
+		<div className="flex items-center justify-between">
+			<p className="text-lg font-bold text-black">{experience.role}</p>
+
+			{experience.countryFlag && <span className="text-xl">{experience.countryFlag}</span>}
+		</div>
 
 		<p className="mb-1 text-sm font-semibold text-gray-600">
 			{formatDate(experience.startDate)} — {formatDate(experience.endDate)}
@@ -54,6 +58,10 @@ const ExperienceEntry = ({ experience }) => (
 		</p>
 
 		<p className="mb-3 text-sm text-gray-500">{experience.location}</p>
+
+		{experience.description && (
+			<p className="mb-4 text-justify text-sm leading-relaxed text-gray-700">{experience.description}</p>
+		)}
 
 		{TECH_CATEGORIES.some(cat => experience[cat.key]?.length > 0) && (
 			<p className="mb-2 text-xs font-bold tracking-widest text-gray-500 uppercase">Technologies used</p>
@@ -93,22 +101,24 @@ const ExperiencesSection = ({ experiences }) => {
 	const activeCompany = companies.find(g => g.company === activeTab)
 
 	return (
-		<section className="w-full max-w-lg">
+		<section className="w-full max-w-3xl">
 			<div className="border-4 border-black bg-white shadow-[6px_6px_0px_0px_#60a5fa]">
 				<div className="border-b-4 border-black">
 					<h2 className="mb-6 flex items-center justify-center gap-2 px-8 pt-8 text-2xl font-bold tracking-widest text-black uppercase sm:text-3xl">
-						<span>Experience</span>
+						<span>Where I&#39;ve Worked</span>
 
 						<span className="-translate-y-1">💼</span>
 					</h2>
 
-					<div className="flex overflow-x-auto">
+					<div className="flex overflow-x-auto overflow-y-hidden">
 						{companies.map(group => (
 							<button
 								key={group.company}
 								onClick={() => setActiveTab(group.company)}
-								className={`min-w-max flex-1 cursor-pointer border-t-2 border-r-2 border-black px-4 py-2 text-sm font-bold whitespace-nowrap transition-colors duration-100 last:border-r-0 ${
-									activeTab === group.company ? 'bg-black text-white' : 'bg-gray-100 text-black hover:bg-gray-200'
+								className={`min-w-max flex-1 cursor-pointer border-t-2 border-r-2 border-black px-4 py-2 text-sm font-bold whitespace-nowrap transition-all duration-150 last:border-r-0 ${
+									activeTab === group.company
+										? 'translate-y-[2px] bg-blue-400 text-black shadow-none'
+										: 'bg-gray-100 text-black shadow-[2px_2px_0px_0px_#000] hover:bg-gray-200'
 								}`}
 								title={group.company}
 							>

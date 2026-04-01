@@ -65,6 +65,15 @@ describe('MemoryDatabase', () => {
 		}
 	})
 
+	it('should return each experience with a non-empty description string', async () => {
+		const { experiences } = await db.getProfile()
+
+		for (const exp of experiences) {
+			expect(typeof exp.description).toBe('string')
+			expect(exp.description.trim().length).toBeGreaterThan(0)
+		}
+	})
+
 	it('should return the same profile on repeated calls', async () => {
 		const first = await db.getProfile()
 		const second = await db.getProfile()

@@ -13,7 +13,7 @@ const BrandSection = () => {
 	const brandingText = `I've been working since ${getXpYearsUseCase.startYearOfWork} on both company and freelance projects. Currently, I focus on back-end development using PHP (Laravel/Symfony) and Node.js, while also building personal projects with Next.js`
 
 	return (
-		<section className="w-full max-w-lg border-4 border-black bg-white p-8 text-center shadow-[6px_6px_0px_0px_#60a5fa]">
+		<section className="w-full max-w-3xl border-4 border-black bg-white p-8 text-center shadow-[6px_6px_0px_0px_#60a5fa]">
 			<a
 				className="mb-8 inline-block border-4 border-black shadow-[4px_4px_0px_0px_#60a5fa] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none"
 				href="https://www.linkedin.com/in/victor-fiamoncini-b74b72159"
@@ -36,7 +36,7 @@ const BrandSection = () => {
 
 			<p className="mb-4 text-xl font-semibold text-gray-900">Hey 👋 What&#39;s up?</p>
 
-			<p className="mx-auto w-full max-w-96 font-semibold text-gray-700">{brandingText}</p>
+			<p className="mx-auto w-full font-semibold text-gray-700">{brandingText}</p>
 		</section>
 	)
 }
@@ -60,7 +60,7 @@ const ContactLinksSection = () => (
 )
 
 const ContactFormSection = () => (
-	<section className="w-full max-w-lg text-center">
+	<section className="w-full max-w-3xl text-center">
 		<div className="border-4 border-black bg-white p-8 shadow-[6px_6px_0px_0px_#60a5fa]">
 			<h2 className="mb-6 text-2xl font-bold tracking-widest text-black uppercase sm:text-3xl">Reach Out 📫</h2>
 
