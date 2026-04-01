@@ -13,7 +13,10 @@ const BrandSection = () => {
 	const brandingText = `I've been working since ${getXpYearsUseCase.startYearOfWork} on both company and freelance projects. Currently, I focus on back-end development using PHP (Laravel/Symfony) and Node.js, while also building personal projects with Next.js`
 
 	return (
-		<section className="w-full max-w-3xl border-4 border-black bg-white p-8 text-center shadow-[6px_6px_0px_0px_#60a5fa]">
+		<section
+			id="about"
+			className="w-full max-w-3xl border-4 border-black bg-white p-8 text-center shadow-[6px_6px_0px_0px_#60a5fa]"
+		>
 			<a
 				className="mb-8 inline-block border-4 border-black shadow-[4px_4px_0px_0px_#60a5fa] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none"
 				href="https://www.linkedin.com/in/victor-fiamoncini-b74b72159"
@@ -60,7 +63,7 @@ const ContactLinksSection = () => (
 )
 
 const ContactFormSection = () => (
-	<section className="w-full max-w-3xl text-center">
+	<section id="contact" className="w-full max-w-3xl text-center">
 		<div className="border-4 border-black bg-white p-8 shadow-[6px_6px_0px_0px_#60a5fa]">
 			<h2 className="mb-6 text-2xl font-bold tracking-widest text-black uppercase sm:text-3xl">Reach Out 📫</h2>
 
@@ -82,7 +85,9 @@ const HomePage = async () => {
 		<main className="flex flex-col items-center justify-center gap-12 px-4 py-10">
 			<BrandSection />
 
-			<ExperiencesSection experiences={profile.experiences} />
+			<div id="experience" className="flex w-full justify-center">
+				<ExperiencesSection experiences={profile.experiences} />
+			</div>
 
 			<ContactLinksSection />
 

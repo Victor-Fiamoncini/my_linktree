@@ -2,6 +2,8 @@ import { Analytics } from '@vercel/analytics/next'
 import { Geist, Geist_Mono } from 'next/font/google'
 
 import { GetXpYearsUseCase } from '@/core/application/use-cases/get-xp-years-use-case'
+import Footer from '@/components/footer'
+import Header from '@/components/header'
 
 import '@/app/globals.css'
 
@@ -95,7 +97,11 @@ export default function RootLayout({ children }) {
 	return (
 		<html lang="en">
 			<body className={`${geistSans.variable} ${geistMono.variable} bg-stone-400 antialiased`}>
+				<Header />
+
 				{children}
+
+				<Footer />
 
 				<Analytics />
 			</body>
