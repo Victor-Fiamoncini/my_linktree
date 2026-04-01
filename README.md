@@ -44,13 +44,13 @@ npm run dev
 
 Required environment variables (see `.env.example`):
 
-| Variable | Description |
-|---|---|
-| `MAILER_RESEND_API_KEY` | Resend API key |
-| `MAILER_SENDER_EMAIL` | From address for contact emails |
-| `MAILER_RECIPIENT_EMAIL` | Destination for contact form submissions |
-| `STORAGE_KV_REST_API_URL` | Upstash Redis REST URL |
-| `STORAGE_KV_REST_API_TOKEN` | Upstash Redis REST token |
+| Variable                    | Description                              |
+|-----------------------------|------------------------------------------|
+| `MAILER_RESEND_API_KEY`     | Resend API key                           |
+| `MAILER_SENDER_EMAIL`       | From address for contact emails          |
+| `MAILER_RECIPIENT_EMAIL`    | Destination for contact form submissions |
+| `STORAGE_KV_REST_API_URL`   | Upstash Redis REST URL                   |
+| `STORAGE_KV_REST_API_TOKEN` | Upstash Redis REST token                 |
 
 ## Testing
 
