@@ -64,6 +64,11 @@ const ContactFormSection = () => (
 		<div className="border-4 border-black bg-white p-8 shadow-[6px_6px_0px_0px_#60a5fa]">
 			<h2 className="mb-6 text-2xl font-bold tracking-widest text-black uppercase sm:text-3xl">Reach Out 📫</h2>
 
+			<p className="mb-6 text-justify text-sm text-gray-700">
+				Working on something interesting? I&#39;m always open to remote roles, freelance work, and fullstack
+				collaboration. If you have a project in mind, let&#39;s talk.
+			</p>
+
 			<ContactForm />
 		</div>
 	</section>
