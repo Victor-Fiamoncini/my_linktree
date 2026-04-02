@@ -1,8 +1,8 @@
 @import 'tailwindcss';
 
 html {
-	scroll-behavior: smooth;
-	scroll-padding-top: 64px;
+	@apply scroll-smooth;
+	@apply scroll-pt-[64px];
 }
 
 @theme inline {
