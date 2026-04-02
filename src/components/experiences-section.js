@@ -49,7 +49,11 @@ const ExperienceEntry = ({ experience }) => (
 		<div className="flex items-center justify-between">
 			<p className="text-lg font-bold text-black">{experience.role}</p>
 
-			{experience.countryFlag && <span className="text-xl">{experience.countryFlag}</span>}
+			{experience.countryFlag && (
+				<span className="text-xl" title={experience.countryName}>
+					{experience.countryFlag}
+				</span>
+			)}
 		</div>
 
 		<p className="mb-1 text-sm font-semibold text-gray-600">
