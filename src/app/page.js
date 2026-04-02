@@ -82,16 +82,16 @@ const HomePage = async () => {
 	const profile = await getProfileUseCase.execute()
 
 	return (
-		<main className="flex flex-col items-center justify-center gap-12 px-4 py-10">
+		<main className="flex flex-col items-center justify-center gap-12 px-4 py-12">
 			<BrandSection />
 
 			<div id="experience" className="flex w-full justify-center">
 				<ExperiencesSection experiences={profile.experiences} />
 			</div>
 
-			<ContactLinksSection />
-
 			<ContactFormSection />
+
+			<ContactLinksSection />
 		</main>
 	)
 }
