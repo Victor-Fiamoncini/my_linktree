@@ -2,7 +2,7 @@
 
 html {
 	@apply scroll-smooth;
-	@apply scroll-pt-[64px];
+	@apply scroll-pt-[96px];
 }
 
 @theme inline {
