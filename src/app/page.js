@@ -10,13 +10,25 @@ import { MemoryDatabase } from '@/core/infrastructure/database/memory-database'
 
 const BrandSection = () => {
 	const getXpYearsUseCase = new GetXpYearsUseCase()
-	const brandingText = `I've been working since ${getXpYearsUseCase.startYearOfWork} on both company and freelance projects. Currently, I focus on back-end development using PHP (Laravel/Symfony) and Node.js, while also building personal projects with Next.js`
+	const brandingText = `I've been working since ${getXpYearsUseCase.startYearOfWork} on both company and freelance projects. Currently, I focus on back-end development using PHP (Laravel/Symfony), while also building personal projects with Ruby on Rails and Next.js`
 
 	return (
 		<section
 			id="about"
 			className="w-full max-w-3xl border-4 border-black bg-white p-8 text-center shadow-[6px_6px_0px_0px_#60a5fa]"
 		>
+			<div className="mb-8">
+				<a
+					className="star-power-btn inline-block border-4 border-black px-6 py-3 text-base font-black tracking-widest uppercase"
+					href="https://myblog.victorfiamon.com.br/"
+					target="_blank"
+					rel="noopener noreferrer"
+					title="Check My Blog"
+				>
+					Check My Blog
+				</a>
+			</div>
+
 			<a
 				className="mb-8 inline-block border-4 border-black shadow-[4px_4px_0px_0px_#60a5fa] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none"
 				href="https://www.linkedin.com/in/victor-fiamoncini-b74b72159"
