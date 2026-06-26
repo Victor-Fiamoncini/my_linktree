@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { FaLinkedin, FaGithub, FaInstagram } from 'react-icons/fa'
+import { FaLinkedin, FaGithub } from 'react-icons/fa'
 
 import ContactForm from '@/components/contact-form'
 import ExternalLink from '@/components/external-link'
@@ -17,18 +17,6 @@ const BrandSection = () => {
 			id="about"
 			className="w-full max-w-3xl border-4 border-black bg-white p-8 text-center shadow-[6px_6px_0px_0px_#60a5fa]"
 		>
-			<div className="mb-8">
-				<a
-					className="star-power-btn inline-block border-4 border-black px-6 py-3 text-base font-black tracking-widest uppercase"
-					href="https://myblog.victorfiamon.com.br/"
-					target="_blank"
-					rel="noopener noreferrer"
-					title="Check My Blog"
-				>
-					Check My Blog
-				</a>
-			</div>
-
 			<a
 				className="mb-8 inline-block border-4 border-black shadow-[4px_4px_0px_0px_#60a5fa] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none"
 				href="https://www.linkedin.com/in/victor-fiamoncini-b74b72159"
@@ -58,17 +46,17 @@ const BrandSection = () => {
 
 const ContactLinksSection = () => (
 	<section className="text-center">
-		<ul className="flex flex-row justify-center gap-4 align-middle">
-			<li title="Linkedin">
-				<ExternalLink link="https://www.linkedin.com/in/victor-fiamoncini-b74b72159" icon={FaLinkedin} />
+		<ul className="flex flex-col justify-center gap-4 align-middle min-[375px]:flex-row">
+			<li className="w-full min-[375px]:w-auto">
+				<ExternalLink
+					link="https://www.linkedin.com/in/victor-fiamoncini-b74b72159"
+					icon={FaLinkedin}
+					label="LinkedIn"
+				/>
 			</li>
 
-			<li title="Github">
-				<ExternalLink link="https://github.com/Victor-Fiamoncini" icon={FaGithub} />
-			</li>
-
-			<li title="Instagram">
-				<ExternalLink link="https://www.instagram.com/victorfiamon" icon={FaInstagram} />
+			<li className="w-full min-[375px]:w-auto">
+				<ExternalLink link="https://github.com/Victor-Fiamoncini" icon={FaGithub} label="GitHub" />
 			</li>
 		</ul>
 	</section>

@@ -38,20 +38,32 @@ describe('ExternalLink', () => {
 		expect(screen.getByTestId('link-icon')).toBeInTheDocument()
 	})
 
-	it('passes size={32} to the icon component', () => {
+	it('passes size={28} to the icon component', () => {
 		render(<ExternalLink icon={MockIcon} link="https://example.com" />)
 
-		expect(screen.getByTestId('link-icon')).toHaveAttribute('width', '32')
-		expect(screen.getByTestId('link-icon')).toHaveAttribute('height', '32')
+		expect(screen.getByTestId('link-icon')).toHaveAttribute('width', '28')
+		expect(screen.getByTestId('link-icon')).toHaveAttribute('height', '28')
 	})
 
 	it('renders different links correctly', () => {
-		const links = ['https://linkedin.com/in/victor', 'https://github.com/victor', 'https://instagram.com/victor']
+		const links = ['https://linkedin.com/in/victor', 'https://github.com/victor']
 
 		links.forEach(link => {
 			const { unmount } = render(<ExternalLink icon={MockIcon} link={link} />)
 			expect(screen.getByRole('link')).toHaveAttribute('href', link)
 			unmount()
 		})
+	})
+
+	it('renders the label when provided', () => {
+		render(<ExternalLink icon={MockIcon} link="https://example.com" label="LinkedIn" />)
+
+		expect(screen.getByText('LinkedIn')).toBeInTheDocument()
+	})
+
+	it('does not render a label element when label is not provided', () => {
+		render(<ExternalLink icon={MockIcon} link="https://example.com" />)
+
+		expect(screen.queryByText('LinkedIn')).not.toBeInTheDocument()
 	})
 })
