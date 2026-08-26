@@ -29,41 +29,37 @@ header you'll see in every example below).
 | Response shape              | Whatever the endpoint returns (JSON, HTML, etc.)                | Always a JSON-RPC envelope; tool results are wrapped in `{ content: [...] }` so text, images, etc. can be mixed                                        |
 | Errors                      | HTTP status codes (`404`, `422`, `500`)                         | Usually HTTP `200` with `isError: true` inside the JSON-RPC result — the _transport_ succeeded even if the _tool_ failed (see §3's validation example) |
 
-In this repo, `/api/mcp` (`src/app/api/mcp/route.js`) and `/api/telemetry` (a plain REST-style
-`GET` returning JSON) sit side by side as a concrete example of the difference: `/api/telemetry`
-is a normal endpoint you'd curl or `fetch()` from code that already knows its shape; `/api/mcp` is
-built to be pointed at from an agent's config (see `HireFromAgent`'s AGENTS.md snippet on the
-homepage) which then discovers `get_resume`, `list_services`, etc. on its own.
+In this repo, `/api/mcp` (`app/controllers/api/mcp_controller.rb`) and `/api/telemetry` (a plain
+REST-style `GET` returning JSON) sit side by side as a concrete example of the difference:
+`/api/telemetry` is a normal endpoint you'd curl or `fetch()` from code that already knows its
+shape; `/api/mcp` is built to be pointed at from an agent's config (see the AGENTS.md snippet on
+the homepage) which then discovers `get_resume`, `list_services`, etc. on its own.
 
 ## 1. Automated tests
 
 ```bash
-npm run test                                # everything
-npx vitest src/app/api/mcp/route.test.js    # just the MCP route
+bundle exec rspec                              # everything
+bundle exec rspec spec/requests/api/mcp_spec.rb # just the MCP endpoint
 ```
 
-These mock every collaborator (mailer, booking store, connection log, rate limiter), so they
-never hit Redis, Resend, or the network. Good for verifying logic changes; not a substitute for
-poking the real endpoint below.
+These hit a real (test) Postgres database but never Resend or the network — mail delivery is
+`:test` in the test environment (captured in `ActionMailer::Base.deliveries`, never sent). Good
+for verifying logic changes; not a substitute for poking the real endpoint below.
 
 ## 2. Local setup
 
 ```bash
-cp .env.example .env.local   # if you haven't already
-docker compose up -d         # local Redis, backs the rate limiter + booking store
-npm run dev
+cp .env.example .env    # if you haven't already
+docker compose up -d    # local Postgres 16 — backs the rate limiter (Solid Cache), bookings, telemetry
+bin/rails db:create db:migrate
+bin/dev
 ```
 
-Set this in `.env.local` before doing any manual testing:
-
-```
-MAILER_DRIVER="console"
-```
-
-`schedule_meeting` sends real confirmation emails via Resend. With `MAILER_DRIVER=console`,
-`createMailer()` (`src/core/infrastructure/mailer/create-mailer.js`) swaps in a `ConsoleMailer`
-that logs the email to your terminal instead of sending it. **Without this, every booking test
-sends two real emails.** Watch the `npm run dev` terminal output to see the logged emails.
+No env var switch is needed for manual testing — `config.action_mailer.delivery_method` is
+already `:test` in development (see `config/environments/development.rb`), so `schedule_meeting`
+never sends a real email locally; it's just captured in `ActionMailer::Base.deliveries`. Add
+`Rails.logger.info(ActionMailer::Base.deliveries.last.body)` in a `bin/rails console`, or bump the
+delivery method to `:file`/`:letter_opener` locally, if you want to actually read one.
 
 Stop everything when you're done:
 
@@ -75,7 +71,7 @@ docker compose down
 
 MCP runs JSON-RPC 2.0 over HTTP. Every request needs both `Content-Type: application/json` and
 `Accept: application/json, text/event-stream` — the server replies as a Server-Sent Event even
-for a single response. `npm run dev` prints the port (3000, or the next free one).
+for a single response. `bin/dev` prints the port (3000, or the next free one).
 
 ### Handshake
 

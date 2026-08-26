@@ -5,159 +5,141 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm run dev              # Start development server
-npm run build            # Build for production
-npm run start            # Run production build
-npm run test             # Run all tests (Vitest)
-npm run lint             # Run ESLint
-npm run format:check     # Check formatting
-npm run format           # Auto-fix formatting
-npm run commit           # Commitizen interactive commit
+bin/dev                  # Rails server + Tailwind CSS watcher (foreman via Procfile.dev)
+bin/rails server           # Rails server only (no Tailwind watcher — CSS won't rebuild on change)
+bundle exec rspec          # Run all tests
+bin/rubocop                # Lint (rubocop-rails-omakase)
+bin/rails db:migrate        # Run pending migrations
+bin/rails db:create db:migrate  # First-time setup, after `docker compose up -d`
 ```
 
 Run a single test file:
 
 ```bash
-npx vitest src/components/contact-form.test.jsx
+bundle exec rspec spec/requests/api/mcp_spec.rb
 ```
 
-Node version: 22.21.1 (see `.nvmrc`).
+Ruby version: see `.ruby-version`. Rails 8.1.
 
-Rate limiting, the booking store, and agent connection telemetry are all backed by Upstash Redis.
-For local development, run `docker compose up -d` (see `compose.yml`) and point `STORAGE_KV_REST_API_URL`/`STORAGE_KV_REST_API_TOKEN` at it — `.env.example` has the exact values to use.
+Postgres 16 is required for local development — run `docker compose up -d` (see `compose.yml`).
+There is no Redis anywhere in this app: rate limiting, background jobs, and (in production)
+ActionCable all ride on Rails 8's Postgres-backed Solid Cache / Solid Queue / Solid Cable.
 
 ## Environment Variables
 
-Copy `.env.example` to `.env.local` for local development. Required vars:
+Copy `.env.example` to `.env` for local development (loaded via `dotenv-rails`). Required vars:
 
-- `MAILER_RESEND_API_KEY` — API key for the Resend email service
-- `MAILER_SENDER_EMAIL` — From address for contact emails
-- `MAILER_RECIPIENT_EMAIL` — Where contact form submissions are sent
-- `STORAGE_KV_REST_API_URL` — Upstash Redis REST URL (rate limiting)
-- `STORAGE_KV_REST_API_TOKEN` — Upstash Redis REST token (rate limiting)
+- `DATABASE_HOST` / `DATABASE_USERNAME` / `DATABASE_PASSWORD` — Postgres connection, matching `compose.yml`
+- `MAILER_SENDER_EMAIL` — From address for contact/meeting emails
+- `MAILER_RECIPIENT_EMAIL` — Where contact form submissions and meeting notifications are sent
+- `MAILER_RESEND_API_KEY` — Resend API key, only used in production
 
-Optional:
-
-- `MAILER_DRIVER` — Set to `console` to log emails instead of sending them via Resend. Use this locally to avoid sending real email when testing the contact form or MCP `schedule_meeting` tool. `createMailer()` (`src/core/infrastructure/mailer/create-mailer.js`) selects the mailer; both API routes use it instead of instantiating `ResendMailer` directly.
+`config.action_mailer.delivery_method` is `:test` in development (mail is captured in
+`ActionMailer::Base.deliveries`, nothing is sent) and `:resend` in production (via the `resend`
+gem's Railtie-registered ActionMailer delivery method, configured in
+`config/initializers/resend.rb`). There is no more `MAILER_DRIVER` env var — the switch is purely
+per-environment now.
 
 ## Architecture
 
-This is a Next.js 16 / React 19 personal landing page. The codebase follows a layered architecture separating core business logic from the Next.js framework. It also serves an MCP server so AI agents can read the resume, check availability, and book a meeting — see `docs/testing-mcp.md` for what MCP is and how to exercise it manually.
+This is a Rails 8 personal landing page using Hotwire (Turbo + Stimulus via importmap — no Node,
+no JS bundler). It also serves an MCP server so AI agents can read the resume, check availability,
+and book a meeting — see `docs/testing-mcp.md` for what MCP is and how to exercise it manually.
 
 ```
-src/
-  app/                        # Next.js App Router (routes, layout, global CSS)
-    api/contact/
-      route.js                # POST handler — returns 204 on success
-      route.test.js           # API route unit tests (mailer + rate limiter mocked)
-    api/mcp/
-      route.js                # POST/GET handler — registers 4 tools via mcp-handler, wraps 2 rate limiters
-      route.test.js
-    api/telemetry/
-      route.js                # GET handler — recent agent connections as JSON
-      route.test.js
-    telemetry/page.js         # /telemetry — renders <TelemetryFeed />
-    layout.js                 # Root layout with metadata/SEO
-    page.js                   # Home page (server component)
-  components/                 # React client components (co-located with tests)
-    contact-form.js
-    contact-form.test.jsx
-    external-link.js
-    external-link.test.jsx
-    hire-from-agent.js        # AGENTS.md snippet + copy button, shown on the homepage
-    hire-from-agent.test.jsx
-    telemetry-feed.js         # Client component, polls /api/telemetry every 5s
-    telemetry-feed.test.jsx
-    smooth-scroll.js          # Wires up Lenis smooth scrolling
-  core/
-    application/use-cases/    # Business logic (framework-agnostic, co-located with tests)
-      get-profile-use-case.js
-      list-services-use-case.js
-      check-availability-use-case.js
-      schedule-meeting-use-case.js
-      record-agent-connection-use-case.js
-      list-recent-connections-use-case.js
-      send-contact-email-use-case.js
-    infrastructure/           # External service adapters and error classes
-      errors.js               # MissingRequiredFieldsError, SlotUnavailableError, TooManyRequestsError, InternalServerError
-      mailer/
-        resend-mailer.js       # Real Resend adapter
-        console-mailer.js      # Logs the email instead of sending it (local dev)
-        create-mailer.js       # Factory: picks Resend vs. console mailer via MAILER_DRIVER
-      rate-limiter/
-        upstash-rate-limiter.js               # Sliding window via @upstash/ratelimit
-        upstash-rate-limiter.test.js          # Unit tests (Ratelimit mocked)
-        upstash-rate-limiter.integration.test.js  # Integration tests (fake in-memory Ratelimit)
-      scheduling/
-        availability-config.js       # Timezone, weekly windows, slot duration, booking horizon
-        upstash-booking-store.js     # Reads/writes booked slots in Upstash Redis
-      telemetry/
-        upstash-connection-log.js    # Appends/reads MCP tool-call records in Upstash Redis
-  e2e-setup.js                # Global test setup (jest-dom matchers + RTL cleanup)
+app/
+  controllers/
+    application_controller.rb   # sets @default_description, allow_browser :modern
+    pages_controller.rb         # GET / (home)
+    telemetry_page_controller.rb # GET /telemetry
+    static_controller.rb        # AGENTS.md, llms.txt, sitemap.xml
+    api/
+      contacts_controller.rb    # POST /api/contact — 204/400/429/500
+      telemetry_controller.rb   # GET /api/telemetry — last 50 {tool, timestamp}, no auth
+      mcp_controller.rb         # POST/GET /api/mcp — see "MCP server" below
+      profile_controller.rb     # GET /api/profile
+  mailers/
+    contact_mailer.rb           # new_contact
+    meeting_mailer.rb           # confirmation, notification
+  models/
+    booking.rb                  # unique index on slot_start prevents double-booking
+    agent_connection.rb         # MCP tool-call telemetry
+  services/
+    use_cases/                  # framework-agnostic business logic, constructor-injected deps
+      get_profile_use_case.rb
+      list_services_use_case.rb
+      get_xp_years_use_case.rb
+      check_availability_use_case.rb   # timezone-aware slot generation (ActiveSupport::TimeZone)
+      schedule_meeting_use_case.rb     # composes CheckAvailabilityUseCase, books + emails
+      send_contact_email_use_case.rb
+      record_agent_connection_use_case.rb
+      list_recent_connections_use_case.rb
+    rate_limiter.rb             # Rails.cache (Solid Cache)-backed; blank identifier = always allowed
+    config_database.rb          # loads config/profile.yml (static resume/services data)
+    seo_config.rb
+    agents_content.rb           # AGENTS.md content, shared by the UI snippet and /AGENTS.md route
+  mcp_tools/                    # MCP::Tool subclasses: get_resume, list_services,
+                                 # check_availability, schedule_meeting
+  errors/                       # ApplicationError + 4 subclasses (see "Errors" below)
+  javascript/controllers/       # Stimulus: contact_form, telemetry_feed, mobile_nav,
+                                 # experiences_tabs, hire_from_agent
+  views/
+    layouts/application.html.erb
+    pages/                      # home.html.erb + partials (hero, experiences, contact, etc.)
+    telemetry_page/show.html.erb
+    shared/                     # header, footer, external_link, person_json_ld partials
+config/
+  profile.yml                  # static resume/services data (was memory-database.js)
+  availability.yml             # timezone, weekly windows, slot duration, booking horizon
+  database.yml                 # dev/test use ENV-driven Postgres connection
 ```
 
 ### Key design decisions
 
-- **Use cases** (`src/core/application/use-cases/`) contain all business logic and are plain JS classes with no Next.js dependency. They are unit-tested in isolation using Vitest with mocked dependencies.
-- **Infrastructure** (`src/core/infrastructure/`) wraps external services. `createMailer()` picks `ResendMailer` or `ConsoleMailer` (via `MAILER_DRIVER`) and is injected into `SendContactEmailUseCase` / `ScheduleMeetingUseCase` via constructor injection. `UpstashRateLimiter` wraps `@upstash/ratelimit` with a sliding window algorithm; `UpstashBookingStore` and `UpstashConnectionLog` similarly wrap Upstash Redis for bookings and agent-connection telemetry.
-- **API routes** (`src/app/api/*/route.js`) are composition roots — they wire infrastructure to use cases and translate HTTP (or JSON-RPC, for `/api/mcp`) concerns.
-  - `/api/contact`: `204` on success, `400` for validation errors, `429` when rate-limited, `500` for mailer failures.
-  - `/api/mcp`: registers `get_resume`, `list_services`, `check_availability`, `schedule_meeting` as MCP tools via `mcp-handler`; each call is recorded through `RecordAgentConnectionUseCase`. Has its own general rate limiter (30/min) plus a stricter one (3/10min) specifically for `schedule_meeting`.
-  - Both routes: rate limiting only applies when an IP header is present — requests without `x-forwarded-for` or `x-real-ip` skip rate limiting entirely.
-- **`@/` alias** maps to `src/` (configured in `jsconfig.json`).
-- React Compiler is enabled (`reactCompiler: true` in `next.config.mjs`).
+- **Use cases** (`app/services/use_cases/`) contain all business logic and have no controller/view
+  dependency. They're unit-tested in isolation using RSpec with doubles/instance_doubles for
+  collaborators.
+- **Errors** (`app/errors/`): `ApplicationError` is a `StandardError` subclass with an `action`
+  message and a custom `#as_json` returning `{ name, message, action }`. Four subclasses:
+  `MissingRequiredFieldsError` (400), `SlotUnavailableError` (surfaced as MCP `isError: true`, not
+  an HTTP status), `TooManyRequestsError` (429), `InternalServerError` (500).
+- **Rate limiting**: `RateLimiter` wraps `Rails.cache` (`Rails.cache.increment` with `expires_in`),
+  which is Solid Cache (Postgres-backed) in both development and production, and `MemoryStore` in
+  test. Used explicitly inside `Api::ContactsController` and `Api::McpController` rather than
+  Rails' declarative `rate_limit` class macro, because the `schedule_meeting`-specific throttle
+  needs to inspect the parsed JSON-RPC body before deciding which limiter(s) apply. A blank
+  identifier (no `x-forwarded-for`/`x-real-ip` header) always returns `allowed? == true` — rate
+  limiting is skipped entirely for such requests, matching the original behavior.
+- **MCP server** (`Api::McpController`): builds a fresh `MCP::Server` + stateless
+  `MCP::Server::Transports::StreamableHTTPTransport` per request (official `mcp` gem), and proxies
+  its Rack `[status, headers, body]` triple straight through the Rails response (`self.status=`,
+  `response.set_header`, `self.response_body=`) rather than using `render`, so both the plain-JSON
+  and SSE response shapes pass through untouched. The 4 `MCP::Tool` subclasses deliberately don't
+  declare `required:` in their `input_schema` — the gem short-circuits before calling the tool when
+  required args are missing, but the original behavior (and this port's) records the agent
+  connection *before* validating, even for calls that go on to fail. Validation instead happens
+  inside the use cases, with domain errors caught in the tool's `call` and turned into
+  `MCP::Tool::Response.new(..., error: true)` rather than raised.
+- **`@/` alias**: none — this is a standard Rails app, autoloaded via Zeitwerk from `app/*`.
+  `app/services/use_cases/*.rb` autoloads as `UseCases::*` (the `use_cases` subdirectory becomes an
+  implicit namespace under the `app/services` root).
 
 ## Testing
 
-Tests are co-located with the source files they cover (e.g. `contact-form.test.jsx` lives next to `contact-form.js`).
+RSpec, with specs co-located by type under `spec/` (`spec/models`, `spec/services/use_cases`,
+`spec/requests/api`).
 
-For manually calling the MCP server (raw JSON-RPC requests, listing tools, booking a slot, checking rate limits and telemetry), see [`docs/testing-mcp.md`](docs/testing-mcp.md) — it also explains what MCP is and how it differs from plain HTTP/REST.
-
-### Vitest configuration (`vitest.config.js`)
-
-A custom esbuild plugin transforms JSX in all `.js`/`.jsx` source files. This is necessary because `@vitejs/plugin-react` skips SSR-mode transforms, which is the mode Vitest always uses — without this, Next.js components written with `.js` extensions (containing JSX) would fail to load.
-
-### jsdom environment
-
-Component tests that render React require the jsdom environment. Add this docblock as the **first line** of any `.jsx` test file that calls `render`:
-
-```js
-// @vitest-environment jsdom
-```
-
-`environmentMatchGlobs` in the Vitest config does not work reliably for this project (absolute path matching issue), so the per-file docblock is the required approach.
-
-### Mocking constructors in API route tests
-
-Vitest 4 requires `function` or `class` syntax (not arrow functions) for mocks used as constructors. Use `vi.hoisted()` to share the mock reference between the factory and test assertions:
-
-```js
-const mockSendEmail = vi.hoisted(() => vi.fn())
-const mockIsAllowed = vi.hoisted(() => vi.fn())
-
-vi.mock('@/core/infrastructure/mailer/resend-mailer', () => ({
-	ResendMailer: class {
-		constructor() {
-			this.sendEmail = mockSendEmail
-		}
-	},
-}))
-
-vi.mock('@/core/infrastructure/rate-limiter/upstash-rate-limiter', () => ({
-	UpstashRateLimiter: class {
-		constructor() {
-			this.isAllowed = mockIsAllowed
-		}
-	},
-}))
-```
-
-`mockIsAllowed` must return a promise (`mockResolvedValue`) since `isAllowed` is async.
-
-### Integration tests with `vi.resetModules()`
-
-`upstash-rate-limiter.integration.test.js` uses `vi.resetModules()` in `beforeEach` to force `route.js` to re-execute on each test, creating a fresh `UpstashRateLimiter` instance. The `@upstash/ratelimit` and `@upstash/redis` modules are mocked at the top of the file with an in-memory sliding window implementation, so the real `UpstashRateLimiter` class code is exercised without a live Redis connection.
+- `Rails.cache.clear` runs before every example (`spec/rails_helper.rb`) — `RateLimiter` instances
+  are memoized as controller-level constants and share the process-wide cache, so state must be
+  reset between examples or one spec's requests would count toward another spec's rate limit.
+- The `mcp` gem's DNS-rebinding protection only allows loopback `Host` headers by default; request
+  specs against `/api/mcp` need `host! "127.0.0.1"` (Rails' request-spec default host,
+  `www.example.com`, gets rejected with 403).
+- Use `travel_to`/`around { |example| travel_to(...) { example.run } }`
+  (`ActiveSupport::Testing::TimeHelpers`, included globally) for anything touching
+  `CheckAvailabilityUseCase` or `GetXpYearsUseCase` — both are date-sensitive.
 
 ## Code Style
 
-Prettier is enforced (no semicolons, single quotes, trailing commas ES5, 120-char print width). ESLint uses `eslint-config-next/core-web-vitals`.
+Rubocop with `rubocop-rails-omakase` (Rails' default Omakase style — no custom `.rubocop.yml`
+rules beyond what the generator added). Run `bin/rubocop -A` to auto-correct.
