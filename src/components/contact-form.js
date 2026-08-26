@@ -2,6 +2,9 @@
 
 import { useState } from 'react'
 
+const INPUT_CLASS_NAME =
+	'bg-ctp-mantle border-ctp-surface1 text-ctp-text rounded-btn focus:border-ctp-blue w-full border px-[14px] py-3 text-[15px] transition-colors outline-none'
+
 export default function ContactForm() {
 	const [formData, setFormData] = useState({ name: '', email: '', message: '' })
 	const [status, setStatus] = useState('neutral') // 'neutral', 'sending', 'success', 'error'
@@ -30,55 +33,51 @@ export default function ContactForm() {
 	}
 
 	return (
-		<form onSubmit={handleSubmit} className="flex w-full flex-col items-center gap-4">
-			<div className="w-full text-left">
-				<label htmlFor="name" className="mb-1 block text-sm font-bold tracking-wide text-black uppercase">
-					Name
+		<form onSubmit={handleSubmit} className="grid w-full gap-4">
+			<div className="grid grid-cols-1 gap-4 min-[500px]:grid-cols-2">
+				<label className="grid gap-2">
+					<span className="text-ctp-subtext0 font-mono text-xs">name</span>
+
+					<input
+						id="name"
+						className={INPUT_CLASS_NAME}
+						type="text"
+						value={formData.name}
+						onChange={event => setFormData({ ...formData, name: event.target.value })}
+						required
+					/>
 				</label>
 
-				<input
-					id="name"
-					className="w-full border-4 border-black bg-white px-4 py-2 font-semibold text-black transition-colors focus:border-blue-400 focus:outline-none"
-					type="text"
-					value={formData.name}
-					onChange={event => setFormData({ ...formData, name: event.target.value })}
-					required
-				/>
+				<label className="grid gap-2">
+					<span className="text-ctp-subtext0 font-mono text-xs">email</span>
+
+					<input
+						id="email"
+						className={INPUT_CLASS_NAME}
+						type="email"
+						value={formData.email}
+						onChange={event => setFormData({ ...formData, email: event.target.value })}
+						required
+					/>
+				</label>
 			</div>
 
-			<div className="w-full text-left">
-				<label htmlFor="email" className="mb-1 block text-sm font-bold tracking-wide text-black uppercase">
-					Email
-				</label>
-
-				<input
-					id="email"
-					className="w-full border-4 border-black bg-white px-4 py-2 font-semibold text-black transition-colors focus:border-blue-400 focus:outline-none"
-					type="email"
-					value={formData.email}
-					onChange={event => setFormData({ ...formData, email: event.target.value })}
-					required
-				/>
-			</div>
-
-			<div className="w-full text-left">
-				<label htmlFor="message" className="mb-1 block text-sm font-bold tracking-wide text-black uppercase">
-					Message
-				</label>
+			<label className="grid gap-2">
+				<span className="text-ctp-subtext0 font-mono text-xs">message</span>
 
 				<textarea
 					id="message"
-					className="w-full border-4 border-black bg-white px-4 py-2 font-semibold text-black transition-colors focus:border-blue-400 focus:outline-none"
-					rows="4"
+					className={`${INPUT_CLASS_NAME} resize-y`}
+					rows="5"
 					value={formData.message}
 					onChange={event => setFormData({ ...formData, message: event.target.value })}
 					required
 				/>
-			</div>
+			</label>
 
 			{status === 'neutral' || status === 'sending' ? (
 				<button
-					className="w-full cursor-pointer border-4 border-black bg-blue-400 px-4 py-3 font-bold text-black shadow-[4px_4px_0px_0px_#000000] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none disabled:translate-x-0 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-[4px_4px_0px_0px_#000000]"
+					className="bg-ctp-green text-ctp-crust rounded-btn hover:bg-ctp-teal cursor-pointer justify-self-center px-[26px] py-[13px] font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_20px_-4px_var(--color-ctp-teal)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none max-[531px]:w-full min-[500px]:justify-self-start"
 					type="submit"
 					title="Send Message"
 					disabled={status === 'sending' || !formData.name || !formData.email || !formData.message}
@@ -86,12 +85,12 @@ export default function ContactForm() {
 					{status === 'sending' ? 'Sending...' : 'Reach Out'}
 				</button>
 			) : status === 'success' ? (
-				<p className="w-full border-4 border-black bg-green-400 px-4 py-3 text-sm font-bold text-black">
+				<p className="bg-ctp-surface0 text-ctp-green rounded-btn w-full px-4 py-3 text-sm">
 					Thank you for your message! I&#39;ll get back to you as soon as possible.
 				</p>
 			) : (
 				status === 'error' && (
-					<p className="w-full border-4 border-black bg-red-400 px-4 py-3 text-sm font-bold text-black">
+					<p className="bg-ctp-surface0 text-ctp-red rounded-btn w-full px-4 py-3 text-sm">
 						Oops! Something went wrong while sending your message. Please try again later.
 					</p>
 				)

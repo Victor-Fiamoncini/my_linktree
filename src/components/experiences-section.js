@@ -30,55 +30,60 @@ const calcDuration = (startDate, endDate) => {
 }
 
 const TECH_CATEGORIES = [
-	{ key: 'backend', label: 'Backend', color: 'bg-blue-400' },
-	{ key: 'frontend', label: 'Frontend', color: 'bg-green-400' },
-	{ key: 'infra', label: 'Infra', color: 'bg-orange-400' },
-	{ key: 'otherTools', label: 'Tools', color: 'bg-purple-400' },
+	{ key: 'backend', label: 'Backend', accentClassName: 'text-ctp-blue' },
+	{ key: 'frontend', label: 'Frontend', accentClassName: 'text-ctp-mauve' },
+	{ key: 'infra', label: 'Infra', accentClassName: 'text-ctp-green' },
+	{ key: 'otherTools', label: 'Tools', accentClassName: 'text-ctp-yellow' },
 ]
 
-const TechBadge = ({ tech, color }) => (
-	<span
-		className={`border-2 border-black ${color} px-2 py-1 text-xs font-bold text-black shadow-[2px_2px_0px_0px_#000]`}
-	>
+const TAB_ACCENT_CLASS_NAMES = [
+	'text-ctp-blue min-[900px]:border-ctp-blue',
+	'text-ctp-mauve min-[900px]:border-ctp-mauve',
+	'text-ctp-green min-[900px]:border-ctp-green',
+	'text-ctp-yellow min-[900px]:border-ctp-yellow',
+]
+
+const TechChip = ({ tech }) => (
+	<span className="bg-ctp-base border-ctp-surface1 text-ctp-text rounded-chip border px-3 py-1.5 font-mono text-[13px]">
 		{tech}
 	</span>
 )
 
 const ExperienceEntry = ({ experience }) => (
-	<div className="mb-4 last:mb-0">
-		<div className="flex items-center justify-between">
-			<p className="text-lg font-bold text-black">{experience.role}</p>
+	<div>
+		<div className="mb-1.5 flex flex-wrap items-baseline gap-2.5">
+			<h3 className="text-ctp-text text-[23px] font-semibold">{experience.role}</h3>
 
-			{experience.countryFlag && (
-				<span className="text-xl" title={experience.countryName}>
-					{experience.countryFlag}
-				</span>
-			)}
+			<span className="text-ctp-mauve text-[19px] font-medium">@ {experience.company}</span>
 		</div>
 
-		<p className="mb-1 text-sm font-semibold text-gray-600">
+		<p className="text-ctp-subtext0 mb-1 font-mono text-[13px]">
 			{formatDate(experience.startDate)} — {formatDate(experience.endDate)}
-			<span className="ml-2 text-gray-400">({calcDuration(experience.startDate, experience.endDate)})</span>
+			<span className="text-ctp-overlay0 ml-2">({calcDuration(experience.startDate, experience.endDate)})</span>
 		</p>
 
-		<p className="mb-3 text-sm text-gray-500">{experience.location}</p>
+		<p className="text-ctp-overlay0 mb-[22px] flex items-center gap-2 font-mono text-[13px]">
+			<span>{experience.location}</span>
+
+			{experience.countryFlag && <span title={experience.countryName}>{experience.countryFlag}</span>}
+		</p>
 
 		{experience.description && (
-			<p className="mb-4 text-justify text-sm leading-relaxed text-gray-700">{experience.description}</p>
+			<p className="text-ctp-subtext1 mb-7 max-w-[62ch] text-base leading-[1.75] text-pretty">
+				{experience.description}
+			</p>
 		)}
 
-		{TECH_CATEGORIES.some(cat => experience[cat.key]?.length > 0) && (
-			<p className="mb-2 text-xs font-bold tracking-widest text-gray-500 uppercase">Technologies used</p>
-		)}
-
-		<div className="flex flex-col gap-3">
+		<div className="flex flex-col gap-[18px]">
 			{TECH_CATEGORIES.filter(cat => experience[cat.key]?.length > 0).map(cat => (
 				<div key={cat.key}>
-					<span className="mb-1 block text-xs font-bold tracking-wider text-gray-400 uppercase">{cat.label}</span>
+					<p className={`mb-2.5 font-mono text-[11px] font-medium tracking-[0.12em] uppercase ${cat.accentClassName}`}>
+						{cat.label}
+					</p>
 
 					<div className="flex flex-wrap gap-2">
 						{experience[cat.key].map(tech => (
-							<TechBadge key={tech} tech={tech} color={cat.color} />
+							<TechChip key={tech} tech={tech} />
 						))}
 					</div>
 				</div>
@@ -105,37 +110,41 @@ const ExperiencesSection = ({ experiences }) => {
 	const activeCompany = companies.find(g => g.company === activeTab)
 
 	return (
-		<section className="w-full max-w-3xl">
-			<div className="border-4 border-black bg-white shadow-[6px_6px_0px_0px_#60a5fa]">
-				<div className="border-b-4 border-black">
-					<h2 className="mb-6 flex items-center justify-center gap-2 px-8 pt-8 text-2xl font-bold tracking-widest text-black uppercase sm:text-3xl">
-						<span>Where I&#39;ve Worked</span>
+		<section id="experience" className="border-ctp-surface0 w-full max-w-[1080px] border-t pt-14 pb-14">
+			<p className="text-ctp-yellow mb-3.5 font-mono text-[13px] tracking-[0.06em]">$ cat career.log</p>
 
-						<span className="-translate-y-1">💼</span>
-					</h2>
+			<h2 className="text-ctp-text mb-10 text-[28px] font-semibold tracking-[-0.025em] min-[900px]:text-[34px]">
+				Where I&#39;ve worked
+			</h2>
 
-					<div className="flex overflow-x-auto">
-						{companies.map(group => (
+			<div className="flex flex-col gap-8 min-[900px]:grid min-[900px]:grid-cols-[210px_1fr] min-[900px]:items-start min-[900px]:gap-10">
+				<div className="border-ctp-surface0 flex gap-1 overflow-x-auto border-b pb-3 min-[900px]:flex-col min-[900px]:border-b-0 min-[900px]:border-l-2 min-[900px]:pb-0">
+					{companies.map((group, index) => {
+						const isActive = activeTab === group.company
+						const accentClassName = TAB_ACCENT_CLASS_NAMES[index % TAB_ACCENT_CLASS_NAMES.length]
+
+						return (
 							<button
 								key={group.company}
 								onClick={() => setActiveTab(group.company)}
-								className={`min-w-max flex-1 cursor-pointer border-t-2 border-r-2 border-black px-4 py-2 text-sm font-bold whitespace-nowrap transition-all duration-150 last:border-r-0 ${
-									activeTab === group.company
-										? 'bg-blue-400 text-black shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.2)]'
-										: 'bg-gray-100 text-black shadow-[2px_2px_0px_0px_#000] hover:bg-gray-200'
-								}`}
 								title={group.company}
+								className={`rounded-chip min-w-max cursor-pointer px-4 py-2.5 text-left font-mono text-[15px] whitespace-nowrap transition-all duration-[180ms] min-[900px]:-ml-0.5 min-[900px]:rounded-none min-[900px]:border-l-2 min-[900px]:border-transparent min-[900px]:px-4 min-[900px]:py-3 ${
+									isActive ? `bg-ctp-surface0 font-semibold ${accentClassName}` : 'text-ctp-subtext0 font-normal'
+								}`}
 							>
 								{group.company}
 							</button>
-						))}
-					</div>
+						)
+					})}
 				</div>
 
-				<div className="p-8">
+				<div
+					key={activeCompany?.company}
+					className="bg-ctp-mantle border-ctp-surface0 rounded-card animate-[fr-fade_0.28s_ease_both] border p-8"
+				>
 					{activeCompany?.entries.map((exp, index) => (
 						<div key={exp.id}>
-							{index > 0 && <hr className="my-4 border-t-2 border-dashed border-gray-300" />}
+							{index > 0 && <hr className="border-ctp-surface0 my-7 border-t border-dashed" />}
 
 							<ExperienceEntry experience={exp} />
 						</div>

@@ -38,11 +38,11 @@ describe('ExternalLink', () => {
 		expect(screen.getByTestId('link-icon')).toBeInTheDocument()
 	})
 
-	it('passes size={28} to the icon component', () => {
+	it('passes size={18} to the icon component', () => {
 		render(<ExternalLink icon={MockIcon} link="https://example.com" />)
 
-		expect(screen.getByTestId('link-icon')).toHaveAttribute('width', '28')
-		expect(screen.getByTestId('link-icon')).toHaveAttribute('height', '28')
+		expect(screen.getByTestId('link-icon')).toHaveAttribute('width', '18')
+		expect(screen.getByTestId('link-icon')).toHaveAttribute('height', '18')
 	})
 
 	it('renders different links correctly', () => {
@@ -65,5 +65,28 @@ describe('ExternalLink', () => {
 		render(<ExternalLink icon={MockIcon} link="https://example.com" />)
 
 		expect(screen.queryByText('LinkedIn')).not.toBeInTheDocument()
+	})
+
+	describe('card variant', () => {
+		it('renders the label and handle', () => {
+			render(
+				<ExternalLink
+					icon={MockIcon}
+					link="https://linkedin.com/in/victor"
+					label="LinkedIn"
+					handle="@victor"
+					variant="card"
+				/>
+			)
+
+			expect(screen.getByText('LinkedIn')).toBeInTheDocument()
+			expect(screen.getByText('@victor')).toBeInTheDocument()
+		})
+
+		it('does not render a handle element when handle is not provided', () => {
+			render(<ExternalLink icon={MockIcon} link="https://example.com" label="GitHub" variant="card" />)
+
+			expect(screen.queryByText('@victor')).not.toBeInTheDocument()
+		})
 	})
 })

@@ -1,5 +1,5 @@
 import { Analytics } from '@vercel/analytics/next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { JetBrains_Mono, Space_Grotesk } from 'next/font/google'
 
 import { GetXpYearsUseCase } from '@/core/application/use-cases/get-xp-years-use-case'
 import Footer from '@/components/footer'
@@ -13,13 +13,13 @@ import '@/app/globals.css'
 const getXpYearsUseCase = new GetXpYearsUseCase()
 const description = `Software Engineer with ${getXpYearsUseCase.execute()} years of experience in both companies and freelance projects. Currently focused on back-end development using PHP (Laravel/Symfony) and NodeJS, while also building personal projects with React and Next.js.`
 
-const geistSans = Geist({
-	variable: '--font-geist-sans',
+const spaceGrotesk = Space_Grotesk({
+	variable: '--font-space-grotesk',
 	subsets: ['latin'],
 })
 
-const geistMono = Geist_Mono({
-	variable: '--font-geist-mono',
+const jetBrainsMono = JetBrains_Mono({
+	variable: '--font-jetbrains-mono',
 	subsets: ['latin'],
 })
 
@@ -74,8 +74,8 @@ export const metadata = {
 	},
 	other: {
 		'X-UA-Compatible': 'ie=edge',
-		'msapplication-navbutton-color': '#60a5fa',
-		'apple-mobile-web-app-status-bar-style': '#60a5fa',
+		'msapplication-navbutton-color': '#8caaee',
+		'apple-mobile-web-app-status-bar-style': '#8caaee',
 	},
 	manifest: '/site.webmanifest',
 }
@@ -84,14 +84,14 @@ export const viewport = {
 	width: 'device-width',
 	initialScale: 1,
 	maximumScale: 1,
-	themeColor: '#60a5fa',
+	themeColor: '#8caaee',
 }
 
 export default function RootLayout({ children }) {
 	return (
 		<html lang="en">
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col bg-stone-400 antialiased`}
+				className={`${spaceGrotesk.variable} ${jetBrainsMono.variable} bg-ctp-base flex min-h-screen flex-col antialiased`}
 			>
 				<PersonJsonLd />
 

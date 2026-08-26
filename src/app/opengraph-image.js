@@ -18,12 +18,12 @@ export default async function OpengraphImage() {
 				flexDirection: 'column',
 				justifyContent: 'center',
 				alignItems: 'center',
-				backgroundColor: '#60a5fa',
+				backgroundColor: '#303446',
 				fontFamily: 'sans-serif',
 			}}
 		>
-			<div style={{ fontSize: 72, fontWeight: 700, color: '#000' }}>Victor Fiamoncini</div>
-			<div style={{ fontSize: 36, color: '#111', marginTop: 16 }}>
+			<div style={{ fontSize: 72, fontWeight: 700, color: '#c6d0f5' }}>Victor Fiamoncini</div>
+			<div style={{ fontSize: 36, color: '#8caaee', marginTop: 16 }}>
 				{`Software Engineer · ${getXpYearsUseCase.execute()}+ years experience`}
 			</div>
 		</div>,

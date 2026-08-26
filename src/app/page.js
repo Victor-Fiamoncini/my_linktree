@@ -4,76 +4,123 @@ import { FaLinkedin, FaGithub } from 'react-icons/fa'
 import ContactForm from '@/components/contact-form'
 import ExternalLink from '@/components/external-link'
 import ExperiencesSection from '@/components/experiences-section'
+import GetInTouchButton from '@/components/get-in-touch-button'
 import HireFromAgent from '@/components/hire-from-agent'
 import { GetXpYearsUseCase } from '@/core/application/use-cases/get-xp-years-use-case'
 import { GetProfileUseCase } from '@/core/application/use-cases/get-profile-use-case'
 import { MemoryDatabase } from '@/core/infrastructure/database/memory-database'
 
-const BrandSection = () => {
+const GITHUB_LINK = 'https://github.com/Victor-Fiamoncini'
+const LINKEDIN_LINK = 'https://www.linkedin.com/in/victor-fiamoncini-b74b72159'
+
+const SWATCH_CLASS_NAMES = [
+	'bg-ctp-blue',
+	'bg-ctp-mauve',
+	'bg-ctp-green',
+	'bg-ctp-yellow',
+	'bg-ctp-peach',
+	'bg-ctp-teal',
+]
+
+const HeroSection = () => {
 	const getXpYearsUseCase = new GetXpYearsUseCase()
-	const brandingText = `I've been working since ${getXpYearsUseCase.startYearOfWork} on both company and freelance projects. Currently, I focus on back-end development using PHP (Laravel/Symfony), while also building personal projects with Ruby on Rails and Next.js`
 
 	return (
 		<section
 			id="about"
-			className="w-full max-w-3xl border-4 border-black bg-white p-8 text-center shadow-[6px_6px_0px_0px_#60a5fa]"
+			className="grid w-full max-w-[1080px] items-center gap-12 pt-16 pb-14 min-[900px]:grid-cols-[1fr_260px] min-[900px]:gap-16 min-[900px]:pt-24"
 		>
-			<a
-				className="mb-8 inline-block border-4 border-black shadow-[4px_4px_0px_0px_#60a5fa] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none"
-				href="https://www.linkedin.com/in/victor-fiamoncini-b74b72159"
-				target="_blank"
-				rel="noopener noreferrer"
-				title="Linkedin"
-			>
-				<Image
-					className="block h-40 w-40 object-cover object-center"
-					src="/photo.jpg"
-					alt="Victor Fiamoncini Foto"
-					width={300}
-					height={300}
-				/>
-			</a>
+			<div>
+				<p className="text-ctp-green mb-5 font-mono text-[13px] tracking-[0.06em]">$ whoami</p>
 
-			<div className="mb-6 text-2xl font-bold text-black sm:text-4xl">
-				<h1 className="inline-block">Victor Fiamoncini 👨‍💻</h1>
+				<h1 className="text-ctp-text mb-6 text-[40px] leading-[1.04] font-bold tracking-[-0.035em] min-[900px]:text-[58px]">
+					Victor <span className="text-ctp-mauve">Fiamoncini</span>
+				</h1>
+
+				<p className="text-ctp-subtext1 mb-[18px] max-w-[46ch] text-[19px] leading-[1.6] text-pretty">
+					Software Engineer since {getXpYearsUseCase.startYearOfWork}, across company and freelance projects.
+				</p>
+
+				<p className="text-ctp-subtext0 mb-9 max-w-[52ch] text-[17px] leading-[1.7] text-pretty">
+					Currently focused on back-end development using PHP (Laravel/Symfony), while also building personal projects
+					with Ruby on Rails and Next.js.
+				</p>
+
+				<div className="flex flex-wrap gap-3">
+					<GetInTouchButton />
+
+					<ExternalLink link={GITHUB_LINK} icon={FaGithub} label="GitHub" />
+
+					<ExternalLink link={LINKEDIN_LINK} icon={FaLinkedin} label="LinkedIn" />
+				</div>
 			</div>
 
-			<p className="mb-4 text-xl font-semibold text-gray-900">Hey 👋 What&#39;s up?</p>
+			<div className="relative order-first justify-self-center min-[900px]:order-none min-[900px]:justify-self-end">
+				<div className="absolute -inset-2.5 rounded-[10px] bg-[linear-gradient(150deg,var(--color-ctp-blue),var(--color-ctp-mauve)_55%,var(--color-ctp-green))] opacity-50" />
 
-			<p className="mx-auto w-full font-semibold text-gray-700">{brandingText}</p>
+				<Image
+					className="border-ctp-surface1 rounded-card relative block h-[300px] w-[260px] border object-cover"
+					src="/photo.jpg"
+					alt="Victor Fiamoncini"
+					width={260}
+					height={300}
+				/>
+			</div>
 		</section>
 	)
 }
 
-const ContactLinksSection = () => (
-	<section className="text-center">
-		<ul className="flex flex-col justify-center gap-4 align-middle min-[375px]:flex-row">
-			<li className="w-full min-[375px]:w-auto">
-				<ExternalLink
-					link="https://www.linkedin.com/in/victor-fiamoncini-b74b72159"
-					icon={FaLinkedin}
-					label="LinkedIn"
-				/>
-			</li>
+const ContactAside = () => (
+	<div className="grid gap-3">
+		<ExternalLink
+			variant="card"
+			accent="blue"
+			icon={FaLinkedin}
+			label="LinkedIn"
+			handle="/in/victor-fiamoncini"
+			link={LINKEDIN_LINK}
+		/>
 
-			<li className="w-full min-[375px]:w-auto">
-				<ExternalLink link="https://github.com/Victor-Fiamoncini" icon={FaGithub} label="GitHub" />
-			</li>
-		</ul>
-	</section>
+		<ExternalLink
+			variant="card"
+			accent="mauve"
+			icon={FaGithub}
+			label="GitHub"
+			handle="Victor-Fiamoncini"
+			link={GITHUB_LINK}
+		/>
+
+		<div className="bg-ctp-mantle border-ctp-surface0 rounded-btn border px-5 py-[18px]">
+			<p className="text-ctp-overlay0 mb-2 font-mono text-xs tracking-[0.08em] uppercase">Theme</p>
+
+			<p className="text-ctp-subtext0 mb-3.5 text-sm">Catppuccin Frappé</p>
+
+			<div className="flex gap-1.5">
+				{SWATCH_CLASS_NAMES.map(className => (
+					<span key={className} className={`rounded-chip h-5 w-5 ${className}`} />
+				))}
+			</div>
+		</div>
+	</div>
 )
 
 const ContactFormSection = () => (
-	<section id="contact" className="w-full max-w-3xl text-center">
-		<div className="border-4 border-black bg-white p-8 shadow-[6px_6px_0px_0px_#60a5fa]">
-			<h2 className="mb-6 text-2xl font-bold tracking-widest text-black uppercase sm:text-3xl">Reach Out 📫</h2>
+	<section id="contact" className="border-ctp-surface0 w-full max-w-[1080px] border-t pt-14 pb-14">
+		<p className="text-ctp-teal mb-3.5 font-mono text-[13px] tracking-[0.06em]">$ echo &quot;let&#39;s talk&quot;</p>
 
-			<p className="mb-6 text-justify text-sm text-gray-700">
-				Working on something interesting? I&#39;m always open to remote roles, freelance work, and fullstack
-				collaboration. If you have a project in mind, let&#39;s talk.
-			</p>
+		<h2 className="text-ctp-text mb-4 text-[28px] font-semibold tracking-[-0.025em] min-[900px]:text-[34px]">
+			Reach out
+		</h2>
 
+		<p className="text-ctp-subtext0 mb-10 max-w-[58ch] text-[17px] leading-[1.7] text-pretty">
+			Working on something interesting? I&#39;m always open to remote roles, freelance work, and fullstack
+			collaboration. If you have a project in mind, let&#39;s talk.
+		</p>
+
+		<div className="grid gap-12 min-[900px]:grid-cols-[1.2fr_1fr] min-[900px]:items-start">
 			<ContactForm />
+
+			<ContactAside />
 		</div>
 	</section>
 )
@@ -83,18 +130,14 @@ const HomePage = async () => {
 	const profile = await getProfileUseCase.execute()
 
 	return (
-		<main className="flex flex-1 flex-col items-center justify-center gap-12 px-4 py-12">
-			<BrandSection />
+		<main className="flex flex-1 flex-col items-center px-8">
+			<HeroSection />
 
-			<div id="experience" className="flex w-full justify-center">
-				<ExperiencesSection experiences={profile.experiences} />
-			</div>
+			<ExperiencesSection experiences={profile.experiences} />
 
 			<HireFromAgent />
 
 			<ContactFormSection />
-
-			<ContactLinksSection />
 		</main>
 	)
 }

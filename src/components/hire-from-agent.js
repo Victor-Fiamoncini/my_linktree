@@ -20,45 +20,45 @@ export default function HireFromAgent() {
 	}
 
 	return (
-		<section id="agents" className="w-full max-w-3xl text-center">
-			<div className="border-4 border-black bg-white p-8 shadow-[6px_6px_0px_0px_#60a5fa]">
-				<h2 className="mb-6 text-2xl font-bold tracking-widest text-black uppercase sm:text-3xl">
-					Hire me from your agent 🤖
-				</h2>
+		<section id="agents" className="border-ctp-surface0 w-full max-w-[1080px] border-t pt-14 pb-14">
+			<p className="text-ctp-peach mb-3.5 font-mono text-[13px] tracking-[0.06em]">$ ./hire-me --no-human-required</p>
 
-				<p className="mb-6 text-justify text-sm text-gray-700">
-					This portfolio speaks MCP. Point your AI agent at the endpoint below to read my resume, check my services and
-					availability, and book a presentation — no human required.
-				</p>
+			<h2 className="text-ctp-text mb-4 text-[28px] font-semibold tracking-[-0.025em] min-[900px]:text-[34px]">
+				Hire me from your agent
+			</h2>
 
-				<div className="w-full text-left">
-					<div className="flex items-center justify-between border-4 border-b-0 border-black bg-[#181825] px-4 py-2">
-						<div className="flex items-center gap-3">
-							<span className="flex gap-1.5">
-								<span className="h-2.5 w-2.5 rounded-full bg-[#f38ba8]" />
-								<span className="h-2.5 w-2.5 rounded-full bg-[#f9e2af]" />
-								<span className="h-2.5 w-2.5 rounded-full bg-[#a6e3a1]" />
-							</span>
+			<p className="text-ctp-subtext0 mb-8 max-w-[62ch] text-[17px] leading-[1.7] text-pretty">
+				This portfolio speaks MCP. Point your AI agent at the endpoint below to read my resume, check my services and
+				availability, and book a presentation — no human required.
+			</p>
 
-							<span className="text-xs font-bold tracking-widest text-[#cdd6f4]">AGENTS.md</span>
-						</div>
+			<div className="w-full text-left">
+				<div className="border-ctp-surface0 rounded-t-btn flex items-center justify-between border border-b-0 bg-[#181825] px-4 py-2">
+					<div className="flex items-center gap-3">
+						<span className="flex gap-1.5">
+							<span className="h-2.5 w-2.5 rounded-full bg-[#f38ba8]" />
+							<span className="h-2.5 w-2.5 rounded-full bg-[#f9e2af]" />
+							<span className="h-2.5 w-2.5 rounded-full bg-[#a6e3a1]" />
+						</span>
 
-						<button
-							type="button"
-							onClick={handleCopy}
-							title="Copy AGENTS.md"
-							className={`cursor-pointer text-xs font-bold tracking-widest uppercase transition-colors ${
-								copied ? 'text-[#a6e3a1]' : 'text-[#89b4fa] hover:text-[#cdd6f4]'
-							}`}
-						>
-							{copied ? 'Copied!' : 'Copy'}
-						</button>
+						<span className="text-xs font-bold tracking-widest text-[#cdd6f4]">AGENTS.md</span>
 					</div>
 
-					<pre className="w-full overflow-x-auto border-4 border-black bg-[#1e1e2e] p-4 text-xs leading-relaxed font-semibold text-[#a6e3a1]">
-						<code>{AGENTS_MD_CONTENT}</code>
-					</pre>
+					<button
+						type="button"
+						onClick={handleCopy}
+						title="Copy AGENTS.md"
+						className={`cursor-pointer text-xs font-bold tracking-widest uppercase transition-colors ${
+							copied ? 'text-[#a6e3a1]' : 'text-[#89b4fa] hover:text-[#cdd6f4]'
+						}`}
+					>
+						{copied ? 'Copied!' : 'Copy'}
+					</button>
 				</div>
+
+				<pre className="border-ctp-surface0 rounded-b-btn w-full overflow-x-auto border bg-[#1e1e2e] p-4 text-xs leading-relaxed font-semibold text-[#a6e3a1]">
+					<code>{AGENTS_MD_CONTENT}</code>
+				</pre>
 			</div>
 		</section>
 	)
