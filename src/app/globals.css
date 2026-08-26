@@ -1,8 +1,24 @@
 @import 'tailwindcss';
 
 html {
-	@apply scroll-smooth;
 	@apply scroll-pt-[96px];
+}
+
+html.lenis,
+html.lenis body {
+	height: auto;
+}
+
+.lenis.lenis-smooth {
+	scroll-behavior: auto;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+	overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+	overflow: hidden;
 }
 
 @theme inline {
