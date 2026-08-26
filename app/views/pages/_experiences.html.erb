@@ -1,0 +1,48 @@
+<%
+  companies = experiences.each_with_object([]) do |exp, acc|
+    group = acc.find { |g| g[:company] == exp[:company] }
+    group ? group[:entries] << exp : acc << { company: exp[:company], entries: [ exp ] }
+  end
+  active_class = "bg-ctp-surface0 font-semibold"
+  inactive_class = "text-ctp-subtext0 font-normal"
+  base_tab_class = "rounded-chip min-w-max cursor-pointer px-4 py-2.5 text-left font-mono text-[15px] whitespace-nowrap transition-all duration-[180ms] min-[900px]:-ml-0.5 min-[900px]:rounded-none min-[900px]:border-l-2 min-[900px]:border-transparent min-[900px]:px-4 min-[900px]:py-3"
+%>
+<section id="experience" class="border-ctp-surface0 w-full max-w-[1080px] border-t pt-14 pb-14" data-controller="experiences-tabs">
+  <p class="text-ctp-yellow mb-3.5 font-mono text-[13px] tracking-[0.06em]">$ cat career.log</p>
+
+  <h2 class="text-ctp-text mb-10 text-[28px] font-semibold tracking-[-0.025em] min-[900px]:text-[34px]">Where I've worked</h2>
+
+  <div class="flex flex-col gap-8 min-[900px]:grid min-[900px]:grid-cols-[210px_1fr] min-[900px]:items-start min-[900px]:gap-10">
+    <div class="border-ctp-surface0 flex gap-1 overflow-x-auto border-b pb-3 min-[900px]:flex-col min-[900px]:border-b-0 min-[900px]:border-l-2 min-[900px]:pb-0">
+      <% companies.each_with_index do |group, index| %>
+        <% accent_class = ExperiencesHelper::TAB_ACCENT_CLASSES[index % ExperiencesHelper::TAB_ACCENT_CLASSES.size] %>
+        <button
+          type="button"
+          title="<%= group[:company] %>"
+          data-experiences-tabs-target="tab"
+          data-company="<%= group[:company] %>"
+          data-base-class="<%= base_tab_class %>"
+          data-active-class="<%= active_class %> <%= accent_class %>"
+          data-inactive-class="<%= inactive_class %>"
+          data-action="experiences-tabs#select"
+          class="<%= base_tab_class %> <%= index == 0 ? "#{active_class} #{accent_class}" : inactive_class %>"
+        ><%= group[:company] %></button>
+      <% end %>
+    </div>
+
+    <div>
+      <% companies.each_with_index do |group, index| %>
+        <div
+          data-experiences-tabs-target="panel"
+          data-company="<%= group[:company] %>"
+          class="bg-ctp-mantle border-ctp-surface0 rounded-card animate-[fr-fade_0.28s_ease_both] border p-8 <%= "hidden" unless index == 0 %>"
+        >
+          <% group[:entries].each_with_index do |exp, entry_index| %>
+            <% if entry_index > 0 %><hr class="border-ctp-surface0 my-7 border-t border-dashed"><% end %>
+            <%= render "pages/experience_entry", experience: exp %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

@@ -1,2 +1,6 @@
-<h1><%= @profile[:name] %></h1>
-<p>Placeholder home page — full layout lands in the frontend pass.</p>
+<main class="flex flex-1 flex-col items-center px-8">
+  <%= render "pages/hero", start_year_of_work: @start_year_of_work %>
+  <%= render "pages/experiences", experiences: @profile[:experiences] %>
+  <%= render "pages/hire_from_agent" %>
+  <%= render "pages/contact_form_section" %>
+</main>

@@ -1,0 +1,21 @@
+<%
+  variant ||= "outline"
+  accent ||= "blue"
+  handle ||= nil
+  card_hover_class = { "blue" => "hover:border-ctp-blue hover:shadow-[0_0_20px_-8px_var(--color-ctp-blue)]", "mauve" => "hover:border-ctp-mauve hover:shadow-[0_0_20px_-8px_var(--color-ctp-mauve)]" }.fetch(accent)
+  card_icon_class = { "blue" => "text-ctp-blue", "mauve" => "text-ctp-mauve" }.fetch(accent)
+%>
+<% if variant == "card" %>
+  <a href="<%= link %>" target="_blank" rel="noopener noreferrer" class="bg-ctp-mantle border-ctp-surface0 rounded-btn flex items-center justify-between gap-3 border px-5 py-[18px] transition-all duration-200 hover:-translate-y-0.5 <%= card_hover_class %>">
+    <span class="flex items-center gap-3">
+      <span class="<%= card_icon_class %> h-[18px] w-[18px]"><%= svg_icon(icon) %></span>
+      <% if label %><span class="text-ctp-text text-sm font-medium"><%= label %></span><% end %>
+    </span>
+    <% if handle %><span class="text-ctp-overlay0 font-mono text-xs"><%= handle %></span><% end %>
+  </a>
+<% else %>
+  <a href="<%= link %>" target="_blank" rel="noopener noreferrer" class="border-ctp-surface1 text-ctp-text rounded-btn hover:border-ctp-blue hover:bg-ctp-surface0 inline-flex items-center justify-center gap-[9px] border px-[22px] py-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_20px_-8px_var(--color-ctp-blue)] max-[531px]:w-full">
+    <span class="text-current h-[18px] w-[18px]"><%= svg_icon(icon) %></span>
+    <% if label %><span class="font-mono text-sm"><%= label %></span><% end %>
+  </a>
+<% end %>

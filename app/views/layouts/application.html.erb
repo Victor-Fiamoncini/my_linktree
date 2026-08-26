@@ -1,30 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title><%= content_for(:title) || "My Linktree" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta charset="utf-8">
+    <title><%= content_for(:title) || "Victor Fiamoncini" %></title>
+    <meta name="description" content="<%= content_for(:description) || @default_description %>">
+    <meta name="keywords" content="Victor Fiamoncini, Software Developer, Software Engineer, Full Stack Developer, Developer, PHP, Laravel, Symfony, NodeJS, React, Next.js">
+    <meta name="author" content="Victor Fiamoncini">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="<%= SeoConfig::SITE_URL %><%= content_for(:canonical) || "/" %>">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#8caaee">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="msapplication-navbutton-color" content="#8caaee">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#8caaee">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="My Linktree">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Victor Fiamoncini">
+
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Victor Fiamoncini">
+    <meta property="og:url" content="<%= SeoConfig::SITE_URL %><%= content_for(:canonical) || "/" %>">
+    <meta property="og:title" content="<%= content_for(:og_title) || content_for(:title) || "Victor Fiamoncini" %>">
+    <meta property="og:description" content="<%= content_for(:description) || @default_description %>">
+    <meta property="og:image" content="<%= SeoConfig::SITE_URL %>/opengraph-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= content_for(:og_title) || content_for(:title) || "Victor Fiamoncini" %>">
+    <meta name="twitter:description" content="<%= content_for(:description) || @default_description %>">
+    <meta name="twitter:image" content="<%= SeoConfig::SITE_URL %>/opengraph-image.png">
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&family=JetBrains+Mono:wght@400..700&display=swap" rel="stylesheet">
+
     <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+
+    <%= render "shared/person_json_ld" %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
-      <%= yield %>
-    </main>
+  <body class="bg-ctp-base flex min-h-screen flex-col font-sans antialiased">
+    <%= render "shared/header" %>
+
+    <%= yield %>
+
+    <%= render "shared/footer" %>
   </body>
 </html>

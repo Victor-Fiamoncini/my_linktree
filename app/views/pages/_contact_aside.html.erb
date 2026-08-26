@@ -1,0 +1,17 @@
+<%
+  swatch_classes = %w[bg-ctp-blue bg-ctp-mauve bg-ctp-green bg-ctp-yellow bg-ctp-peach bg-ctp-teal]
+%>
+<div class="grid gap-3">
+  <%= render "shared/external_link", icon: :linkedin, link: SeoConfig::LINKEDIN_URL, label: "LinkedIn", handle: "/in/victor-fiamoncini", variant: "card", accent: "blue" %>
+  <%= render "shared/external_link", icon: :github, link: SeoConfig::GITHUB_URL, label: "GitHub", handle: "Victor-Fiamoncini", variant: "card", accent: "mauve" %>
+
+  <div class="bg-ctp-mantle border-ctp-surface0 rounded-btn border px-5 py-[18px]">
+    <p class="text-ctp-overlay0 mb-2 font-mono text-xs tracking-[0.08em] uppercase">Theme</p>
+    <p class="text-ctp-subtext0 mb-3.5 text-sm">Catppuccin Frappé</p>
+    <div class="flex gap-1.5">
+      <% swatch_classes.each do |klass| %>
+        <span class="rounded-chip h-5 w-5 <%= klass %>"></span>
+      <% end %>
+    </div>
+  </div>
+</div>

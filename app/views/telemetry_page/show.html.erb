@@ -1,2 +1,42 @@
-<h1>Live Agent Telemetry</h1>
-<p>Placeholder telemetry page — full layout lands in the frontend pass.</p>
+<% content_for :title, "Live Agent Telemetry" %>
+<% content_for :og_title, "Live Agent Telemetry — Victor Fiamoncini" %>
+<% content_for :description, "Watch AI agents connect to Victor Fiamoncini's MCP server in real time — tool calls, timestamps, and live activity." %>
+<% content_for :canonical, "/telemetry" %>
+
+<main class="bg-ctp-base flex flex-1 flex-col items-center px-8 py-16">
+  <section class="w-full max-w-[720px]">
+    <p class="text-ctp-pink mb-3.5 font-mono text-[13px] tracking-[0.06em]">$ tail -f /var/log/agents.log</p>
+
+    <h1 class="text-ctp-text mb-4 text-[28px] font-semibold tracking-[-0.025em] sm:text-[34px]">Live Agent Telemetry</h1>
+
+    <p class="text-ctp-subtext0 mb-6 max-w-[58ch] text-[17px] leading-[1.7] text-pretty">
+      Watch which AI agents are connecting to the MCP server in real time.
+    </p>
+
+    <div class="text-ctp-green mb-5 flex items-center gap-2 font-mono text-xs">
+      <span class="relative flex h-2 w-2">
+        <span class="bg-ctp-green absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
+        <span class="bg-ctp-green relative inline-flex h-2 w-2 rounded-full"></span>
+      </span>
+      live
+    </div>
+
+    <div class="text-left">
+      <div class="border-ctp-surface0 rounded-t-btn flex items-center gap-3 border border-b-0 bg-[#181825] px-4 py-2">
+        <span class="flex gap-1.5">
+          <span class="h-2.5 w-2.5 rounded-full bg-[#f38ba8]"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-[#f9e2af]"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-[#a6e3a1]"></span>
+        </span>
+        <span class="text-xs font-bold tracking-widest text-[#cdd6f4]">agents.log</span>
+      </div>
+
+      <div class="border-ctp-surface0 rounded-b-btn border bg-[#1e1e2e] px-4 py-3" data-controller="telemetry-feed" data-telemetry-feed-url-value="<%= api_telemetry_path %>">
+        <p data-telemetry-feed-target="loading" class="text-ctp-overlay0 py-2 font-mono text-xs"># loading live telemetry...</p>
+        <p data-telemetry-feed-target="error" class="text-ctp-red hidden py-2 font-mono text-xs"># error: something went wrong while loading live telemetry.</p>
+        <p data-telemetry-feed-target="empty" class="text-ctp-overlay0 hidden py-2 font-mono text-xs"># no agent connections yet.</p>
+        <ul data-telemetry-feed-target="list" class="hidden max-h-96 w-full flex-col overflow-y-auto"></ul>
+      </div>
+    </div>
+  </section>
+</main>

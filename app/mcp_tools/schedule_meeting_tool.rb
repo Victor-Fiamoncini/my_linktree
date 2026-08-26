@@ -6,7 +6,7 @@ class ScheduleMeetingTool < MCP::Tool
       name: { type: "string" },
       email: { type: "string" },
       company: { type: "string" },
-      slotStart: { type: "string" },
+      slotStart: { type: "string" }
     }
   )
 
