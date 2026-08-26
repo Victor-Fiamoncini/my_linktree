@@ -88,7 +88,7 @@ describe('MCP route', () => {
 	beforeEach(() => {
 		mockRecord.mockReset().mockResolvedValue(undefined)
 		mockListUpcoming.mockReset().mockResolvedValue([])
-		mockBook.mockReset().mockResolvedValue(undefined)
+		mockBook.mockReset().mockResolvedValue(true)
 		mockSendEmail.mockReset().mockResolvedValue(undefined)
 		mockGeneralIsAllowed.mockReset().mockResolvedValue(true)
 		mockScheduleIsAllowed.mockReset().mockResolvedValue(true)

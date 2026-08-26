@@ -30,7 +30,11 @@ export class ScheduleMeetingUseCase {
 
 		const booking = { name, email, company: company ?? null, slotStart }
 
-		await this.#bookingStore.book({ slotStartEpochMs: new Date(slotStart).getTime(), booking })
+		const booked = await this.#bookingStore.book({ slotStartEpochMs: new Date(slotStart).getTime(), booking })
+
+		if (!booked) {
+			throw new SlotUnavailableError()
+		}
 
 		await this.#mailer.sendEmail({
 			from: this.#senderEmail,

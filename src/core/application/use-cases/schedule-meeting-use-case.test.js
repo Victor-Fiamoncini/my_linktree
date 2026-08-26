@@ -24,7 +24,7 @@ describe('ScheduleMeetingUseCase', () => {
 
 		bookingStoreMock = {
 			listUpcoming: vi.fn().mockResolvedValue([]),
-			book: vi.fn().mockResolvedValue(undefined),
+			book: vi.fn().mockResolvedValue(true),
 		}
 
 		mailerMock = {
@@ -139,5 +139,44 @@ describe('ScheduleMeetingUseCase', () => {
 		expect(bookingStoreMock.book).toHaveBeenCalledWith(
 			expect.objectContaining({ booking: expect.objectContaining({ company: 'Acme Inc' }) })
 		)
+	})
+
+	it('throws SlotUnavailableError when the store reports the slot was taken concurrently', async () => {
+		bookingStoreMock.book.mockResolvedValue(false)
+
+		await expect(
+			useCase.execute({ name: 'John Doe', email: 'john@example.com', slotStart: availableSlotStart })
+		).rejects.toThrow(SlotUnavailableError)
+	})
+
+	it('does not send emails when the store reports the slot was taken concurrently', async () => {
+		bookingStoreMock.book.mockResolvedValue(false)
+
+		await expect(
+			useCase.execute({ name: 'John Doe', email: 'john@example.com', slotStart: availableSlotStart })
+		).rejects.toThrow()
+
+		expect(mailerMock.sendEmail).not.toHaveBeenCalled()
+	})
+
+	it('propagates errors thrown by bookingStore.book', async () => {
+		bookingStoreMock.book.mockRejectedValue(new Error('Redis failure'))
+
+		await expect(
+			useCase.execute({ name: 'John Doe', email: 'john@example.com', slotStart: availableSlotStart })
+		).rejects.toThrow('Redis failure')
+
+		expect(mailerMock.sendEmail).not.toHaveBeenCalled()
+	})
+
+	it('does not attempt the internal notification email when the confirmation email fails', async () => {
+		mailerMock.sendEmail.mockRejectedValueOnce(new Error('Mailer failure'))
+
+		await expect(
+			useCase.execute({ name: 'John Doe', email: 'john@example.com', slotStart: availableSlotStart })
+		).rejects.toThrow('Mailer failure')
+
+		expect(bookingStoreMock.book).toHaveBeenCalledOnce()
+		expect(mailerMock.sendEmail).toHaveBeenCalledTimes(1)
 	})
 })

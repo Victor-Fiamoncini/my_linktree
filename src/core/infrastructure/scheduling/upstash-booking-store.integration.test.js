@@ -1,9 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-// Fake sorted set backed by an in-memory array so the real UpstashBookingStore
-// class is exercised without a real Redis connection.
+// Fake sorted set + key-value store backed by in-memory structures so the real
+// UpstashBookingStore class is exercised without a real Redis connection.
 class FakeSortedSet {
 	#store = new Map()
+	#keys = new Map()
 
 	zadd(key, { score, member }) {
 		const entries = this.#store.get(key) ?? []
@@ -21,6 +22,15 @@ class FakeSortedSet {
 				.map(entry => entry.member)
 		)
 	}
+
+	set(key, value, { nx } = {}) {
+		if (nx && this.#keys.has(key)) {
+			return Promise.resolve(null)
+		}
+
+		this.#keys.set(key, value)
+		return Promise.resolve('OK')
+	}
 }
 
 let fakeSortedSet
@@ -30,6 +40,7 @@ vi.mock('@upstash/redis', () => ({
 		constructor() {
 			this.zadd = (...args) => fakeSortedSet.zadd(...args)
 			this.zrange = (...args) => fakeSortedSet.zrange(...args)
+			this.set = (...args) => fakeSortedSet.set(...args)
 		}
 	},
 }))
@@ -91,5 +102,38 @@ describe('UpstashBookingStore integration', () => {
 		})
 
 		expect(result).toEqual([earlier, later])
+	})
+
+	it('prevents double-booking when two requests race for the same slot', async () => {
+		const slotStartEpochMs = new Date('2026-03-04T09:00:00.000Z').getTime()
+		const first = { name: 'A', email: 'a@example.com', slotStart: '2026-03-04T09:00:00.000Z' }
+		const second = { name: 'B', email: 'b@example.com', slotStart: '2026-03-04T09:00:00.000Z' }
+
+		const [firstResult, secondResult] = await Promise.all([
+			bookingStore.book({ slotStartEpochMs, booking: first }),
+			bookingStore.book({ slotStartEpochMs, booking: second }),
+		])
+
+		expect([firstResult, secondResult].sort()).toEqual([false, true])
+
+		const result = await bookingStore.listUpcoming({ fromEpochMs: slotStartEpochMs, toEpochMs: slotStartEpochMs })
+		expect(result).toHaveLength(1)
+	})
+
+	it('allows booking the same slot again after the first reservation is for a different slot', async () => {
+		const first = { name: 'A', email: 'a@example.com', slotStart: '2026-03-04T09:00:00.000Z' }
+		const second = { name: 'B', email: 'b@example.com', slotStart: '2026-03-04T14:00:00.000Z' }
+
+		const firstBooked = await bookingStore.book({
+			slotStartEpochMs: new Date(first.slotStart).getTime(),
+			booking: first,
+		})
+		const secondBooked = await bookingStore.book({
+			slotStartEpochMs: new Date(second.slotStart).getTime(),
+			booking: second,
+		})
+
+		expect(firstBooked).toBe(true)
+		expect(secondBooked).toBe(true)
 	})
 })
