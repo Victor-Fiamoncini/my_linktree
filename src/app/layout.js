@@ -4,7 +4,9 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import { GetXpYearsUseCase } from '@/core/application/use-cases/get-xp-years-use-case'
 import Footer from '@/components/footer'
 import Header from '@/components/header'
+import PersonJsonLd from '@/components/person-json-ld'
 import SmoothScroll from '@/components/smooth-scroll'
+import { SITE_URL } from '@/app/seo-config'
 
 import '@/app/globals.css'
 
@@ -37,14 +39,14 @@ export const metadata = {
 		'React',
 		'Next.js',
 	],
-	metadataBase: new URL('https://www.victorfiamon.com.br'),
-	authors: [{ name: 'Victor Fiamoncini', url: 'https://www.victorfiamon.com.br' }],
+	metadataBase: new URL(SITE_URL),
+	authors: [{ name: 'Victor Fiamoncini', url: SITE_URL }],
 	creator: 'Victor Fiamoncini',
 	publisher: 'Victor Fiamoncini',
-	icons: {
-		icon: '/favicon.ico',
-		shortcut: '/icon.png',
-		apple: '/apple-icon.png',
+	applicationName: 'Victor Fiamoncini',
+	category: 'technology',
+	alternates: {
+		canonical: '/',
 	},
 	robots: {
 		index: true,
@@ -60,24 +62,15 @@ export const metadata = {
 	openGraph: {
 		type: 'website',
 		locale: 'en_US',
-		url: 'https://www.victorfiamon.com.br',
+		url: SITE_URL,
 		siteName: 'Victor Fiamoncini',
 		title: 'Victor Fiamoncini',
 		description,
-		images: [
-			{
-				url: 'https://www.victorfiamon.com.br/photo.jpg',
-				width: 1200,
-				height: 630,
-				alt: "Victor's photo",
-			},
-		],
 	},
 	twitter: {
 		card: 'summary_large_image',
 		title: 'Victor Fiamoncini',
 		description,
-		images: ['https://www.victorfiamon.com.br/photo.jpg'],
 	},
 	other: {
 		'X-UA-Compatible': 'ie=edge',
@@ -100,6 +93,8 @@ export default function RootLayout({ children }) {
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col bg-stone-400 antialiased`}
 			>
+				<PersonJsonLd />
+
 				<SmoothScroll />
 
 				<Header />

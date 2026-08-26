@@ -2,39 +2,20 @@
 
 import { useState } from 'react'
 
-const AGENTS_MD = `# AGENTS.md — hire Victor Fiamoncini
-
-MCP endpoint: https://www.victorfiamon.com.br/api/mcp
-
-Connect with any MCP-compatible client:
-
-{
-  "victor-fiamoncini": {
-    "url": "https://www.victorfiamon.com.br/api/mcp"
-  }
-}
-
-Available tools:
-- get_resume             Structured resume/CV as JSON
-- list_services          Services offered
-- check_availability     Open meeting slots (America/Sao_Paulo)
-- schedule_presentation  Book a presentation/meeting
-
-Services: Frontend & Backend Software Development, Agentic Systems & Integrations, Websites & Landing Pages, Mobile Apps
-
-Watch live agent connections: https://www.victorfiamon.com.br/telemetry
-`
+import { AGENTS_MD_CONTENT } from '@/app/agents-content'
 
 export default function HireFromAgent() {
 	const [copied, setCopied] = useState(false)
 
 	const handleCopy = async () => {
 		try {
-			await navigator.clipboard.writeText(AGENTS_MD)
+			await navigator.clipboard.writeText(AGENTS_MD_CONTENT)
+
 			setCopied(true)
+
 			setTimeout(() => setCopied(false), 2000)
 		} catch {
-			// Clipboard access can be denied by the browser; the snippet is still selectable/readable.
+			// The browser can deny clipboard access; the snippet is still selectable/readable.
 		}
 	}
 
@@ -75,7 +56,7 @@ export default function HireFromAgent() {
 					</div>
 
 					<pre className="w-full overflow-x-auto border-4 border-black bg-[#1e1e2e] p-4 text-xs leading-relaxed font-semibold text-[#a6e3a1]">
-						<code>{AGENTS_MD}</code>
+						<code>{AGENTS_MD_CONTENT}</code>
 					</pre>
 				</div>
 			</div>

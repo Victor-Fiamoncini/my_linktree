@@ -1,5 +1,24 @@
 import TelemetryFeed from '@/components/telemetry-feed'
 
+export const metadata = {
+	title: 'Live Agent Telemetry',
+	description:
+		"Watch AI agents connect to Victor Fiamoncini's MCP server in real time — tool calls, timestamps, and live activity.",
+	alternates: {
+		canonical: '/telemetry',
+	},
+	openGraph: {
+		title: 'Live Agent Telemetry — Victor Fiamoncini',
+		description: 'Watch AI agents connect to the MCP server in real time.',
+		url: '/telemetry',
+		images: ['/opengraph-image'],
+	},
+	twitter: {
+		title: 'Live Agent Telemetry — Victor Fiamoncini',
+		images: ['/opengraph-image'],
+	},
+}
+
 const TelemetryPage = () => (
 	<main className="flex flex-1 flex-col items-center justify-center gap-8 px-4 py-12">
 		<section className="w-full max-w-3xl border-4 border-black bg-white p-8 text-center shadow-[6px_6px_0px_0px_#60a5fa]">
