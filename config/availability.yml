@@ -1,0 +1,29 @@
+default: &default
+  timezone: America/Sao_Paulo
+  slot_duration_minutes: 30
+  booking_horizon_days: 21
+  weekly_windows:
+    - weekday: 1 # Monday
+      start: "09:00"
+      end: "18:00"
+    - weekday: 2 # Tuesday
+      start: "09:00"
+      end: "18:00"
+    - weekday: 3 # Wednesday
+      start: "09:00"
+      end: "18:00"
+    - weekday: 4 # Thursday
+      start: "09:00"
+      end: "18:00"
+    - weekday: 5 # Friday
+      start: "09:00"
+      end: "18:00"
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default
