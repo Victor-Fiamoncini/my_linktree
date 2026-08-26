@@ -65,6 +65,11 @@ group :development, :test do
   gem "rubocop-rails-omakase", require: false
 end
 
+group :development, :test do
+  # Loads environment variables from .env files [https://github.com/bkeepers/dotenv]
+  gem "dotenv-rails"
+end
+
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
