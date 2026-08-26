@@ -16,7 +16,7 @@ Available tools:
 - get_resume             Structured resume/CV as JSON
 - list_services          Services offered
 - check_availability     Open meeting slots (America/Sao_Paulo)
-- schedule_presentation  Book a presentation/meeting
+- schedule_meeting       Book a meeting
 
 Services: Frontend & Backend Software Development, Agentic Systems & Integrations, Websites & Landing Pages, Mobile Apps
 

@@ -29,7 +29,7 @@ export default function HireFromAgent() {
 
 			<p className="text-ctp-subtext0 mb-8 max-w-[62ch] text-[17px] leading-[1.7] text-pretty">
 				This portfolio speaks MCP. Point your AI agent at the endpoint below to read my resume, check my services and
-				availability, and book a presentation — no human required.
+				availability, and book a meeting — no human required.
 			</p>
 
 			<div className="w-full text-left">

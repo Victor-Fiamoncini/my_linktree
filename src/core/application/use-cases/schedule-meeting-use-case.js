@@ -2,7 +2,7 @@ import { MissingRequiredFieldsError, SlotUnavailableError } from '@/core/infrast
 
 import { CheckAvailabilityUseCase } from './check-availability-use-case'
 
-export class SchedulePresentationUseCase {
+export class ScheduleMeetingUseCase {
 	#bookingStore
 	#checkAvailabilityUseCase
 	#mailer
@@ -35,17 +35,17 @@ export class SchedulePresentationUseCase {
 		await this.#mailer.sendEmail({
 			from: this.#senderEmail,
 			to: email,
-			subject: 'My Linktree - Presentation scheduled',
+			subject: 'My Linktree - Meeting scheduled',
 			html: `
 				<p>Hi ${name},</p>
-				<p>Your presentation with Victor Fiamoncini is confirmed for ${slotStart}.</p>
+				<p>Your meeting with Victor Fiamoncini is confirmed for ${slotStart}.</p>
 			`,
 		})
 
 		await this.#mailer.sendEmail({
 			from: this.#senderEmail,
 			to: this.#recipientEmail,
-			subject: `My Linktree - New presentation booked by ${name}`,
+			subject: `My Linktree - New meeting booked by ${name}`,
 			html: `
 				<p>Name: ${name}</p>
 				<p>Email: ${email}</p>

@@ -38,11 +38,11 @@ Copy `.env.example` to `.env.local` for local development. Required vars:
 
 Optional:
 
-- `MAILER_DRIVER` — Set to `console` to log emails instead of sending them via Resend. Use this locally to avoid sending real email when testing the contact form or MCP `schedule_presentation` tool. `createMailer()` (`src/core/infrastructure/mailer/create-mailer.js`) selects the mailer; both API routes use it instead of instantiating `ResendMailer` directly.
+- `MAILER_DRIVER` — Set to `console` to log emails instead of sending them via Resend. Use this locally to avoid sending real email when testing the contact form or MCP `schedule_meeting` tool. `createMailer()` (`src/core/infrastructure/mailer/create-mailer.js`) selects the mailer; both API routes use it instead of instantiating `ResendMailer` directly.
 
 ## Architecture
 
-This is a Next.js 16 / React 19 personal landing page. The codebase follows a layered architecture separating core business logic from the Next.js framework. It also serves an MCP server so AI agents can read the resume, check availability, and book a presentation — see `docs/testing-mcp.md` for what MCP is and how to exercise it manually.
+This is a Next.js 16 / React 19 personal landing page. The codebase follows a layered architecture separating core business logic from the Next.js framework. It also serves an MCP server so AI agents can read the resume, check availability, and book a meeting — see `docs/testing-mcp.md` for what MCP is and how to exercise it manually.
 
 ```
 src/
@@ -74,7 +74,7 @@ src/
       get-profile-use-case.js
       list-services-use-case.js
       check-availability-use-case.js
-      schedule-presentation-use-case.js
+      schedule-meeting-use-case.js
       record-agent-connection-use-case.js
       list-recent-connections-use-case.js
       send-contact-email-use-case.js
@@ -99,10 +99,10 @@ src/
 ### Key design decisions
 
 - **Use cases** (`src/core/application/use-cases/`) contain all business logic and are plain JS classes with no Next.js dependency. They are unit-tested in isolation using Vitest with mocked dependencies.
-- **Infrastructure** (`src/core/infrastructure/`) wraps external services. `createMailer()` picks `ResendMailer` or `ConsoleMailer` (via `MAILER_DRIVER`) and is injected into `SendContactEmailUseCase` / `SchedulePresentationUseCase` via constructor injection. `UpstashRateLimiter` wraps `@upstash/ratelimit` with a sliding window algorithm; `UpstashBookingStore` and `UpstashConnectionLog` similarly wrap Upstash Redis for bookings and agent-connection telemetry.
+- **Infrastructure** (`src/core/infrastructure/`) wraps external services. `createMailer()` picks `ResendMailer` or `ConsoleMailer` (via `MAILER_DRIVER`) and is injected into `SendContactEmailUseCase` / `ScheduleMeetingUseCase` via constructor injection. `UpstashRateLimiter` wraps `@upstash/ratelimit` with a sliding window algorithm; `UpstashBookingStore` and `UpstashConnectionLog` similarly wrap Upstash Redis for bookings and agent-connection telemetry.
 - **API routes** (`src/app/api/*/route.js`) are composition roots — they wire infrastructure to use cases and translate HTTP (or JSON-RPC, for `/api/mcp`) concerns.
   - `/api/contact`: `204` on success, `400` for validation errors, `429` when rate-limited, `500` for mailer failures.
-  - `/api/mcp`: registers `get_resume`, `list_services`, `check_availability`, `schedule_presentation` as MCP tools via `mcp-handler`; each call is recorded through `RecordAgentConnectionUseCase`. Has its own general rate limiter (30/min) plus a stricter one (3/10min) specifically for `schedule_presentation`.
+  - `/api/mcp`: registers `get_resume`, `list_services`, `check_availability`, `schedule_meeting` as MCP tools via `mcp-handler`; each call is recorded through `RecordAgentConnectionUseCase`. Has its own general rate limiter (30/min) plus a stricter one (3/10min) specifically for `schedule_meeting`.
   - Both routes: rate limiting only applies when an IP header is present — requests without `x-forwarded-for` or `x-real-ip` skip rate limiting entirely.
 - **`@/` alias** maps to `src/` (configured in `jsconfig.json`).
 - React Compiler is enabled (`reactCompiler: true` in `next.config.mjs`).

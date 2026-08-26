@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { GetProfileUseCase } from '@/core/application/use-cases/get-profile-use-case'
 import { ListServicesUseCase } from '@/core/application/use-cases/list-services-use-case'
 import { CheckAvailabilityUseCase } from '@/core/application/use-cases/check-availability-use-case'
-import { SchedulePresentationUseCase } from '@/core/application/use-cases/schedule-presentation-use-case'
+import { ScheduleMeetingUseCase } from '@/core/application/use-cases/schedule-meeting-use-case'
 import { RecordAgentConnectionUseCase } from '@/core/application/use-cases/record-agent-connection-use-case'
 import { MemoryDatabase } from '@/core/infrastructure/database/memory-database'
 import { UpstashBookingStore } from '@/core/infrastructure/scheduling/upstash-booking-store'
@@ -59,7 +59,7 @@ const handler = createMcpHandler(server => {
 		'check_availability',
 		{
 			title: 'Check Availability',
-			description: 'Lists open meeting slots for a presentation with Victor.',
+			description: 'Lists open meeting slots with Victor.',
 			inputSchema: z.object({}),
 		},
 		async () => {
@@ -72,11 +72,10 @@ const handler = createMcpHandler(server => {
 	)
 
 	server.registerTool(
-		'schedule_presentation',
+		'schedule_meeting',
 		{
-			title: 'Schedule Presentation',
-			description:
-				'Books a presentation/meeting slot with Victor. Use check_availability first to get a valid slotStart.',
+			title: 'Schedule Meeting',
+			description: 'Books a meeting slot with Victor. Use check_availability first to get a valid slotStart.',
 			inputSchema: z.object({
 				name: z.string(),
 				email: z.string(),
@@ -85,9 +84,9 @@ const handler = createMcpHandler(server => {
 			}),
 		},
 		async args => {
-			await recordAgentConnectionUseCase.execute({ tool: 'schedule_presentation' })
+			await recordAgentConnectionUseCase.execute({ tool: 'schedule_meeting' })
 
-			const schedulePresentationUseCase = new SchedulePresentationUseCase({
+			const scheduleMeetingUseCase = new ScheduleMeetingUseCase({
 				bookingStore,
 				availabilityConfig,
 				mailer: createMailer(),
@@ -95,18 +94,18 @@ const handler = createMcpHandler(server => {
 				recipientEmail: process.env.MAILER_RECIPIENT_EMAIL,
 			})
 
-			const booking = await schedulePresentationUseCase.execute(args)
+			const booking = await scheduleMeetingUseCase.execute(args)
 
 			return { content: [{ type: 'text', text: JSON.stringify(booking) }] }
 		}
 	)
 })
 
-async function isSchedulePresentationCall(request) {
+async function isScheduleMeetingCall(request) {
 	try {
 		const body = await request.clone().json()
 
-		return body?.method === 'tools/call' && body?.params?.name === 'schedule_presentation'
+		return body?.method === 'tools/call' && body?.params?.name === 'schedule_meeting'
 	} catch {
 		return false
 	}
@@ -119,7 +118,7 @@ export async function POST(request) {
 		return Response.json(new TooManyRequestsError(), { status: 429 })
 	}
 
-	if (ip && (await isSchedulePresentationCall(request)) && !(await scheduleRateLimiter.isAllowed(ip))) {
+	if (ip && (await isScheduleMeetingCall(request)) && !(await scheduleRateLimiter.isAllowed(ip))) {
 		return Response.json(new TooManyRequestsError(), { status: 429 })
 	}
 

@@ -1,14 +1,14 @@
 # My Linktree
 
 Personal landing page with social links, experience history, a contact form, and an MCP server so
-AI agents can read the resume, check availability, and book a presentation directly.
+AI agents can read the resume, check availability, and book a meeting directly.
 
 ## Tech Stack
 
 - **Next.js 16** / **React 19** — App Router, React Compiler enabled
 - **Tailwind CSS** — neo-brutalism UI style
 - **mcp-handler** / **zod** — MCP server (`/api/mcp`) and tool input validation
-- **Resend** — transactional email for the contact form and presentation bookings
+- **Resend** — transactional email for the contact form and meeting bookings
 - **Upstash Redis** — sliding window rate limiting, booking storage, and agent connection telemetry
 - **Lenis** — smooth scrolling
 - **Vitest** — unit and integration tests
@@ -41,9 +41,9 @@ src/
 **Layers:**
 
 - **Use cases** (`core/application/use-cases/`) hold all business rules as plain JS classes. They have no dependency on Next.js and receive collaborators via constructor injection, making them straightforward to unit test with mocks.
-- **Infrastructure** (`core/infrastructure/`) wraps external services behind implicit interfaces. `ResendMailer`/`ConsoleMailer` are selected by `createMailer()` and injected into `SendContactEmailUseCase` / `SchedulePresentationUseCase`; `UpstashRateLimiter`, `UpstashBookingStore`, and `UpstashConnectionLog` are used directly where needed.
+- **Infrastructure** (`core/infrastructure/`) wraps external services behind implicit interfaces. `ResendMailer`/`ConsoleMailer` are selected by `createMailer()` and injected into `SendContactEmailUseCase` / `ScheduleMeetingUseCase`; `UpstashRateLimiter`, `UpstashBookingStore`, and `UpstashConnectionLog` are used directly where needed.
 - **API routes** are composition roots — each wires infrastructure to use cases and handles HTTP (or JSON-RPC, for `/api/mcp`) concerns. Rate limiting runs before validation; requests without a forwarded IP header skip the limiter entirely.
-- **MCP server** (`app/api/mcp/route.js`) registers four tools via `mcp-handler`: `get_resume`, `list_services`, `check_availability`, `schedule_presentation`. Every tool call is recorded through `RecordAgentConnectionUseCase` so it shows up on `/telemetry`. `schedule_presentation` has its own, stricter rate limit on top of the general one. See [`docs/testing-mcp.md`](docs/testing-mcp.md) for what MCP is and how to call it by hand.
+- **MCP server** (`app/api/mcp/route.js`) registers four tools via `mcp-handler`: `get_resume`, `list_services`, `check_availability`, `schedule_meeting`. Every tool call is recorded through `RecordAgentConnectionUseCase` so it shows up on `/telemetry`. `schedule_meeting` has its own, stricter rate limit on top of the general one. See [`docs/testing-mcp.md`](docs/testing-mcp.md) for what MCP is and how to call it by hand.
 
 ## Getting Started
 

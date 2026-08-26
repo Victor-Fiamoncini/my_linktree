@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 import { MissingRequiredFieldsError, SlotUnavailableError } from '@/core/infrastructure/errors'
 
-import { SchedulePresentationUseCase } from '@/core/application/use-cases/schedule-presentation-use-case'
+import { ScheduleMeetingUseCase } from '@/core/application/use-cases/schedule-meeting-use-case'
 
 const availabilityConfig = {
 	timezone: 'America/Sao_Paulo',
@@ -13,7 +13,7 @@ const availabilityConfig = {
 
 const availableSlotStart = '2026-03-02T12:00:00.000Z'
 
-describe('SchedulePresentationUseCase', () => {
+describe('ScheduleMeetingUseCase', () => {
 	let bookingStoreMock
 	let mailerMock
 	let useCase
@@ -31,7 +31,7 @@ describe('SchedulePresentationUseCase', () => {
 			sendEmail: vi.fn().mockResolvedValue(undefined),
 		}
 
-		useCase = new SchedulePresentationUseCase({
+		useCase = new ScheduleMeetingUseCase({
 			bookingStore: bookingStoreMock,
 			availabilityConfig,
 			mailer: mailerMock,

@@ -96,8 +96,8 @@ describe('MCP route', () => {
 	})
 
 	describe('tool registration', () => {
-		it('registers get_resume, list_services, check_availability and schedule_presentation', () => {
-			expect(Object.keys(tools)).toEqual(['get_resume', 'list_services', 'check_availability', 'schedule_presentation'])
+		it('registers get_resume, list_services, check_availability and schedule_meeting', () => {
+			expect(Object.keys(tools)).toEqual(['get_resume', 'list_services', 'check_availability', 'schedule_meeting'])
 		})
 	})
 
@@ -162,7 +162,7 @@ describe('MCP route', () => {
 		})
 	})
 
-	describe('schedule_presentation tool', () => {
+	describe('schedule_meeting tool', () => {
 		beforeEach(() => {
 			vi.useFakeTimers()
 			vi.setSystemTime(new Date('2026-03-02T10:00:00.000Z'))
@@ -173,17 +173,17 @@ describe('MCP route', () => {
 		})
 
 		it('records the agent connection', async () => {
-			await tools.schedule_presentation.handler({
+			await tools.schedule_meeting.handler({
 				name: 'John Doe',
 				email: 'john@example.com',
 				slotStart: VALID_SLOT_START,
 			})
 
-			expect(mockRecord).toHaveBeenCalledWith(expect.objectContaining({ tool: 'schedule_presentation' }))
+			expect(mockRecord).toHaveBeenCalledWith(expect.objectContaining({ tool: 'schedule_meeting' }))
 		})
 
 		it('books the slot and returns the booking as JSON text content', async () => {
-			const result = await tools.schedule_presentation.handler({
+			const result = await tools.schedule_meeting.handler({
 				name: 'John Doe',
 				email: 'john@example.com',
 				slotStart: VALID_SLOT_START,
@@ -200,7 +200,7 @@ describe('MCP route', () => {
 		})
 
 		it('sends confirmation and notification emails', async () => {
-			await tools.schedule_presentation.handler({
+			await tools.schedule_meeting.handler({
 				name: 'John Doe',
 				email: 'john@example.com',
 				slotStart: VALID_SLOT_START,
@@ -210,14 +210,14 @@ describe('MCP route', () => {
 		})
 
 		it('rejects when required fields are missing', async () => {
-			await expect(tools.schedule_presentation.handler({})).rejects.toThrow()
+			await expect(tools.schedule_meeting.handler({})).rejects.toThrow()
 
 			expect(mockBook).not.toHaveBeenCalled()
 		})
 
 		it('rejects when the slot is unavailable', async () => {
 			await expect(
-				tools.schedule_presentation.handler({
+				tools.schedule_meeting.handler({
 					name: 'John Doe',
 					email: 'john@example.com',
 					slotStart: '2026-03-02T23:00:00.000Z',
@@ -255,10 +255,10 @@ describe('MCP route', () => {
 			expect(body).toMatchObject({ name: 'TooManyRequestsError', message: 'Too many requests' })
 		})
 
-		it('returns 429 when the schedule limiter blocks a schedule_presentation call', async () => {
+		it('returns 429 when the schedule limiter blocks a schedule_meeting call', async () => {
 			mockScheduleIsAllowed.mockResolvedValue(false)
 
-			const response = await POST(makeMcpRequest(toolsCallBody('schedule_presentation'), ip('1.2.3.4')))
+			const response = await POST(makeMcpRequest(toolsCallBody('schedule_meeting'), ip('1.2.3.4')))
 
 			expect(response.status).toBe(429)
 			expect(mockHandlerFn).not.toHaveBeenCalled()

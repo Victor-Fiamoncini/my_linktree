@@ -2,7 +2,7 @@
 	"id": "/",
 	"name": "Victor Fiamoncini",
 	"short_name": "Victor",
-	"description": "Victor Fiamoncini — Software Engineer portfolio and MCP server for AI agents to read his resume and book a presentation.",
+	"description": "Victor Fiamoncini — Software Engineer portfolio and MCP server for AI agents to read his resume and book a meeting.",
 	"start_url": "/",
 	"scope": "/",
 	"icons": [
