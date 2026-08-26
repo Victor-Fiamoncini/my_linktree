@@ -14,9 +14,9 @@ Rails.application.routes.draw do
   get "sitemap.xml" => "static#sitemap"
   get "AGENTS.md" => "static#agents_md"
   get "llms.txt" => "static#agents_md"
+  post "contact" => "contacts#create"
 
   namespace :api do
-    post "contact" => "contacts#create"
     get "telemetry" => "telemetry#index"
     get "profile" => "profile#show"
     match "mcp" => "mcp#create", via: [ :post, :get ]

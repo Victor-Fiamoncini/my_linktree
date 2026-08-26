@@ -1,0 +1,11 @@
+<% if flash[:notice].present? %>
+  <p class="bg-ctp-surface0 text-ctp-green rounded-btn mx-auto mt-4 w-full max-w-[1080px] px-4 py-3 text-sm">
+    <%= flash[:notice] %>
+  </p>
+<% end %>
+
+<% if flash[:alert].present? %>
+  <p class="bg-ctp-surface0 text-ctp-red rounded-btn mx-auto mt-4 w-full max-w-[1080px] px-4 py-3 text-sm">
+    <%= flash[:alert] %>
+  </p>
+<% end %>

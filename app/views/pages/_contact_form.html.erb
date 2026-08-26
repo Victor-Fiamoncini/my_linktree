@@ -1,38 +1,27 @@
 <%
   input_class = "bg-ctp-mantle border-ctp-surface1 text-ctp-text rounded-btn focus:border-ctp-blue w-full border px-[14px] py-3 text-[15px] transition-colors outline-none"
 %>
-<form data-controller="contact-form" data-action="submit->contact-form#submit" class="grid w-full gap-4">
+<%= form_with url: contact_path, method: :post, class: "grid w-full gap-4" do |form| %>
   <div class="grid grid-cols-1 gap-4 min-[500px]:grid-cols-2">
     <label class="grid gap-2">
       <span class="text-ctp-subtext0 font-mono text-xs">name</span>
-      <input id="name" name="name" type="text" class="<%= input_class %>" data-contact-form-target="name" required>
+      <%= form.text_field :name, id: "name", class: input_class, required: true %>
     </label>
 
     <label class="grid gap-2">
       <span class="text-ctp-subtext0 font-mono text-xs">email</span>
-      <input id="email" name="email" type="email" class="<%= input_class %>" data-contact-form-target="email" required>
+      <%= form.email_field :email, id: "email", class: input_class, required: true %>
     </label>
   </div>
 
   <label class="grid gap-2">
     <span class="text-ctp-subtext0 font-mono text-xs">message</span>
-    <textarea id="message" name="message" rows="5" class="<%= input_class %> resize-y" data-contact-form-target="message" required></textarea>
+    <%= form.text_area :message, id: "message", rows: 5, class: "#{input_class} resize-y", required: true %>
   </label>
 
-  <div data-contact-form-target="submitWrapper">
-    <button
-      type="submit"
-      title="Send Message"
-      data-contact-form-target="submitButton"
-      class="bg-ctp-green text-ctp-crust rounded-btn hover:bg-ctp-teal cursor-pointer justify-self-center px-[26px] py-[13px] font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_20px_-4px_var(--color-ctp-teal)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none max-[531px]:w-full min-[500px]:justify-self-start"
-    >Reach Out</button>
+  <div>
+    <%= form.submit "Reach Out",
+      title: "Send Message",
+      class: "bg-ctp-green text-ctp-crust rounded-btn hover:bg-ctp-teal cursor-pointer justify-self-center px-[26px] py-[13px] font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_20px_-4px_var(--color-ctp-teal)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none max-[531px]:w-full min-[500px]:justify-self-start" %>
   </div>
-
-  <p data-contact-form-target="successMessage" class="bg-ctp-surface0 text-ctp-green rounded-btn hidden w-full px-4 py-3 text-sm">
-    Thank you for your message! I'll get back to you as soon as possible.
-  </p>
-
-  <p data-contact-form-target="errorMessage" class="bg-ctp-surface0 text-ctp-red rounded-btn hidden w-full px-4 py-3 text-sm">
-    Oops! Something went wrong while sending your message. Please try again later.
-  </p>
-</form>
+<% end %>

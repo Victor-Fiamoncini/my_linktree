@@ -51,10 +51,10 @@ app/
   controllers/
     application_controller.rb   # sets @default_description, allow_browser :modern
     pages_controller.rb         # GET / (home)
+    contacts_controller.rb      # POST /contact — redirect + flash
     telemetry_page_controller.rb # GET /telemetry
     static_controller.rb        # AGENTS.md, llms.txt, sitemap.xml
     api/
-      contacts_controller.rb    # POST /api/contact — 204/400/429/500
       telemetry_controller.rb   # GET /api/telemetry — last 50 {tool, timestamp}, no auth
       mcp_controller.rb         # POST/GET /api/mcp — see "MCP server" below
       profile_controller.rb     # GET /api/profile
@@ -81,13 +81,13 @@ app/
   mcp_tools/                    # MCP::Tool subclasses: get_resume, list_services,
                                  # check_availability, schedule_meeting
   errors/                       # ApplicationError + 4 subclasses (see "Errors" below)
-  javascript/controllers/       # Stimulus: contact_form, telemetry_feed, mobile_nav,
-                                 # experiences_tabs, hire_from_agent
+  javascript/controllers/       # Stimulus: telemetry_feed, mobile_nav, experiences_tabs,
+                                 # hire_from_agent
   views/
     layouts/application.html.erb
     pages/                      # home.html.erb + partials (hero, experiences, contact, etc.)
     telemetry_page/show.html.erb
-    shared/                     # header, footer, external_link, person_json_ld partials
+    shared/                     # header, footer, flash, external_link, person_json_ld partials
 config/
   profile.yml                  # static resume/services data (was memory-database.js)
   availability.yml             # timezone, weekly windows, slot duration, booking horizon
@@ -105,7 +105,7 @@ config/
   an HTTP status), `TooManyRequestsError` (429), `InternalServerError` (500).
 - **Rate limiting**: `RateLimiter` wraps `Rails.cache` (`Rails.cache.increment` with `expires_in`),
   which is Solid Cache (Postgres-backed) in both development and production, and `MemoryStore` in
-  test. Used explicitly inside `Api::ContactsController` and `Api::McpController` rather than
+  test. Used explicitly inside `ContactsController` and `Api::McpController` rather than
   Rails' declarative `rate_limit` class macro, because the `schedule_meeting`-specific throttle
   needs to inspect the parsed JSON-RPC body before deciding which limiter(s) apply. A blank
   identifier (no `x-forwarded-for`/`x-real-ip` header) always returns `allowed? == true` — rate
@@ -127,7 +127,7 @@ config/
 ## Testing
 
 RSpec, with specs co-located by type under `spec/` (`spec/models`, `spec/services/use_cases`,
-`spec/requests/api`).
+`spec/requests`, `spec/requests/api`).
 
 - `Rails.cache.clear` runs before every example (`spec/rails_helper.rb`) — `RateLimiter` instances
   are memoized as controller-level constants and share the process-wide cache, so state must be

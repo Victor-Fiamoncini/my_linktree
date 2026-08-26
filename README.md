@@ -20,8 +20,9 @@ the app had before this migration:
 ```
 app/
 ├── controllers/
-│   ├── api/                   # contacts#create, telemetry#index, mcp#create, profile#show
+│   ├── api/                   # telemetry#index, mcp#create, profile#show
 │   ├── pages_controller.rb    # home page
+│   ├── contacts_controller.rb # POST /contact — redirect + flash
 │   └── telemetry_page_controller.rb
 ├── services/
 │   ├── use_cases/             # framework-agnostic business logic (constructor-injected deps)
@@ -32,7 +33,7 @@ app/
 ├── errors/                    # ApplicationError + 4 subclasses, serialize to {name,message,action}
 ├── mailers/                   # ContactMailer, MeetingMailer
 ├── models/                    # Booking (unique slot_start), AgentConnection
-└── javascript/controllers/    # 5 Stimulus controllers (contact form, telemetry polling, etc.)
+└── javascript/controllers/    # 4 Stimulus controllers (telemetry polling, mobile nav, etc.)
 ```
 
 **Layers:**
