@@ -6,7 +6,7 @@ export async function GET() {
 	try {
 		const getProfileUseCase = new GetProfileUseCase({ database: new MemoryDatabase() })
 
-		return new Response(await getProfileUseCase.execute(), { status: 200 })
+		return Response.json(await getProfileUseCase.execute(), { status: 200 })
 	} catch (error) {
 		const internalServerError = new InternalServerError({ cause: error })
 

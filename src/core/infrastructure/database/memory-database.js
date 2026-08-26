@@ -1,5 +1,6 @@
 export class MemoryDatabase {
 	#profile
+	#services
 
 	constructor() {
 		this.#profile = {
@@ -122,9 +123,36 @@ export class MemoryDatabase {
 				},
 			],
 		}
+
+		this.#services = [
+			{
+				id: 1,
+				name: 'Frontend & Backend Software Development',
+				description: 'Full-stack web systems — from user interfaces to APIs and databases.',
+			},
+			{
+				id: 2,
+				name: 'Agentic Systems & Integrations',
+				description: 'AI agent workflows, MCP servers, and LLM-powered integrations.',
+			},
+			{
+				id: 3,
+				name: 'Websites & Landing Pages',
+				description: 'Fast, responsive marketing sites and landing pages.',
+			},
+			{
+				id: 4,
+				name: 'Mobile Apps',
+				description: 'Cross-platform apps for iOS and Android.',
+			},
+		]
 	}
 
 	async getProfile() {
 		return this.#profile
+	}
+
+	async getServices() {
+		return this.#services
 	}
 }

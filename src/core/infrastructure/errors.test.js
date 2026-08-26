@@ -1,6 +1,87 @@
 import { describe, it, expect } from 'vitest'
 
-import { InternalServerError, TooManyRequestsError } from '@/core/infrastructure/errors'
+import {
+	InternalServerError,
+	MissingRequiredFieldsError,
+	SlotUnavailableError,
+	TooManyRequestsError,
+} from '@/core/infrastructure/errors'
+
+describe('MissingRequiredFieldsError', () => {
+	it('is an instance of Error', () => {
+		const error = new MissingRequiredFieldsError()
+
+		expect(error).toBeInstanceOf(Error)
+	})
+
+	it('has the correct message', () => {
+		const error = new MissingRequiredFieldsError()
+
+		expect(error.message).toBe('Missing required fields')
+	})
+
+	it('has the correct name', () => {
+		const error = new MissingRequiredFieldsError()
+
+		expect(error.name).toBe('MissingRequiredFieldsError')
+	})
+
+	it('has the correct action', () => {
+		const error = new MissingRequiredFieldsError()
+
+		expect(error.action).toBe('Check if all required fields are provided and try again.')
+	})
+
+	describe('toJSON()', () => {
+		it('returns name, message and action', () => {
+			const error = new MissingRequiredFieldsError()
+
+			expect(error.toJSON()).toEqual({
+				name: 'MissingRequiredFieldsError',
+				message: 'Missing required fields',
+				action: 'Check if all required fields are provided and try again.',
+			})
+		})
+	})
+})
+
+describe('SlotUnavailableError', () => {
+	it('is an instance of Error', () => {
+		const error = new SlotUnavailableError()
+
+		expect(error).toBeInstanceOf(Error)
+	})
+
+	it('has the correct message', () => {
+		const error = new SlotUnavailableError()
+
+		expect(error.message).toBe('Slot unavailable')
+	})
+
+	it('has the correct name', () => {
+		const error = new SlotUnavailableError()
+
+		expect(error.name).toBe('SlotUnavailableError')
+	})
+
+	it('has the correct action', () => {
+		const error = new SlotUnavailableError()
+
+		expect(error.action).toBe('Please choose a different slot and try again.')
+	})
+
+	describe('toJSON()', () => {
+		it('returns name, message and action', () => {
+			const error = new SlotUnavailableError()
+
+			expect(error.toJSON()).toEqual({
+				name: 'SlotUnavailableError',
+				message: 'Slot unavailable',
+				action: 'Please choose a different slot and try again.',
+			})
+		})
+	})
+})
 
 describe('TooManyRequestsError', () => {
 	it('is an instance of Error', () => {

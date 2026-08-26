@@ -4,6 +4,7 @@ import { FaLinkedin, FaGithub } from 'react-icons/fa'
 import ContactForm from '@/components/contact-form'
 import ExternalLink from '@/components/external-link'
 import ExperiencesSection from '@/components/experiences-section'
+import HireFromAgent from '@/components/hire-from-agent'
 import { GetXpYearsUseCase } from '@/core/application/use-cases/get-xp-years-use-case'
 import { GetProfileUseCase } from '@/core/application/use-cases/get-profile-use-case'
 import { MemoryDatabase } from '@/core/infrastructure/database/memory-database'
@@ -82,12 +83,14 @@ const HomePage = async () => {
 	const profile = await getProfileUseCase.execute()
 
 	return (
-		<main className="flex flex-col items-center justify-center gap-12 px-4 py-12">
+		<main className="flex flex-1 flex-col items-center justify-center gap-12 px-4 py-12">
 			<BrandSection />
 
 			<div id="experience" className="flex w-full justify-center">
 				<ExperiencesSection experiences={profile.experiences} />
 			</div>
+
+			<HireFromAgent />
 
 			<ContactFormSection />
 

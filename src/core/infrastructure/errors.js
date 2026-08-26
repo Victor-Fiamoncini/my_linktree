@@ -1,3 +1,37 @@
+export class MissingRequiredFieldsError extends Error {
+	constructor() {
+		super('Missing required fields')
+
+		this.name = 'MissingRequiredFieldsError'
+		this.action = 'Check if all required fields are provided and try again.'
+	}
+
+	toJSON() {
+		return {
+			name: this.name,
+			message: this.message,
+			action: this.action,
+		}
+	}
+}
+
+export class SlotUnavailableError extends Error {
+	constructor() {
+		super('Slot unavailable')
+
+		this.name = 'SlotUnavailableError'
+		this.action = 'Please choose a different slot and try again.'
+	}
+
+	toJSON() {
+		return {
+			name: this.name,
+			message: this.message,
+			action: this.action,
+		}
+	}
+}
+
 export class TooManyRequestsError extends Error {
 	constructor() {
 		super('Too many requests')

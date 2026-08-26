@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import { SendContactEmailUseCase, MissingRequiredFieldsError } from './send-contact-email-use-case'
+import { MissingRequiredFieldsError } from '@/core/infrastructure/errors'
+
+import { SendContactEmailUseCase } from './send-contact-email-use-case'
 
 describe('SendContactEmailUseCase', () => {
 	let mailerMock

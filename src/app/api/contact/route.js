@@ -1,28 +1,22 @@
-import {
-	MissingRequiredFieldsError,
-	SendContactEmailUseCase,
-} from '@/core/application/use-cases/send-contact-email-use-case'
-import { InternalServerError } from '@/core/infrastructure/errors'
-import { ResendMailer } from '@/core/infrastructure/mailer/resend-mailer'
+import { SendContactEmailUseCase } from '@/core/application/use-cases/send-contact-email-use-case'
+import { InternalServerError, MissingRequiredFieldsError, TooManyRequestsError } from '@/core/infrastructure/errors'
+import { createMailer } from '@/core/infrastructure/mailer/create-mailer'
+import { UpstashRateLimiter } from '@/core/infrastructure/rate-limiter/upstash-rate-limiter'
 
-// Commented out rate limiting for now due Redis cost issues
-// import { TooManyRequestsError } from '@/core/infrastructure/errors'
-// import { UpstashRateLimiter } from '@/core/infrastructure/rate-limiter/upstash-rate-limiter'
-
-// const rateLimiter = new UpstashRateLimiter({ maxRequests: 2, window: '10 m' })
+const rateLimiter = new UpstashRateLimiter({ maxRequests: 2, window: '10 m' })
 
 export async function POST(request) {
-	// const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')
+	const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')
 
-	// if (ip && !(await rateLimiter.isAllowed(ip))) {
-	// 	return Response.json(new TooManyRequestsError(), { status: 429 })
-	// }
+	if (ip && !(await rateLimiter.isAllowed(ip))) {
+		return Response.json(new TooManyRequestsError(), { status: 429 })
+	}
 
 	const { name, email, message } = await request.json()
 
 	try {
 		const sendContactEmailUseCase = new SendContactEmailUseCase({
-			mailer: new ResendMailer({ resendApiKey: process.env.MAILER_RESEND_API_KEY }),
+			mailer: createMailer(),
 			senderEmail: process.env.MAILER_SENDER_EMAIL,
 			recipientEmail: process.env.MAILER_RECIPIENT_EMAIL,
 		})

@@ -76,7 +76,7 @@ const makeRequest = (body, headers = {}) =>
 const ip = addr => ({ 'x-forwarded-for': addr })
 const validBody = { name: 'John Doe', email: 'john@example.com', message: 'Hello!' }
 
-describe.skip('UpstashRateLimiter integration with POST /api/contact — disabled: rate limiter commented out', () => {
+describe('UpstashRateLimiter integration with POST /api/contact', () => {
 	let POST
 
 	beforeEach(async () => {
@@ -90,8 +90,8 @@ describe.skip('UpstashRateLimiter integration with POST /api/contact — disable
 		process.env.SENDER_EMAIL = 'sender@example.com'
 		process.env.RECIPIENT_EMAIL = 'recipient@example.com'
 
-		const module = await import('@/app/api/contact/route')
-		POST = module.POST
+		const contactRouteModule = await import('@/app/api/contact/route')
+		POST = contactRouteModule.POST
 	})
 
 	afterEach(() => {

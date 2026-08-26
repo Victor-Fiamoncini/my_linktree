@@ -80,4 +80,21 @@ describe('MemoryDatabase', () => {
 
 		expect(first).toEqual(second)
 	})
+
+	it('should return services as a non-empty array', async () => {
+		const services = await db.getServices()
+
+		expect(Array.isArray(services)).toBe(true)
+		expect(services.length).toBeGreaterThan(0)
+	})
+
+	it('should return each service with required fields', async () => {
+		const services = await db.getServices()
+
+		for (const service of services) {
+			expect(service).toHaveProperty('id')
+			expect(service).toHaveProperty('name')
+			expect(service).toHaveProperty('description')
+		}
+	})
 })

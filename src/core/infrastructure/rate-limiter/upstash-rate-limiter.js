@@ -16,6 +16,7 @@ export class UpstashRateLimiter {
 
 	async isAllowed(identifier) {
 		const { success } = await this.#limiter.limit(identifier)
+
 		return success
 	}
 }
