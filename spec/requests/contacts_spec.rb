@@ -27,10 +27,10 @@ RSpec.describe "Contacts", type: :request do
     expect(flash[:alert]).to include("Too many requests")
   end
 
-  it "skips rate limiting when no IP header is present" do
-    3.times do
-      post "/contact", params: valid_params
-      expect(flash[:notice]).to be_present
-    end
+  it "rate limits by the real connection IP when no X-Forwarded-For header is present" do
+    2.times { post "/contact", params: valid_params }
+    post "/contact", params: valid_params
+
+    expect(flash[:alert]).to include("Too many requests")
   end
 end

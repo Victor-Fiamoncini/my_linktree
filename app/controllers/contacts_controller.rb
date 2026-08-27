@@ -1,10 +1,10 @@
 class ContactsController < ApplicationController
-  rate_limit to: 2, within: 10.minutes, by: -> { rate_limit_identifier },
-    unless: -> { rate_limit_identifier.blank? }, only: :create
+  rate_limit to: 2, within: 10.minutes, by: -> { rate_limit_identifier }, only: :create
 
   rescue_from StandardError, with: :redirect_with_internal_error
   rescue_from ArgumentError, with: :redirect_with_missing_fields
   rescue_from ActionController::TooManyRequests, with: :redirect_with_too_many_requests
+  rescue_from ActionController::InvalidAuthenticityToken, with: :redirect_with_invalid_authenticity_token
 
   def create
     UseCases::SendContactEmailUseCase.new.execute(**contact_params)
@@ -26,6 +26,11 @@ class ContactsController < ApplicationController
 
   def redirect_with_too_many_requests
     flash[:alert] = "Too many requests. Please wait a moment before trying again."
+    redirect_to root_path(anchor: "contact")
+  end
+
+  def redirect_with_invalid_authenticity_token
+    flash[:alert] = "Your session expired. Please try submitting the form again."
     redirect_to root_path(anchor: "contact")
   end
 
