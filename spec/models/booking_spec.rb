@@ -22,6 +22,20 @@ RSpec.describe Booking, type: :model do
     expect(booking).to be_valid
   end
 
+  it "rejects a malformed email" do
+    booking = Booking.new(name: "Jane", email: "not-an-email", slot_start: 1.day.from_now)
+
+    expect(booking).not_to be_valid
+    expect(booking.errors[:email]).to be_present
+  end
+
+  it "rejects a name longer than 255 characters" do
+    booking = Booking.new(name: "a" * 256, email: "jane@example.com", slot_start: 1.day.from_now)
+
+    expect(booking).not_to be_valid
+    expect(booking.errors[:name]).to be_present
+  end
+
   it "prevents two bookings for the same slot_start" do
     slot_start = 1.day.from_now.change(usec: 0)
     Booking.create!(name: "Jane", email: "jane@example.com", slot_start: slot_start)
