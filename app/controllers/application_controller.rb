@@ -11,13 +11,18 @@ class ApplicationController < ActionController::Base
 
   def set_default_description
     xp_years = UseCases::GetXpYearsUseCase.new.execute
+
     @default_description =
       "Software Engineer with #{xp_years} years of experience in both companies and freelance projects. " \
       "Currently focused on back-end development using PHP (Laravel/Symfony) and NodeJS, while also " \
       "building personal projects with Ruby on Rails and Next.js."
   end
 
+  # Rails' own trusted-proxy-aware IP resolution — honors X-Forwarded-For/X-Real-IP only when
+  # they come from a trusted proxy (loopback/private ranges by default; see
+  # config.action_dispatch.trusted_proxies), and otherwise falls back to the real connection IP.
+  # Unlike reading those headers directly, a client can't spoof this to dodge rate limiting.
   def rate_limit_identifier
-    request.headers["X-Forwarded-For"] || request.headers["X-Real-IP"]
+    request.remote_ip
   end
 end
