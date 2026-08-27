@@ -16,23 +16,23 @@ RSpec.describe UseCases::ScheduleMeetingUseCase do
     expect(subjects).to eq([ "My Linktree - Meeting scheduled", "My Linktree - New meeting booked by Jane" ])
   end
 
-  it "raises MissingRequiredFieldsError when a required field is missing" do
+  it "raises ArgumentError when a required field is missing" do
     expect {
       use_case.execute(name: "", email: "jane@example.com", slot_start: slot_start)
-    }.to raise_error(MissingRequiredFieldsError)
+    }.to raise_error(ArgumentError, "Missing required fields")
   end
 
-  it "raises SlotUnavailableError when the slot isn't currently available" do
+  it "raises ArgumentError when the slot isn't currently available" do
     expect {
       use_case.execute(name: "Jane", email: "jane@example.com", slot_start: "2099-01-01T00:00:00.000Z")
-    }.to raise_error(SlotUnavailableError)
+    }.to raise_error(ArgumentError, "Slot unavailable")
   end
 
-  it "raises SlotUnavailableError on a double-booking race" do
+  it "raises ArgumentError on a double-booking race" do
     Booking.create!(name: "Bob", email: "bob@example.com", slot_start: slot_start)
 
     expect {
       use_case.execute(name: "Jane", email: "jane@example.com", slot_start: slot_start)
-    }.to raise_error(SlotUnavailableError)
+    }.to raise_error(ArgumentError, "Slot unavailable")
   end
 end

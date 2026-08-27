@@ -10,9 +10,9 @@ RSpec.describe UseCases::SendContactEmailUseCase do
     expect(mail.subject).to eq("My Linktree - New contact from Jane")
   end
 
-  it "raises MissingRequiredFieldsError when a field is missing" do
+  it "raises ArgumentError when a field is missing" do
     expect {
       described_class.new.execute(name: "", email: "jane@example.com", message: "Hello!")
-    }.to raise_error(MissingRequiredFieldsError)
+    }.to raise_error(ArgumentError, "Missing required fields")
   end
 end

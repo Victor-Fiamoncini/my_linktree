@@ -1,21 +1,15 @@
 module Api
   class McpController < BaseController
-    GENERAL_RATE_LIMITER = RateLimiter.new(key_prefix: "mcp:general", max_requests: 30, window: 1.minute)
-    SCHEDULE_RATE_LIMITER = RateLimiter.new(key_prefix: "mcp:schedule_meeting", max_requests: 3, window: 10.minutes)
-
     TOOLS = [ GetResumeTool, ListServicesTool, CheckAvailabilityTool, ScheduleMeetingTool ].freeze
 
+    rate_limit to: 30, within: 1.minute, by: -> { rate_limit_identifier },
+      unless: -> { rate_limit_identifier.blank? }, only: :create
+    rate_limit to: 3, within: 10.minutes, name: "schedule_meeting", by: -> { rate_limit_identifier },
+      unless: -> { rate_limit_identifier.blank? || !schedule_meeting_call? }, only: :create
+
+    rescue_from ActionController::TooManyRequests, with: :render_too_many_requests
+
     def create
-      ip = rate_limit_identifier
-
-      unless GENERAL_RATE_LIMITER.allowed?(ip)
-        return render json: too_many_requests_body, status: :too_many_requests
-      end
-
-      if ip.present? && schedule_meeting_call? && !SCHEDULE_RATE_LIMITER.allowed?(ip)
-        return render json: too_many_requests_body, status: :too_many_requests
-      end
-
       server = MCP::Server.new(name: "my_linktree", tools: TOOLS)
       transport = MCP::Server::Transports::StreamableHTTPTransport.new(server, stateless: true)
       status, headers, body = transport.handle_request(request)
@@ -27,8 +21,9 @@ module Api
 
     private
 
-    def too_many_requests_body
-      { message: "Too many requests", action: "Please wait a moment before trying again." }
+    def render_too_many_requests
+      render json: { message: "Too many requests", action: "Please wait a moment before trying again." },
+             status: :too_many_requests
     end
 
     def schedule_meeting_call?

@@ -1,15 +1,12 @@
 class ContactsController < ApplicationController
-  RATE_LIMITER = RateLimiter.new(key_prefix: "contact", max_requests: 2, window: 10.minutes)
+  rate_limit to: 2, within: 10.minutes, by: -> { rate_limit_identifier },
+    unless: -> { rate_limit_identifier.blank? }, only: :create
 
   rescue_from StandardError, with: :redirect_with_internal_error
-  rescue_from MissingRequiredFieldsError, with: :redirect_with_missing_fields
+  rescue_from ArgumentError, with: :redirect_with_missing_fields
+  rescue_from ActionController::TooManyRequests, with: :redirect_with_too_many_requests
 
   def create
-    unless RATE_LIMITER.allowed?(rate_limit_identifier)
-      flash[:alert] = "Too many requests. Please wait a moment before trying again."
-      return redirect_to root_path(anchor: "contact")
-    end
-
     UseCases::SendContactEmailUseCase.new.execute(**contact_params)
 
     flash[:notice] = "Thank you for your message! I'll get back to you as soon as possible."
@@ -23,7 +20,12 @@ class ContactsController < ApplicationController
   end
 
   def redirect_with_missing_fields(e)
-    flash[:alert] = "#{e.message}. #{e.action}"
+    flash[:alert] = "#{e.message}. Check if all required fields are provided and try again."
+    redirect_to root_path(anchor: "contact")
+  end
+
+  def redirect_with_too_many_requests
+    flash[:alert] = "Too many requests. Please wait a moment before trying again."
     redirect_to root_path(anchor: "contact")
   end
 

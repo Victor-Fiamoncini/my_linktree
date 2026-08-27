@@ -17,7 +17,7 @@ class ScheduleMeetingTool < MCP::Tool
 
     payload = { name: booking[:name], email: booking[:email], company: booking[:company], slotStart: booking[:slot_start] }
     MCP::Tool::Response.new([ { type: "text", text: payload.to_json } ])
-  rescue ApplicationError => e
+  rescue ArgumentError => e
     MCP::Tool::Response.new([ { type: "text", text: e.message } ], error: true)
   end
 end

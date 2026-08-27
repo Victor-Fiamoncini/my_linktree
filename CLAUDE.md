@@ -74,13 +74,11 @@ app/
       send_contact_email_use_case.rb
       record_agent_connection_use_case.rb
       list_recent_connections_use_case.rb
-    rate_limiter.rb             # Rails.cache (Solid Cache)-backed; blank identifier = always allowed
     config_database.rb          # loads config/profile.yml (static resume/services data)
     seo_config.rb
     agents_content.rb           # AGENTS.md content, shared by the UI snippet and /AGENTS.md route
   mcp_tools/                    # MCP::Tool subclasses: get_resume, list_services,
                                  # check_availability, schedule_meeting
-  errors/                       # ApplicationError + 4 subclasses (see "Errors" below)
   javascript/controllers/       # Stimulus: telemetry_feed, mobile_nav, experiences_tabs,
                                  # hire_from_agent
   views/
@@ -99,17 +97,24 @@ config/
 - **Use cases** (`app/services/use_cases/`) contain all business logic and have no controller/view
   dependency. They're unit-tested in isolation using RSpec with doubles/instance_doubles for
   collaborators.
-- **Errors** (`app/errors/`): `ApplicationError` is a `StandardError` subclass with an `action`
-  message and a custom `#as_json` returning `{ name, message, action }`. Four subclasses:
-  `MissingRequiredFieldsError` (400), `SlotUnavailableError` (surfaced as MCP `isError: true`, not
-  an HTTP status), `TooManyRequestsError` (429), `InternalServerError` (500).
-- **Rate limiting**: `RateLimiter` wraps `Rails.cache` (`Rails.cache.increment` with `expires_in`),
-  which is Solid Cache (Postgres-backed) in both development and production, and `MemoryStore` in
-  test. Used explicitly inside `ContactsController` and `Api::McpController` rather than
-  Rails' declarative `rate_limit` class macro, because the `schedule_meeting`-specific throttle
-  needs to inspect the parsed JSON-RPC body before deciding which limiter(s) apply. A blank
-  identifier (no `x-forwarded-for`/`x-real-ip` header) always returns `allowed? == true` — rate
-  limiting is skipped entirely for such requests, matching the original behavior.
+- **Errors**: no custom error hierarchy — use cases raise plain `ArgumentError` (with a message
+  like `"Missing required fields"` or `"Slot unavailable"`) for validation/business-rule failures.
+  Controllers catch it via `rescue_from ArgumentError` (`ContactsController`); `ScheduleMeetingTool`
+  catches it directly (`rescue ArgumentError => e`) and turns it into an MCP `isError: true`
+  response using `e.message`. Anything else falls through to a generic `rescue_from StandardError`
+  (`ContactsController`, `Api::BaseController`) for a 500-equivalent response.
+- **Rate limiting**: uses Rails 8's declarative `rate_limit` class macro
+  (`ActionController::RateLimiting`) in `ContactsController` and `Api::McpController`, backed by
+  `Rails.cache` — Solid Cache (Postgres-backed) in development/production, `MemoryStore` in test.
+  A blank identifier (no `x-forwarded-for`/`x-real-ip` header, read via
+  `ApplicationController#rate_limit_identifier`) skips the `rate_limit` before_action entirely via
+  `unless: -> { rate_limit_identifier.blank? }`, matching the original "always allowed" behavior.
+  `Api::McpController` declares two named limiters on the same action — a general one and a
+  `schedule_meeting`-specific one — and the schedule-specific limiter's `unless:` proc additionally
+  calls `schedule_meeting_call?` (which parses and rewinds the JSON-RPC request body) so it only
+  counts against requests calling the `schedule_meeting` tool. Both controllers catch the resulting
+  `ActionController::TooManyRequests` via `rescue_from` rather than using the macro's `with:` option,
+  to keep the handling consistent with their other `rescue_from`-based error handling.
 - **MCP server** (`Api::McpController`): builds a fresh `MCP::Server` + stateless
   `MCP::Server::Transports::StreamableHTTPTransport` per request (official `mcp` gem), and proxies
   its Rack `[status, headers, body]` triple straight through the Rails response (`self.status=`,

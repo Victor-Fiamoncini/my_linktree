@@ -37,9 +37,9 @@ end
 RSpec.configure do |config|
   config.include ActiveSupport::Testing::TimeHelpers
 
-  # RateLimiter instances are memoized as controller constants and share the process-wide
-  # Rails.cache (MemoryStore in test), so state must be cleared between examples or one
-  # spec's requests would count toward another spec's rate limit.
+  # Rails' rate_limit macro shares the process-wide Rails.cache (MemoryStore in test) for its
+  # counters, so state must be cleared between examples or one spec's requests would count
+  # toward another spec's rate limit.
   config.before { Rails.cache.clear }
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures

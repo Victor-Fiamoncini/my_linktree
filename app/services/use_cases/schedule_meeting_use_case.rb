@@ -5,17 +5,17 @@ module UseCases
     end
 
     def execute(name:, email:, slot_start:, company: nil)
-      raise MissingRequiredFieldsError if name.blank? || email.blank? || slot_start.blank?
+      raise ArgumentError, "Missing required fields" if name.blank? || email.blank? || slot_start.blank?
 
       available_slots = @check_availability_use_case.execute[:slots]
-      raise SlotUnavailableError unless available_slots.include?(slot_start)
+      raise ArgumentError, "Slot unavailable" unless available_slots.include?(slot_start)
 
       booking = Booking.new(name: name, email: email, company: company, slot_start: slot_start)
 
       begin
-        raise SlotUnavailableError unless booking.save
+        raise ArgumentError, "Slot unavailable" unless booking.save
       rescue ActiveRecord::RecordNotUnique
-        raise SlotUnavailableError
+        raise ArgumentError, "Slot unavailable"
       end
 
       MeetingMailer.confirmation(name: name, email: email, slot_start: slot_start).deliver_now
