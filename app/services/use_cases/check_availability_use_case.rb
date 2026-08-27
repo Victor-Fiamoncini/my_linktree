@@ -1,8 +1,7 @@
 module UseCases
   class CheckAvailabilityUseCase
-    def initialize(availability_config: Rails.application.config_for(:availability), bookings: Booking)
+    def initialize(availability_config: Rails.application.config_for(:availability))
       @availability_config = availability_config
-      @bookings = bookings
     end
 
     def execute
@@ -15,7 +14,7 @@ module UseCases
       today = now.in_time_zone(zone).to_date
       horizon_end = zone.parse("#{today + horizon_days} 23:59")
 
-      booked_slots = @bookings.where(slot_start: now..horizon_end).pluck(:slot_start).map { |t| to_iso(t) }.to_set
+      booked_slots = Booking.where(slot_start: now..horizon_end).pluck(:slot_start).map { |t| to_iso(t) }.to_set
 
       slots = []
 

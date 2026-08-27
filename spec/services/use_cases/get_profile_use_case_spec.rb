@@ -1,11 +1,11 @@
 require "rails_helper"
 
 RSpec.describe UseCases::GetProfileUseCase do
-  it "returns the profile from the database" do
-    database = double("database", profile: { name: "Jane" })
+  it "returns the profile from the config" do
+    config = { name: "Jane", experiences: [], education: [] }
 
-    result = described_class.new(database: database).execute
+    result = described_class.new(config: config).execute
 
-    expect(result).to eq(name: "Jane")
+    expect(result).to eq(name: "Jane", experiences: [], education: [])
   end
 end

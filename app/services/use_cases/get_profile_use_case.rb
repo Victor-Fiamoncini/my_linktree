@@ -1,11 +1,11 @@
 module UseCases
   class GetProfileUseCase
-    def initialize(database: ConfigDatabase.new)
-      @database = database
+    def initialize(config: Rails.application.config_for(:profile))
+      @config = config
     end
 
     def execute
-      @database.profile
+      { name: @config[:name], experiences: @config[:experiences], education: @config[:education] }
     end
   end
 end

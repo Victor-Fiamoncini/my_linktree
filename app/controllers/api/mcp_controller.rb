@@ -6,14 +6,14 @@ module Api
     TOOLS = [ GetResumeTool, ListServicesTool, CheckAvailabilityTool, ScheduleMeetingTool ].freeze
 
     def create
-      ip = request.headers["X-Forwarded-For"] || request.headers["X-Real-IP"]
+      ip = rate_limit_identifier
 
       unless GENERAL_RATE_LIMITER.allowed?(ip)
-        return render json: TooManyRequestsError.new, status: :too_many_requests
+        return render json: too_many_requests_body, status: :too_many_requests
       end
 
       if ip.present? && schedule_meeting_call? && !SCHEDULE_RATE_LIMITER.allowed?(ip)
-        return render json: TooManyRequestsError.new, status: :too_many_requests
+        return render json: too_many_requests_body, status: :too_many_requests
       end
 
       server = MCP::Server.new(name: "my_linktree", tools: TOOLS)
@@ -26,6 +26,10 @@ module Api
     end
 
     private
+
+    def too_many_requests_body
+      { message: "Too many requests", action: "Please wait a moment before trying again." }
+    end
 
     def schedule_meeting_call?
       parsed = JSON.parse(request.body.read)

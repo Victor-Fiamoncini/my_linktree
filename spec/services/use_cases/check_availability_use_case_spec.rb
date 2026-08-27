@@ -15,7 +15,7 @@ RSpec.describe UseCases::CheckAvailabilityUseCase do
   around { |example| travel_to(frozen_time) { example.run } }
 
   it "returns one-hour slots for a 09:00-12:00 window, converted to UTC" do
-    result = described_class.new(availability_config: availability_config, bookings: Booking).execute
+    result = described_class.new(availability_config: availability_config).execute
 
     expect(result[:timezone]).to eq("America/Sao_Paulo")
     expect(result[:slots]).to eq(
@@ -30,7 +30,7 @@ RSpec.describe UseCases::CheckAvailabilityUseCase do
   it "excludes already booked slots" do
     Booking.create!(name: "Jane", email: "jane@example.com", slot_start: "2027-03-03T13:00:00.000Z")
 
-    result = described_class.new(availability_config: availability_config, bookings: Booking).execute
+    result = described_class.new(availability_config: availability_config).execute
 
     expect(result[:slots]).to eq(%w[2027-03-03T12:00:00.000Z 2027-03-03T14:00:00.000Z])
   end
@@ -38,7 +38,7 @@ RSpec.describe UseCases::CheckAvailabilityUseCase do
   it "excludes days that don't match any weekly window" do
     config = availability_config.merge(weekly_windows: [ { weekday: 6, start: "09:00", end: "12:00" } ])
 
-    result = described_class.new(availability_config: config, bookings: Booking).execute
+    result = described_class.new(availability_config: config).execute
 
     expect(result[:slots]).to eq([])
   end

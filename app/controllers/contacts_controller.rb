@@ -1,12 +1,12 @@
 class ContactsController < ApplicationController
   RATE_LIMITER = RateLimiter.new(key_prefix: "contact", max_requests: 2, window: 10.minutes)
 
-  def create
-    ip = request.headers["X-Forwarded-For"] || request.headers["X-Real-IP"]
+  rescue_from StandardError, with: :redirect_with_internal_error
+  rescue_from MissingRequiredFieldsError, with: :redirect_with_missing_fields
 
-    unless RATE_LIMITER.allowed?(ip)
-      error = TooManyRequestsError.new
-      flash[:alert] = "#{error.message}. #{error.action}"
+  def create
+    unless RATE_LIMITER.allowed?(rate_limit_identifier)
+      flash[:alert] = "Too many requests. Please wait a moment before trying again."
       return redirect_to root_path(anchor: "contact")
     end
 
@@ -14,19 +14,22 @@ class ContactsController < ApplicationController
 
     flash[:notice] = "Thank you for your message! I'll get back to you as soon as possible."
     redirect_to root_path(anchor: "contact")
-  rescue MissingRequiredFieldsError => e
-    flash[:alert] = "#{e.message}. #{e.action}"
-    redirect_to root_path(anchor: "contact")
-  rescue => e
-    Rails.logger.error(e)
-    error = InternalServerError.new(cause: e)
-    flash[:alert] = "#{error.message}. #{error.action}"
-    redirect_to root_path(anchor: "contact")
   end
 
   private
 
   def contact_params
-    { name: params[:name], email: params[:email], message: params[:message] }
+    params.permit(:name, :email, :message).to_h.symbolize_keys
+  end
+
+  def redirect_with_missing_fields(e)
+    flash[:alert] = "#{e.message}. #{e.action}"
+    redirect_to root_path(anchor: "contact")
+  end
+
+  def redirect_with_internal_error(e)
+    Rails.logger.error(e)
+    flash[:alert] = "Internal Server Error. Please contact the administrator of the application."
+    redirect_to root_path(anchor: "contact")
   end
 end

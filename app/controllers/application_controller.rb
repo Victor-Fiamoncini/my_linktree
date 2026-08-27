@@ -16,4 +16,8 @@ class ApplicationController < ActionController::Base
       "Currently focused on back-end development using PHP (Laravel/Symfony) and NodeJS, while also " \
       "building personal projects with Ruby on Rails and Next.js."
   end
+
+  def rate_limit_identifier
+    request.headers["X-Forwarded-For"] || request.headers["X-Real-IP"]
+  end
 end
