@@ -2,20 +2,21 @@ module Api
   class McpController < BaseController
     TOOLS = [ GetResumeTool, ListServicesTool, CheckAvailabilityTool, ScheduleMeetingTool ].freeze
 
-    rate_limit to: 30, within: 1.minute, by: -> { rate_limit_identifier },
-      unless: -> { rate_limit_identifier.blank? }, only: :create
+    rate_limit to: 30, within: 1.minute, by: -> { rate_limit_identifier }, only: :create
     rate_limit to: 3, within: 10.minutes, name: "schedule_meeting", by: -> { rate_limit_identifier },
-      unless: -> { rate_limit_identifier.blank? || !schedule_meeting_call? }, only: :create
+      unless: -> { !schedule_meeting_call? }, only: :create
 
     rescue_from ActionController::TooManyRequests, with: :render_too_many_requests
 
     def create
       server = MCP::Server.new(name: "my_linktree", tools: TOOLS)
-      transport = MCP::Server::Transports::StreamableHTTPTransport.new(server, stateless: true)
+      transport = MCP::Server::Transports::StreamableHTTPTransport.new(
+        server, stateless: true, allowed_hosts: [ URI.parse(SeoConfig::SITE_URL).host ]
+      )
       status, headers, body = transport.handle_request(request)
 
-      self.status = status
       headers.each { |key, value| response.set_header(key, value) }
+      self.status = status
       self.response_body = body
     end
 

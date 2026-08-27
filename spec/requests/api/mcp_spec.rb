@@ -112,10 +112,13 @@ RSpec.describe "Api::Mcp", type: :request do
     expect(response).to have_http_status(:too_many_requests)
   end
 
-  it "skips rate limiting when no IP header is present" do
-    35.times do
-      post "/api/mcp", params: rpc(id: 1, method: "tools/list"), headers: headers
+  it "rate limits by the real connection IP when no X-Forwarded-For header is present" do
+    30.times do |i|
+      post "/api/mcp", params: rpc(id: i, method: "tools/list"), headers: headers
       expect(response).to have_http_status(:ok)
     end
+
+    post "/api/mcp", params: rpc(id: 31, method: "tools/list"), headers: headers
+    expect(response).to have_http_status(:too_many_requests)
   end
 end
