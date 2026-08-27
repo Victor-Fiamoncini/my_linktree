@@ -74,7 +74,6 @@ app/
       send_contact_email_use_case.rb
       record_agent_connection_use_case.rb
       list_recent_connections_use_case.rb
-    config_database.rb          # loads config/profile.yml (static resume/services data)
     seo_config.rb
     agents_content.rb           # AGENTS.md content, shared by the UI snippet and /AGENTS.md route
   mcp_tools/                    # MCP::Tool subclasses: get_resume, list_services,
@@ -96,35 +95,45 @@ config/
 
 - **Use cases** (`app/services/use_cases/`) contain all business logic and have no controller/view
   dependency. They're unit-tested in isolation using RSpec with doubles/instance_doubles for
-  collaborators.
+  collaborators. `GetProfileUseCase` and `ListServicesUseCase` load `config/profile.yml` directly
+  via `Rails.application.config_for(:profile)` — there's no `ConfigDatabase` wrapper class.
 - **Errors**: no custom error hierarchy — use cases raise plain `ArgumentError` (with a message
   like `"Missing required fields"` or `"Slot unavailable"`) for validation/business-rule failures.
   Controllers catch it via `rescue_from ArgumentError` (`ContactsController`); `ScheduleMeetingTool`
   catches it directly (`rescue ArgumentError => e`) and turns it into an MCP `isError: true`
-  response using `e.message`. Anything else falls through to a generic `rescue_from StandardError`
+  response using `e.message`. `ContactsController` also has a dedicated
+  `rescue_from ActionController::InvalidAuthenticityToken` (Rails' default CSRF protection raises
+  this on a missing/stale token) so an expired session redirects with a flash message instead of
+  a raw 422. Anything else falls through to a generic `rescue_from StandardError`
   (`ContactsController`, `Api::BaseController`) for a 500-equivalent response.
 - **Rate limiting**: uses Rails 8's declarative `rate_limit` class macro
   (`ActionController::RateLimiting`) in `ContactsController` and `Api::McpController`, backed by
   `Rails.cache` — Solid Cache (Postgres-backed) in development/production, `MemoryStore` in test.
-  A blank identifier (no `x-forwarded-for`/`x-real-ip` header, read via
-  `ApplicationController#rate_limit_identifier`) skips the `rate_limit` before_action entirely via
-  `unless: -> { rate_limit_identifier.blank? }`, matching the original "always allowed" behavior.
+  `ApplicationController#rate_limit_identifier` returns `request.remote_ip` — Rails' own
+  trusted-proxy-aware IP resolution — rather than reading `X-Forwarded-For`/`X-Real-IP` directly, so
+  a client can't spoof or omit those headers to dodge the limit; every request is rate-limited by
+  its real connection IP (or the proxy-forwarded IP, only when the connection comes from a trusted
+  proxy — see `config.action_dispatch.trusted_proxies` if this app ever sits behind a public-IP
+  reverse proxy/CDN, which needs to be added to that list to be trusted).
   `Api::McpController` declares two named limiters on the same action — a general one and a
-  `schedule_meeting`-specific one — and the schedule-specific limiter's `unless:` proc additionally
-  calls `schedule_meeting_call?` (which parses and rewinds the JSON-RPC request body) so it only
-  counts against requests calling the `schedule_meeting` tool. Both controllers catch the resulting
+  `schedule_meeting`-specific one — and the schedule-specific limiter's `unless:` proc calls
+  `schedule_meeting_call?` (which parses and rewinds the JSON-RPC request body) so it only counts
+  against requests calling the `schedule_meeting` tool. Both controllers catch the resulting
   `ActionController::TooManyRequests` via `rescue_from` rather than using the macro's `with:` option,
   to keep the handling consistent with their other `rescue_from`-based error handling.
 - **MCP server** (`Api::McpController`): builds a fresh `MCP::Server` + stateless
   `MCP::Server::Transports::StreamableHTTPTransport` per request (official `mcp` gem), and proxies
   its Rack `[status, headers, body]` triple straight through the Rails response (`self.status=`,
   `response.set_header`, `self.response_body=`) rather than using `render`, so both the plain-JSON
-  and SSE response shapes pass through untouched. The 4 `MCP::Tool` subclasses deliberately don't
-  declare `required:` in their `input_schema` — the gem short-circuits before calling the tool when
-  required args are missing, but the original behavior (and this port's) records the agent
-  connection *before* validating, even for calls that go on to fail. Validation instead happens
-  inside the use cases, with domain errors caught in the tool's `call` and turned into
-  `MCP::Tool::Response.new(..., error: true)` rather than raised.
+  and SSE response shapes pass through untouched. The transport is constructed with
+  `allowed_hosts: [URI.parse(SeoConfig::SITE_URL).host]` — the gem's DNS-rebinding protection only
+  accepts loopback `Host` headers by default, which would reject every real production request
+  without this. The 4 `MCP::Tool` subclasses deliberately don't declare `required:` in their
+  `input_schema` — the gem short-circuits before calling the tool when required args are missing,
+  but the original behavior (and this port's) records the agent connection *before* validating,
+  even for calls that go on to fail. Validation instead happens inside the use cases, with domain
+  errors caught in the tool's `call` and turned into `MCP::Tool::Response.new(..., error: true)`
+  rather than raised.
 - **`@/` alias**: none — this is a standard Rails app, autoloaded via Zeitwerk from `app/*`.
   `app/services/use_cases/*.rb` autoloads as `UseCases::*` (the `use_cases` subdirectory becomes an
   implicit namespace under the `app/services` root).
@@ -134,9 +143,9 @@ config/
 RSpec, with specs co-located by type under `spec/` (`spec/models`, `spec/services/use_cases`,
 `spec/requests`, `spec/requests/api`).
 
-- `Rails.cache.clear` runs before every example (`spec/rails_helper.rb`) — `RateLimiter` instances
-  are memoized as controller-level constants and share the process-wide cache, so state must be
-  reset between examples or one spec's requests would count toward another spec's rate limit.
+- `Rails.cache.clear` runs before every example (`spec/rails_helper.rb`) — Rails' `rate_limit`
+  macro shares the process-wide cache for its counters, so state must be reset between examples or
+  one spec's requests would count toward another spec's rate limit.
 - The `mcp` gem's DNS-rebinding protection only allows loopback `Host` headers by default; request
   specs against `/api/mcp` need `host! "127.0.0.1"` (Rails' request-spec default host,
   `www.example.com`, gets rejected with 403).

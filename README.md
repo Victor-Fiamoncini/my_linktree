@@ -26,11 +26,8 @@ app/
 │   └── telemetry_page_controller.rb
 ├── services/
 │   ├── use_cases/             # framework-agnostic business logic (constructor-injected deps)
-│   ├── rate_limiter.rb        # Rails.cache (Solid Cache)-backed sliding-window-ish limiter
-│   ├── config_database.rb     # static profile/services data (config/profile.yml)
 │   └── seo_config.rb
 ├── mcp_tools/                 # get_resume, list_services, check_availability, schedule_meeting
-├── errors/                    # ApplicationError + 4 subclasses, serialize to {name,message,action}
 ├── mailers/                   # ContactMailer, MeetingMailer
 ├── models/                    # Booking (unique slot_start), AgentConnection
 └── javascript/controllers/    # 4 Stimulus controllers (telemetry polling, mobile nav, etc.)
@@ -43,8 +40,11 @@ app/
 - **Models** (`Booking`, `AgentConnection`) replace the old Redis-backed stores; double-booking
   prevention is a DB-level unique index on `slot_start` instead of a Redis `SETNX` reservation key.
 - **Controllers** are composition roots — they wire models/services to use cases and translate
-  HTTP (or JSON-RPC, for `/api/mcp`) concerns. Rate limiting runs before validation; requests
-  without a forwarded IP header skip the limiter entirely.
+  HTTP (or JSON-RPC, for `/api/mcp`) concerns. Rate limiting uses Rails 8's `rate_limit` macro,
+  keyed by `request.remote_ip` (Rails' trusted-proxy-aware IP resolution — a client can't spoof
+  or omit headers to dodge the limit). Use cases raise plain `ArgumentError` for validation/
+  business-rule failures instead of a custom error hierarchy; controllers and MCP tools catch it
+  via `rescue_from`/`rescue` and turn it into a user-facing message.
 - **MCP server** (`Api::McpController`) drives the `mcp` gem's `StreamableHTTPTransport` in
   stateless mode with 4 registered tools. Every tool call is recorded through
   `RecordAgentConnectionUseCase` before validation runs, so even failed calls show up on
@@ -82,8 +82,8 @@ bin/rubocop               # Lint (rubocop-rails-omakase)
 bin/rails db:migrate       # Run pending migrations
 ```
 
-## Testing the MCP server
+---
 
-See [`docs/testing-mcp.md`](docs/testing-mcp.md) for manually calling the MCP server (raw JSON-RPC
-requests, listing tools, booking a slot, checking rate limits and telemetry) — it also explains
-what MCP is and how it differs from plain HTTP/REST.
+Released in 2021.
+
+By [Victor B. Fiamoncini](https://github.com/Victor-Fiamoncini) ☕️
