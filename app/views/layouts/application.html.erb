@@ -4,9 +4,8 @@
     <meta charset="utf-8">
     <title><%= content_for(:title) || "Victor Fiamoncini" %></title>
     <meta name="description" content="<%= content_for(:description) || @default_description %>">
-    <meta name="keywords" content="Victor Fiamoncini, Software Developer, Software Engineer, Full Stack Developer, Developer, PHP, Laravel, Symfony, NodeJS, React, Next.js">
     <meta name="author" content="Victor Fiamoncini">
-    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="robots" content="<%= content_for(:robots) || "index, follow, max-image-preview:large" %>">
     <link rel="canonical" href="<%= SeoConfig::SITE_URL %><%= content_for(:canonical) || "/" %>">
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
