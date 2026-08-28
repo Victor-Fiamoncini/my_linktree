@@ -1,0 +1,64 @@
+# Name of your application. Used to uniquely configure containers.
+service: my-linktree
+
+# Name of the container image.
+image: <your-docker-hub-username>/my-linktree
+
+# Deploy to these servers.
+servers:
+  web:
+    - <VPS_IP>
+
+# Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
+# Remove this section when using multiple web servers and ensure you terminate SSL at your load balancer.
+#
+# Note: If using Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
+proxy:
+  ssl: true
+  host: victorfiamon.com.br
+  # Proxy connects to your container on port 80 by default (matches Dockerfile's EXPOSE 80 / Thruster).
+
+# Credentials for your image host.
+registry:
+  username: <your-docker-hub-username>
+
+  # Always use an access token rather than real password (pulled from .kamal/secrets).
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+# Configure builder setup.
+builder:
+  arch: amd64
+
+# Database host/port/username/password, mailer sender/recipient, and the Resend API key
+# all live in config/credentials/production.yml.enc instead of plain env vars.
+# RAILS_MASTER_KEY below is what decrypts that file at boot (it's the production.key,
+# not the shared master.key) — the only env var the app needs from Kamal.
+env:
+  secret:
+    - RAILS_MASTER_KEY
+
+# Use a persistent storage volume for Active Storage (local disk service in production).
+volumes:
+  - "my_linktree_storage:/rails/storage"
+
+# Use a different ssh user than root
+#
+# ssh:
+#   user: app
+
+# Bridge fingerprinted assets, like JS and CSS, between versions to avoid
+# hitting 404 on in-flight requests. Combines all files from new and old
+# version inside the asset_path.
+#
+# asset_path: /app/public/assets
+
+# Configure rolling deploys by setting a wait time between batches of restarts.
+#
+# boot:
+#   limit: 10 # Can also specify as a percentage of total hosts, such as "25%"
+#   wait: 2
+
+# No accessories block: Postgres is an external managed instance, reached via
+# database.host/port/username/password in config/credentials/production.yml.enc
+# (see config/database.yml).
