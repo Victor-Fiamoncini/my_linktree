@@ -3,7 +3,9 @@ require "rails_helper"
 RSpec.describe UseCases::SendContactEmailUseCase do
   it "sends a contact email" do
     expect {
-      described_class.new.execute(name: "Jane", email: "jane@example.com", message: "Hello!")
+      perform_enqueued_jobs do
+        described_class.new.execute(name: "Jane", email: "jane@example.com", message: "Hello!")
+      end
     }.to change { ActionMailer::Base.deliveries.size }.by(1)
 
     mail = ActionMailer::Base.deliveries.last

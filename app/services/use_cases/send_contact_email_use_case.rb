@@ -25,7 +25,7 @@ module UseCases
 
       raise ValidationError, errors if errors.any?
 
-      ContactMailer.new_contact(name: name, email: email, message: message).deliver_now
+      ContactMailer.new_contact(name: name, email: email, message: message).deliver_later
       nil
     end
   end
