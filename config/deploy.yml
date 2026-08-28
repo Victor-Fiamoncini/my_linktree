@@ -16,6 +16,8 @@ servers:
 proxy:
   ssl: true
   host: victorfiamon.com.br
+  healthcheck:
+    timeout: 120
   # Proxy connects to your container on port 80 by default (matches Dockerfile's EXPOSE 80 / Thruster).
 
 # Credentials for your image host.
@@ -26,10 +28,6 @@ registry:
   password:
     - KAMAL_REGISTRY_PASSWORD
 
-# Configure builder setup.
-builder:
-  arch: amd64
-
 # Database host/port/username/password, mailer sender/recipient, and the Resend API key
 # all live in config/credentials/production.yml.enc instead of plain env vars.
 # RAILS_MASTER_KEY below is what decrypts that file at boot (it's the production.key,
@@ -37,6 +35,18 @@ builder:
 env:
   secret:
     - RAILS_MASTER_KEY
+  clear:
+    # Run the Solid Queue supervisor inside Puma (single-server setup).
+    # Move to a dedicated `job:` server when you scale horizontally.
+    SOLID_QUEUE_IN_PUMA: true
+
+    # Operational tuning — adjust to match your VPS core count and workload.
+    # RAILS_MAX_THREADS: 3
+    # WEB_CONCURRENCY: 2
+    # JOB_CONCURRENCY: 1
+
+    # Increase log verbosity temporarily for debugging deploys.
+    # RAILS_LOG_LEVEL: debug
 
 # Useful shortcuts for day-to-day operations.
 aliases:
@@ -57,6 +67,18 @@ ssh:
 # hitting 404 on in-flight requests. Combines all files from a new and old
 # version inside the asset_path.
 asset_path: /rails/public/assets
+
+# Image builder configuration.
+builder:
+  # Hetzner VPS runs amd64. If you are on Apple Silicon (arm64), Docker Desktop
+  # can build for amd64 via QEMU, but it is slow. A faster alternative is to
+  # build directly on the Hetzner server itself:
+  #
+  # remote: ssh://foo@YOUR_HETZNER_IPV4
+  #
+  # With `remote` set, Kamal builds the image on the VPS (native amd64) and
+  # pushes it from there. Remove `arch` when using `remote`.
+  arch: amd64
 
 # Configure rolling deploys by setting a wait time between batches of restarts.
 #
