@@ -1,4 +1,4 @@
-<section id="agents" class="border-ctp-surface0 w-full max-w-[1080px] border-t pt-14 pb-14" data-controller="hire-from-agent">
+<section id="agents" class="border-ctp-surface0 w-full max-w-[1080px] border-t pt-14 pb-14" data-controller="hire-from-agent" data-hire-from-agent-content-value="<%= AgentsContent::CONTENT %>">
   <p class="text-ctp-peach mb-3.5 font-mono text-[13px] tracking-[0.06em]">$ ./hire-me --no-human-required</p>
 
   <h2 class="text-ctp-text mb-4 text-[28px] font-semibold tracking-[-0.025em] min-[900px]:text-[34px]">Hire me from your agent</h2>
@@ -24,7 +24,6 @@
         title="Copy AGENTS.md"
         data-action="hire-from-agent#copy"
         data-hire-from-agent-target="button"
-        data-hire-from-agent-content-value="<%= AgentsContent::CONTENT %>"
         class="cursor-pointer text-xs font-bold tracking-widest uppercase transition-colors text-[#89b4fa] hover:text-[#cdd6f4]"
       >Copy</button>
     </div>
