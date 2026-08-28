@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: my_linktree
       POSTGRES_PASSWORD: my_linktree
-      POSTGRES_DB: my_linktree_local
+      POSTGRES_DB: my_linktree_development
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
