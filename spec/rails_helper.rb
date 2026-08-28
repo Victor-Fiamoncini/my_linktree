@@ -9,6 +9,17 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 # return unless Rails.env.test?
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
+require 'capybara/rspec'
+require 'capybara/cuprite'
+
+# Cuprite drives a real headless Chrome via CDP (no chromedriver/Selenium version to manage) for
+# spec/system specs, so client-side JS (Stimulus controllers, fetch calls) gets real coverage
+# instead of just the JSON contract request specs already exercise.
+Capybara.register_driver(:cuprite) do |app|
+  Capybara::Cuprite::Driver.new(app, window_size: [ 1200, 800 ], process_timeout: 15, timeout: 10)
+end
+Capybara.default_driver = :cuprite
+Capybara.javascript_driver = :cuprite
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -41,6 +52,20 @@ RSpec.configure do |config|
   # counters, so state must be cleared between examples or one spec's requests would count
   # toward another spec's rate limit.
   config.before { Rails.cache.clear }
+
+  config.before(:each, type: :system) { driven_by(:cuprite) }
+
+  # `config.action_controller.allow_forgery_protection` is off for the test env (see
+  # config/environments/test.rb), which makes `csrf_meta_tags` render nothing at all — but
+  # system specs drive a real browser running real client-side JS that reads that meta tag
+  # (e.g. contact_form_controller.js), so they need real CSRF behavior turned back on to get
+  # accurate coverage instead of a false failure from a missing meta tag.
+  config.around(:each, type: :system) do |example|
+    original = ActionController::Base.allow_forgery_protection
+    ActionController::Base.allow_forgery_protection = true
+    example.run
+    ActionController::Base.allow_forgery_protection = original
+  end
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [

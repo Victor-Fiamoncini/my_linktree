@@ -70,6 +70,14 @@ group :development, :test do
   gem "dotenv-rails"
 end
 
+group :test do
+  # Acceptance test framework for driving real browser interactions [https://github.com/teamcapybara/capybara]
+  gem "capybara"
+
+  # Headless Chrome driver for Capybara via CDP, no chromedriver version management needed [https://github.com/rubycdp/cuprite]
+  gem "cuprite"
+end
+
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
