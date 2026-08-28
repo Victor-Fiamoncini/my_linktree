@@ -65,11 +65,6 @@ group :development, :test do
   gem "rubocop-rails-omakase", require: false
 end
 
-group :development, :test do
-  # Loads environment variables from .env files [https://github.com/bkeepers/dotenv]
-  gem "dotenv-rails"
-end
-
 group :test do
   # Acceptance test framework for driving real browser interactions [https://github.com/teamcapybara/capybara]
   gem "capybara"

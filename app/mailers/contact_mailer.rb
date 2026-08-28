@@ -4,6 +4,6 @@ class ContactMailer < ApplicationMailer
     @email = email
     @message = message
 
-    mail(to: ENV.fetch("MAILER_RECIPIENT_EMAIL"), subject: "My Linktree - New contact from #{name}")
+    mail(to: Rails.application.credentials.dig(:mailer, :recipient_email), subject: "My Linktree - New contact from #{name}")
   end
 end

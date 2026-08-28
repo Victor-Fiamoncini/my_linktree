@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: -> { ENV.fetch("MAILER_SENDER_EMAIL") }
+  default from: -> { Rails.application.credentials.dig(:mailer, :sender_email) }
   layout "mailer"
 end

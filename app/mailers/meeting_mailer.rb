@@ -12,6 +12,6 @@ class MeetingMailer < ApplicationMailer
     @company = company
     @slot_start = slot_start
 
-    mail(to: ENV.fetch("MAILER_RECIPIENT_EMAIL"), subject: "My Linktree - New meeting booked by #{name}")
+    mail(to: Rails.application.credentials.dig(:mailer, :recipient_email), subject: "My Linktree - New meeting booked by #{name}")
   end
 end

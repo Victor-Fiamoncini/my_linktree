@@ -25,20 +25,46 @@ Postgres 16 is required for local development — run `docker compose up -d` (se
 There is no Redis anywhere in this app: rate limiting, background jobs, and (in production)
 ActionCable all ride on Rails 8's Postgres-backed Solid Cache / Solid Queue / Solid Cable.
 
-## Environment Variables
+## Credentials
 
-Copy `.env.example` to `.env` for local development (loaded via `dotenv-rails`). Required vars:
+There is no `.env`/`dotenv-rails` anymore — all per-environment config (database connection,
+mailer sender/recipient, Resend API key) lives in Rails' per-environment encrypted credentials
+under `config/credentials/`, not env vars:
 
-- `DATABASE_HOST` / `DATABASE_USERNAME` / `DATABASE_PASSWORD` — Postgres connection, matching `compose.yml`
-- `MAILER_SENDER_EMAIL` — From address for contact/meeting emails
-- `MAILER_RECIPIENT_EMAIL` — Where contact form submissions and meeting notifications are sent
-- `MAILER_RESEND_API_KEY` — Resend API key, only used in production
+- `config/credentials/development.yml.enc` (key: `config/credentials/development.key`) — holds
+  `database.host/port/username/password` (matching `compose.yml`'s `my_linktree`/`my_linktree`)
+  and `mailer.sender_email`/`mailer.recipient_email`. Edit with
+  `bin/rails credentials:edit --environment development`.
+- `config/credentials/production.yml.enc` (key: `config/credentials/production.key`) — same shape,
+  plus `mailer.resend_api_key`. Edit with `bin/rails credentials:edit --environment production`.
+- `config/credentials.yml.enc` (the shared file, key: `config/master.key`) — only used as a
+  fallback for environments without their own file, i.e. `test`. Holds `secret_key_base` plus a
+  `mailer` block (test doesn't need a real inbox, just non-nil values so `mail()` doesn't raise).
+  Edit with `bin/rails credentials:edit` (no `--environment` flag) — but see the gotcha below.
+
+**Gotcha**: `bin/rails credentials:edit` with no `--environment` flag targets the shared file only
+if `Rails.env` (which defaults to `development` when `RAILS_ENV` is unset) has no matching
+per-environment file. Since `config/credentials/development.yml.enc` exists, running the bare
+command from a normal shell silently edits *that* file instead of the shared one. To edit the
+shared file specifically, `RAILS_ENV=test bin/rails credentials:edit` works, or use
+`ActiveSupport::EncryptedConfiguration` directly with explicit `config_path`/`key_path`.
+
+`config/database.yml`'s `development` block and `production` block both read connection details via
+`Rails.application.credentials.dig(:database, :host)` etc. `test` deliberately keeps the original
+ENV-based `default` anchor (`ENV.fetch("DATABASE_HOST") { "localhost" }`, etc.) — its fallback
+values already equal `compose.yml`'s, so it needs no credentials file or env var at all. Mailers
+(`app/mailers/application_mailer.rb`, `contact_mailer.rb`, `meeting_mailer.rb`) read
+`Rails.application.credentials.dig(:mailer, :sender_email)` / `:recipient_email` in every
+environment. `config/initializers/resend.rb` reads `Rails.application.credentials.dig(:mailer,
+:resend_api_key)`.
 
 `config.action_mailer.delivery_method` is `:test` in development (mail is captured in
 `ActionMailer::Base.deliveries`, nothing is sent) and `:resend` in production (via the `resend`
-gem's Railtie-registered ActionMailer delivery method, configured in
-`config/initializers/resend.rb`). There is no more `MAILER_DRIVER` env var — the switch is purely
-per-environment now.
+gem's Railtie-registered ActionMailer delivery method).
+
+Kamal only needs `RAILS_MASTER_KEY` (set to the *production* credentials key's contents, not the
+shared master key — see `.kamal/secrets`) to decrypt `production.yml.enc` at boot, plus
+`KAMAL_REGISTRY_PASSWORD` to pull the image; see `config/deploy.yml`.
 
 ## Architecture
 
