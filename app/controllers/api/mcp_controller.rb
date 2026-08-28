@@ -4,7 +4,7 @@ module Api
 
     rate_limit to: 30, within: 1.minute, by: -> { rate_limit_identifier }, only: :create
     rate_limit to: 3, within: 10.minutes, name: "schedule_meeting", by: -> { rate_limit_identifier },
-      unless: -> { !schedule_meeting_call? }, only: :create
+               unless: -> { !schedule_meeting_call? }, only: :create
 
     rescue_from ActionController::TooManyRequests, with: :render_too_many_requests
 
@@ -23,8 +23,7 @@ module Api
     private
 
     def render_too_many_requests
-      render json: { message: "Too many requests", action: "Please wait a moment before trying again." },
-             status: :too_many_requests
+      render json: { message: "Too many requests", action: "Please wait a moment before trying again." }, status: :too_many_requests
     end
 
     def schedule_meeting_call?
