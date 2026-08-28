@@ -1,27 +1,38 @@
 <%
   input_class = "bg-ctp-mantle border-ctp-surface1 text-ctp-text rounded-btn focus:border-ctp-blue w-full border px-[14px] py-3 text-[15px] transition-colors outline-none"
+  field_error_class = "text-ctp-red hidden text-xs"
 %>
-<%= form_with url: contact_path, method: :post, class: "grid w-full gap-4" do |form| %>
+<%= form_with url: contact_path, method: :post, class: "grid w-full gap-4",
+  data: { controller: "contact-form", action: "submit->contact-form#submit" } do |form| %>
   <div class="grid grid-cols-1 gap-4 min-[500px]:grid-cols-2">
     <label class="grid gap-2">
       <span class="text-ctp-subtext0 font-mono text-xs">name</span>
-      <%= form.text_field :name, id: "name", class: input_class, required: true %>
+      <%= form.text_field :name, id: "name", class: input_class, required: true,
+        data: { contact_form_target: "input", field: "name" } %>
+      <p class="<%= field_error_class %>" data-contact-form-target="fieldError" data-field="name"></p>
     </label>
 
     <label class="grid gap-2">
       <span class="text-ctp-subtext0 font-mono text-xs">email</span>
-      <%= form.email_field :email, id: "email", class: input_class, required: true %>
+      <%= form.email_field :email, id: "email", class: input_class, required: true,
+        data: { contact_form_target: "input", field: "email" } %>
+      <p class="<%= field_error_class %>" data-contact-form-target="fieldError" data-field="email"></p>
     </label>
   </div>
 
   <label class="grid gap-2">
     <span class="text-ctp-subtext0 font-mono text-xs">message</span>
-    <%= form.text_area :message, id: "message", rows: 5, class: "#{input_class} resize-y", required: true %>
+    <%= form.text_area :message, id: "message", rows: 5, class: "#{input_class} resize-y", required: true,
+      data: { contact_form_target: "input", field: "message" } %>
+    <p class="<%= field_error_class %>" data-contact-form-target="fieldError" data-field="message"></p>
   </label>
 
-  <div>
+  <div class="flex flex-wrap items-center gap-4">
     <%= form.submit "Reach Out",
       title: "Send Message",
-      class: "bg-ctp-green text-ctp-crust rounded-btn hover:bg-ctp-teal cursor-pointer justify-self-center px-[26px] py-[13px] font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_20px_-4px_var(--color-ctp-teal)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none max-[531px]:w-full min-[500px]:justify-self-start" %>
+      data: { contact_form_target: "submit" },
+      class: "bg-ctp-green text-ctp-crust rounded-btn hover:bg-ctp-teal cursor-pointer px-[26px] py-[13px] font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_20px_-4px_var(--color-ctp-teal)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none max-[531px]:w-full" %>
+
+    <p class="bg-ctp-surface0 hidden rounded-btn px-4 py-3 text-sm" data-contact-form-target="banner"></p>
   </div>
 <% end %>

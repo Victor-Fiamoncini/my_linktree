@@ -1,16 +1,15 @@
 class ContactsController < ApplicationController
   rate_limit to: 2, within: 10.minutes, by: -> { rate_limit_identifier }, only: :create
 
-  rescue_from StandardError, with: :redirect_with_internal_error
-  rescue_from ArgumentError, with: :redirect_with_missing_fields
-  rescue_from ActionController::TooManyRequests, with: :redirect_with_too_many_requests
-  rescue_from ActionController::InvalidAuthenticityToken, with: :redirect_with_invalid_authenticity_token
+  rescue_from StandardError, with: :render_internal_error
+  rescue_from UseCases::SendContactEmailUseCase::ValidationError, with: :render_validation_error
+  rescue_from ActionController::TooManyRequests, with: :render_too_many_requests
+  rescue_from ActionController::InvalidAuthenticityToken, with: :render_invalid_authenticity_token
 
   def create
     UseCases::SendContactEmailUseCase.new.execute(**contact_params)
 
-    flash[:notice] = "Thank you for your message! I'll get back to you as soon as possible."
-    redirect_to root_path(anchor: "contact")
+    render json: { message: "Thank you for your message! I'll get back to you as soon as possible." }, status: :ok
   end
 
   private
@@ -19,24 +18,20 @@ class ContactsController < ApplicationController
     params.permit(:name, :email, :message).to_h.symbolize_keys
   end
 
-  def redirect_with_missing_fields(e)
-    flash[:alert] = "#{e.message}. Check if all required fields are provided and try again."
-    redirect_to root_path(anchor: "contact")
+  def render_validation_error(e)
+    render json: { message: "Check the highlighted fields and try again.", errors: e.errors }, status: :unprocessable_content
   end
 
-  def redirect_with_too_many_requests
-    flash[:alert] = "Too many requests. Please wait a moment before trying again."
-    redirect_to root_path(anchor: "contact")
+  def render_too_many_requests
+    render json: { message: "Too many requests. Please wait a moment before trying again." }, status: :too_many_requests
   end
 
-  def redirect_with_invalid_authenticity_token
-    flash[:alert] = "Your session expired. Please try submitting the form again."
-    redirect_to root_path(anchor: "contact")
+  def render_invalid_authenticity_token
+    render json: { message: "Your session expired. Please refresh the page and try again." }, status: :unprocessable_content
   end
 
-  def redirect_with_internal_error(e)
+  def render_internal_error(e)
     Rails.logger.error(e)
-    flash[:alert] = "Internal Server Error. Please contact the administrator of the application."
-    redirect_to root_path(anchor: "contact")
+    render json: { message: "Internal Server Error", action: "Please contact the administrator of the application." }, status: :internal_server_error
   end
 end
