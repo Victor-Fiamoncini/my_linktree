@@ -18,8 +18,8 @@ module UseCases
         raise ArgumentError, "Slot unavailable"
       end
 
-      MeetingMailer.confirmation(name: name, email: email, slot_start: slot_start).deliver_now
-      MeetingMailer.notification(name: name, email: email, company: company, slot_start: slot_start).deliver_now
+      MeetingMailer.confirmation(name: name, email: email, slot_start: slot_start).deliver_later
+      MeetingMailer.notification(name: name, email: email, company: company, slot_start: slot_start).deliver_later
 
       { name: name, email: email, company: company, slot_start: slot_start }
     end

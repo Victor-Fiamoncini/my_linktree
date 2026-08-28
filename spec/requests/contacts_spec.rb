@@ -9,7 +9,7 @@ RSpec.describe "Contacts", type: :request do
   end
 
   it "sends the email and returns a success message" do
-    post_contact(valid_params)
+    perform_enqueued_jobs { post_contact(valid_params) }
 
     expect(response).to have_http_status(:ok)
     expect(response.parsed_body["message"]).to be_present

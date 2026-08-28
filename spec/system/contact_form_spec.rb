@@ -13,6 +13,7 @@ RSpec.describe "Contact form", type: :system do
     expect(page).to have_content("Thank you for your message!")
     expect(page).not_to have_button("Reach Out")
     expect(page).to have_current_path(root_path)
+    perform_enqueued_jobs
     expect(ActionMailer::Base.deliveries.size).to eq(1)
   end
 

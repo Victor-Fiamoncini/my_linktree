@@ -7,9 +7,11 @@ RSpec.describe UseCases::ScheduleMeetingUseCase do
 
   it "books the slot and sends confirmation + notification emails" do
     expect {
-      result = use_case.execute(name: "Jane", email: "jane@example.com", company: "Acme", slot_start: slot_start)
+      perform_enqueued_jobs do
+        result = use_case.execute(name: "Jane", email: "jane@example.com", company: "Acme", slot_start: slot_start)
 
-      expect(result).to eq(name: "Jane", email: "jane@example.com", company: "Acme", slot_start: slot_start)
+        expect(result).to eq(name: "Jane", email: "jane@example.com", company: "Acme", slot_start: slot_start)
+      end
     }.to change(Booking, :count).by(1).and change { ActionMailer::Base.deliveries.size }.by(2)
 
     subjects = ActionMailer::Base.deliveries.last(2).map(&:subject)

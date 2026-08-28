@@ -41,7 +41,15 @@ env:
     SOLID_QUEUE_IN_PUMA: true
 
     # Operational tuning — adjust to match your VPS core count and workload.
-    # RAILS_MAX_THREADS: 3
+    # Bumped from Puma's default of 3: with SOLID_QUEUE_IN_PUMA, the supervisor,
+    # dispatcher, and job worker threads share this same process/thread pool with
+    # web requests, so 3 threads left almost no headroom (a single slow request,
+    # e.g. one blocked on a synchronous mailer deliver_now call, could starve the
+    # whole process and cause the proxy to 502 unrelated requests).
+    RAILS_MAX_THREADS: 5
+    # Leave WEB_CONCURRENCY unset (single worker process) while SOLID_QUEUE_IN_PUMA
+    # is on — cluster mode would start one Solid Queue supervisor per worker,
+    # causing jobs to be picked up and processed more than once.
     # WEB_CONCURRENCY: 2
     # JOB_CONCURRENCY: 1
 
