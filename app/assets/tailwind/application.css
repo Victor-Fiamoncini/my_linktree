@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+html {
+  @apply scroll-pt-[96px] scroll-smooth;
+}
+
+@theme inline {
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --radius-card: 8px;
+  --radius-btn: 6px;
+  --radius-chip: 4px;
+}
+
+@theme {
+  /* Catppuccin Frappé — https://catppuccin.com/palette/ (hand-rolled: the official
+     @catppuccin/tailwindcss plugin pairs Latte-light/Frappé-dark via prefers-color-scheme,
+     which would flip the site to Latte for light-mode visitors instead of staying Frappé) */
+  --color-ctp-base: #303446;
+  --color-ctp-mantle: #292c3c;
+  --color-ctp-crust: #232634;
+  --color-ctp-surface0: #414559;
+  --color-ctp-surface1: #51576d;
+  --color-ctp-surface2: #626880;
+  --color-ctp-overlay0: #737994;
+  --color-ctp-overlay1: #838ba7;
+  --color-ctp-overlay2: #949cbb;
+  --color-ctp-subtext0: #a5adce;
+  --color-ctp-subtext1: #b5bfe2;
+  --color-ctp-text: #c6d0f5;
+  --color-ctp-blue: #8caaee;
+  --color-ctp-mauve: #ca9ee6;
+  --color-ctp-green: #a6d189;
+  --color-ctp-yellow: #e5c890;
+  --color-ctp-teal: #81c8be;
+  --color-ctp-lavender: #babbf1;
+  --color-ctp-peach: #ef9f76;
+  --color-ctp-pink: #f4b8e4;
+  --color-ctp-red: #e78284;
+}
+
+::selection {
+  background-color: var(--color-ctp-mauve);
+  color: var(--color-ctp-crust);
+}
+
+@layer base {
+  a {
+    @apply text-ctp-blue;
+  }
+
+  a:hover {
+    @apply text-ctp-lavender;
+  }
+}
+
+::-webkit-scrollbar {
+  @apply w-[10px];
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-ctp-mantle;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-ctp-surface1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-ctp-blue;
+}
+
+@keyframes fr-fade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

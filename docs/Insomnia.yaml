@@ -1,0 +1,543 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: My Linktree API
+meta:
+  id: wrk_5ddf086741fe22b440ca2f2c27b0041a
+  created: 1787945572764
+  modified: 1787945572764
+  description: Personal landing page + MCP server for Victor Fiamoncini (Rails 8, Hotwire)
+collection:
+  - name: My Linktree API
+    meta:
+      id: fld_10c295c6db5cdc1aae8fd9d0cf98ebd7
+      created: 1787945572764
+      modified: 1787945572764
+      sortKey: -1787945572764
+      description: "JSON REST + MCP (JSON-RPC 2.0) endpoints — see docs/mcp-server.md for
+        the MCP background."
+    children:
+      - name: MCP Server
+        meta:
+          id: fld_35bfcecf4a50c4c87e4d84d6864862b3
+          created: 1787945572764
+          modified: 1787945572764
+          sortKey: -1787945572763
+          description: "POST /api/mcp — JSON-RPC 2.0 over the Streamable HTTP transport (mcp
+            gem). Every request needs Content-Type: application/json and
+            Accept: application/json, text/event-stream — replies come back as
+            a single Server-Sent Event even for one response. No auth. General
+            limiter: 30 req/min per IP; schedule_meeting calls additionally
+            count against a 3 req/10min limiter. See docs/mcp-server.md."
+        children:
+          - url: "{{base_url}}/api/mcp"
+            name: Initialize (handshake)
+            meta:
+              id: req_25b524f90137cf1fe5652a4fa9446ae7
+              created: 1787945572764
+              modified: 1787945572764
+              isPrivate: false
+              description: "Not strictly required for manual testing (the tool calls below work
+                without it), but this is what a real client sends first to
+                negotiate protocol version + capabilities."
+              sortKey: -1787945572762
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "jsonrpc": "2.0",
+                  "id": 1,
+                  "method": "initialize",
+                  "params": {
+                    "protocolVersion": "2025-06-18",
+                    "capabilities": {},
+                    "clientInfo": { "name": "insomnia-test", "version": "1.0" }
+                  }
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: Accept
+                value: "application/json, text/event-stream"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{base_url}}/api/mcp"
+            name: List Tools
+            meta:
+              id: req_f64e6fa5393ae360ecb9baa67da8b265
+              created: 1787945572764
+              modified: 1787945572764
+              isPrivate: false
+              description: "tools/list — returns each of the 4 tools' name, description, and
+                JSON Schema input: get_resume, list_services,
+                check_availability, schedule_meeting."
+              sortKey: -1787945572761
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "jsonrpc": "2.0",
+                  "id": 2,
+                  "method": "tools/list",
+                  "params": {}
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: Accept
+                value: "application/json, text/event-stream"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{base_url}}/api/mcp"
+            name: "Call Tool — get_resume"
+            meta:
+              id: req_1b99e83d10bbf842d349f5e6fcabce67
+              created: 1787945572764
+              modified: 1787945572764
+              isPrivate: false
+              description: "No arguments. Returns GetProfileUseCase's output (name, experiences,
+                education, services — same shape as GET /api/profile) as the
+                tool's text content. Also records an AgentConnection telemetry
+                row ({ tool: 'get_resume', timestamp }), visible via GET
+                /api/telemetry, before any validation runs."
+              sortKey: -1787945572760
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "jsonrpc": "2.0",
+                  "id": 3,
+                  "method": "tools/call",
+                  "params": {
+                    "name": "get_resume",
+                    "arguments": {}
+                  }
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: Accept
+                value: "application/json, text/event-stream"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{base_url}}/api/mcp"
+            name: "Call Tool — list_services"
+            meta:
+              id: req_48476bcb874e38e770132d4b57d1e9dd
+              created: 1787945572764
+              modified: 1787945572764
+              isPrivate: false
+              description: "No arguments. Returns ListServicesUseCase's output (the 4 services
+                from config/profile.yml) as the tool's text content. Records an
+                AgentConnection telemetry row ({ tool: 'list_services',
+                timestamp })."
+              sortKey: -1787945572759
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "jsonrpc": "2.0",
+                  "id": 4,
+                  "method": "tools/call",
+                  "params": {
+                    "name": "list_services",
+                    "arguments": {}
+                  }
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: Accept
+                value: "application/json, text/event-stream"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{base_url}}/api/mcp"
+            name: "Call Tool — check_availability"
+            meta:
+              id: req_b8b4b92a277f5862993f863e470789c2
+              created: 1787945572764
+              modified: 1787945572764
+              isPrivate: false
+              description: "No arguments. Returns { timezone, slots: [...] } — open 30-min slots,
+                Mon–Fri 09:00–18:00 America/Sao_Paulo, up to 21 days out
+                (config/availability.yml), excluding already-booked slots. The
+                afterResponse script stores the first free slot into
+                {{ mcp_slot_start }} for the Schedule Meeting request below —
+                run this request before that one."
+              sortKey: -1787945572758
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "jsonrpc": "2.0",
+                  "id": 5,
+                  "method": "tools/call",
+                  "params": {
+                    "name": "check_availability",
+                    "arguments": {}
+                  }
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: Accept
+                value: "application/json, text/event-stream"
+            scripts:
+              afterResponse: |-
+                const raw = insomnia.response.text();
+                const sseMatch = raw.match(/data:\s*(\{[\s\S]*\})/);
+                if (sseMatch) {
+                  const envelope = JSON.parse(sseMatch[1]);
+                  const toolText = envelope.result.content[0].text;
+                  const payload = JSON.parse(toolText);
+                  if (payload.slots && payload.slots.length) {
+                    insomnia.environment.set("mcp_slot_start", payload.slots[0]);
+                  }
+                }
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{base_url}}/api/mcp"
+            name: "Call Tool — schedule_meeting"
+            meta:
+              id: req_ef62141a93fab0851fbc8203da048c0c
+              created: 1787945572764
+              modified: 1787945572764
+              isPrivate: false
+              description: "name, email, slotStart required; company optional. slotStart must be
+                one of the values check_availability returned — run that
+                request first (it populates {{ mcp_slot_start }}), otherwise
+                this fails with 'Slot unavailable' (a unique DB index prevents
+                double-booking the same slot_start). On success, sends
+                confirmation + notification emails (captured in
+                ActionMailer::Base.deliveries in dev/test, real Resend send in
+                production). Also counts against the schedule_meeting-specific
+                3 req/10min rate limiter, on top of the general 30 req/min
+                limiter."
+              sortKey: -1787945572757
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "jsonrpc": "2.0",
+                  "id": 6,
+                  "method": "tools/call",
+                  "params": {
+                    "name": "schedule_meeting",
+                    "arguments": {
+                      "name": "Test Agent",
+                      "email": "test@example.com",
+                      "company": "Acme",
+                      "slotStart": "{{mcp_slot_start}}"
+                    }
+                  }
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: Accept
+                value: "application/json, text/event-stream"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{base_url}}/api/mcp"
+            name: "Call Tool — schedule_meeting (validation error)"
+            meta:
+              id: req_6e1e929efa6a2144dece0f32405d8d02
+              created: 1787945572764
+              modified: 1787945572764
+              isPrivate: false
+              description: "Missing email triggers an ArgumentError inside ScheduleMeetingUseCase.
+                MCP tool errors come back as HTTP 200 with
+                result.content[0].isError: true (see result.content[0].text
+                for the message) — the JSON-RPC call still 'succeeds' at the
+                transport level even though the tool failed."
+              sortKey: -1787945572756
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "jsonrpc": "2.0",
+                  "id": 7,
+                  "method": "tools/call",
+                  "params": {
+                    "name": "schedule_meeting",
+                    "arguments": {
+                      "name": "No Email",
+                      "slotStart": "2026-08-26T12:30:00.000Z"
+                    }
+                  }
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: Accept
+                value: "application/json, text/event-stream"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: Profile
+        meta:
+          id: fld_7ad01c26bb6bd3b7c26cab611dfe77e3
+          created: 1787945572764
+          modified: 1787945572764
+          sortKey: -1787945572755
+          description: Plain REST/JSON mirror of the resume data — no MCP envelope.
+        children:
+          - url: "{{base_url}}/api/profile"
+            name: Get Profile
+            meta:
+              id: req_f3a25f5561eb1827f40ff2acdd965cf9
+              created: 1787945572764
+              modified: 1787945572764
+              isPrivate: false
+              description: "Returns GetProfileUseCase's output — name, experiences (each with
+                backend/frontend/infra/other_tools arrays), education, services
+                — sourced from config/profile.yml. No auth, no rate limit."
+              sortKey: -1787945572754
+            method: GET
+            headers:
+              - name: Accept
+                value: application/json
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: Telemetry
+        meta:
+          id: fld_9df469d06bce03339b665f27d9279c37
+          created: 1787945572764
+          modified: 1787945572764
+          sortKey: -1787945572753
+          description: Read-only log of recent MCP tool calls.
+        children:
+          - url: "{{base_url}}/api/telemetry"
+            name: Get Telemetry
+            meta:
+              id: req_b4ac0f790405a5dbfc7b41104543bf4e
+              created: 1787945572764
+              modified: 1787945572764
+              isPrivate: false
+              description: "Returns the last 50 { tool, timestamp } records from
+                ListRecentConnectionsUseCase — one entry per MCP tool call
+                (get_resume, list_services, check_availability,
+                schedule_meeting). No auth, no rate limit. The /telemetry page
+                polls this every 5s via the TelemetryFeed Stimulus
+                controller."
+              sortKey: -1787945572752
+            method: GET
+            headers:
+              - name: Accept
+                value: application/json
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: Contact
+        meta:
+          id: fld_11b7159e9cf4a5c4312d504305345dc7
+          created: 1787945572764
+          modified: 1787945572764
+          sortKey: -1787945572751
+          description: "POST /contact — unlike the api/* controllers, ContactsController does
+            NOT skip Rails' default CSRF protection. Run 'Get CSRF Token'
+            first (once per session) so its afterResponse script populates
+            {{ csrf_token }} and the session cookie before sending a
+            message."
+        children:
+          - url: "{{base_url}}/"
+            name: Get CSRF Token
+            meta:
+              id: req_ee272e1f9c73bbdc28db592db45185b5
+              created: 1787945572764
+              modified: 1787945572764
+              isPrivate: false
+              description: "GET the home page to receive a session cookie plus the <meta
+                name='csrf-token'> tag Rails renders via csrf_meta_tags. The
+                afterResponse script extracts the token into {{ csrf_token }}.
+                Requires cookies send/store — Rails ties the token to the
+                session, not just the response body."
+              sortKey: -1787945572750
+            method: GET
+            scripts:
+              afterResponse: |-
+                const html = insomnia.response.text();
+                const match = html.match(/<meta name="csrf-token" content="([^"]+)"/);
+                if (match) {
+                  insomnia.environment.set("csrf_token", match[1]);
+                }
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{base_url}}/contact"
+            name: Send Contact Message
+            meta:
+              id: req_4532e0ee7ab26e520b3326ccdd755afa
+              created: 1787945572764
+              modified: 1787945572764
+              isPrivate: false
+              description: "Validates name/email/message (all required, email format checked)
+                via SendContactEmailUseCase and delivers ContactMailer.new_contact.
+                Returns 200 { message } on success. Rate limited: 2 req/10min
+                per IP. Needs a valid X-CSRF-Token header matching the session
+                cookie — run 'Get CSRF Token' first, or an expired/missing
+                token 422s with 'Your session expired...' instead of
+                validating the body."
+              sortKey: -1787945572749
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "name": "Victor Fiamoncini",
+                  "email": "victor.fiamoncini@gmail.com",
+                  "message": "Hello! I'd like to talk about a project."
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: X-CSRF-Token
+                value: "{{csrf_token}}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{base_url}}/contact"
+            name: "Send Contact Message (validation error)"
+            meta:
+              id: req_f7ddde52aa252899adb62a452fdcb914
+              created: 1787945572764
+              modified: 1787945572764
+              isPrivate: false
+              description: "Blank name/message and a malformed email all fail at once. Returns
+                422 { message, errors: { name, email, message } } — one entry
+                per invalid field. Still needs a valid CSRF token/cookie (run
+                'Get CSRF Token' first) or you'll get the CSRF error instead of
+                this validation error."
+              sortKey: -1787945572748
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "name": "",
+                  "email": "not-an-email",
+                  "message": ""
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: X-CSRF-Token
+                value: "{{csrf_token}}"
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_dafdc95314344579b116329039d2b5b0e6467dc9
+    created: 1787945572764
+    modified: 1787945572764
+environments:
+  name: Base Environment
+  meta:
+    id: env_50be5c68c5bf1add7a7be6c84449b6bb
+    created: 1787945572764
+    modified: 1787945572764
+    isPrivate: false
+  data:
+    base_url: http://localhost:3000
+    csrf_token: ""
+    mcp_slot_start: ""
+  subEnvironments:
+    - name: Local
+      meta:
+        id: env_4221e17abce879080b9aef32cadbbc0b
+        created: 1787945572764
+        modified: 1787945572764
+        isPrivate: false
+        sortKey: 1787945572764
+      data:
+        base_url: http://localhost:3000
+        csrf_token: ""
+        mcp_slot_start: ""
+      color: "#8be49a"
+    - name: Production
+      meta:
+        id: env_9066a97ea099585ec40327a51ace9d6b
+        created: 1787945572764
+        modified: 1787945572764
+        isPrivate: false
+        sortKey: 1787945572765
+      data:
+        base_url: https://www.victorfiamon.com.br
+        csrf_token: ""
+        mcp_slot_start: ""
+      color: "#e49a8b"

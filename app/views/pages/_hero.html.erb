@@ -1,0 +1,30 @@
+<section id="about" class="grid w-full max-w-[1080px] items-center gap-12 pt-16 pb-14 min-[900px]:grid-cols-[1fr_260px] min-[900px]:gap-16 min-[900px]:pt-24">
+  <div>
+    <p class="text-ctp-green mb-5 font-mono text-[13px] tracking-[0.06em]">$ whoami</p>
+
+    <h1 class="text-ctp-text mb-6 text-[40px] leading-[1.04] font-bold tracking-[-0.035em] min-[900px]:text-[58px]">
+      Victor <span class="text-ctp-mauve">Fiamoncini</span>
+    </h1>
+
+    <p class="text-ctp-subtext1 mb-[18px] max-w-[46ch] text-[19px] leading-[1.6] text-pretty">
+      Software Engineer since <%= start_year_of_work %>, across company and freelance projects.
+    </p>
+
+    <p class="text-ctp-subtext0 mb-9 max-w-[52ch] text-[17px] leading-[1.7] text-pretty">
+      Currently focused on back-end development using PHP (Laravel/Symfony), while also building personal projects
+      with Ruby on Rails and Next.js.
+    </p>
+
+    <div class="flex flex-wrap gap-3">
+      <%= render "shared/get_in_touch_button" %>
+      <%= render "shared/external_link", icon: :github, link: SeoConfig::GITHUB_URL, label: "GitHub", variant: "outline", accent: "blue" %>
+      <%= render "shared/external_link", icon: :linkedin, link: SeoConfig::LINKEDIN_URL, label: "LinkedIn", variant: "outline", accent: "blue" %>
+    </div>
+  </div>
+
+  <div class="relative order-first justify-self-center min-[900px]:order-none min-[900px]:justify-self-end">
+    <div class="absolute -inset-2.5 rounded-[10px] bg-[linear-gradient(150deg,var(--color-ctp-blue),var(--color-ctp-mauve)_55%,var(--color-ctp-green))] opacity-50"></div>
+
+    <img src="/photo.jpg" alt="Victor Fiamoncini" width="260" height="300" class="border-ctp-surface1 rounded-card relative block h-[300px] w-[260px] border object-cover">
+  </div>
+</section>

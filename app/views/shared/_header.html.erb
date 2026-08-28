@@ -1,0 +1,49 @@
+<%
+  section_links = [
+    { label: "#about", href: "/#about" },
+    { label: "#experience", href: "/#experience" },
+    { label: "#hire-me", href: "/#agents" },
+    { label: "#contact", href: "/#contact" },
+  ]
+  nav_link_class = "text-ctp-subtext0 hover:text-ctp-blue relative pb-0.5 transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-ctp-blue after:transition-all after:duration-300 hover:after:w-full"
+  telemetry_button_class = "bg-ctp-green text-ctp-crust rounded-btn hover:bg-ctp-teal inline-flex items-center gap-1 px-4 py-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_20px_-4px_var(--color-ctp-green)]"
+%>
+<header
+  data-controller="mobile-nav"
+  class="border-ctp-surface0 bg-ctp-mantle/86 sticky top-0 z-20 w-full border-b backdrop-blur-md"
+>
+  <nav class="mx-auto flex max-w-[1080px] items-center justify-between gap-4 px-6 py-[18px] min-[900px]:px-8">
+    <%= link_to root_path, class: "flex items-center gap-3" do %>
+      <span class="bg-ctp-blue text-ctp-crust rounded-chip flex h-[26px] w-[26px] items-center justify-center font-mono text-xs font-bold">vf</span>
+      <span class="text-ctp-text text-base font-semibold">Victor Fiamoncini</span>
+    <% end %>
+
+    <ul class="hidden items-center gap-x-7 font-mono text-[13px] min-[900px]:flex">
+      <% section_links.each do |link| %>
+        <li><%= link_to link[:label], link[:href], class: nav_link_class %></li>
+      <% end %>
+      <li><%= link_to telemetry_path, class: telemetry_button_class do %>/telemetry <span class="text-ctp-crust/70">↗</span><% end %></li>
+    </ul>
+
+    <button
+      type="button"
+      data-action="mobile-nav#toggle"
+      data-mobile-nav-target="toggleButton"
+      aria-expanded="false"
+      aria-label="Toggle navigation menu"
+      class="border-ctp-surface1 text-ctp-text rounded-btn hover:border-ctp-blue flex h-9 w-9 cursor-pointer items-center justify-center border transition-all duration-200 hover:scale-105 min-[900px]:hidden"
+    >
+      <span data-mobile-nav-target="openIcon" class="h-4 w-4"><%= svg_icon(:bars) %></span>
+      <span data-mobile-nav-target="closeIcon" class="hidden h-4 w-4"><%= svg_icon(:times) %></span>
+    </button>
+  </nav>
+
+  <div data-mobile-nav-target="menu" class="border-ctp-surface0 bg-ctp-mantle hidden border-t px-6 py-5 min-[900px]:hidden">
+    <ul class="flex flex-col items-start gap-4 font-mono text-[13px]">
+      <% section_links.each do |link| %>
+        <li><%= link_to link[:label], link[:href], class: nav_link_class, data: { action: "mobile-nav#close" } %></li>
+      <% end %>
+      <li><%= link_to telemetry_path, class: telemetry_button_class, data: { action: "mobile-nav#close" } do %>/telemetry <span class="text-ctp-crust/70">↗</span><% end %></li>
+    </ul>
+  </div>
+</header>
