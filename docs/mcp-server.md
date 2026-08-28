@@ -49,7 +49,6 @@ for verifying logic changes; not a substitute for poking the real endpoint below
 ## 2. Local setup
 
 ```bash
-cp .env.example .env    # if you haven't already
 docker compose up -d    # local Postgres 16 — backs the rate limiter (Solid Cache), bookings, telemetry
 bin/rails db:create db:migrate
 bin/dev
@@ -158,7 +157,7 @@ curl -s -X POST http://localhost:3000/api/mcp \
 ```
 
 `company` is optional; `name`, `email`, and `slotStart` are required. `slotStart` must be one of
-the values `check_availability` returned — anything else fails with a `SlotUnavailableError`.
+the values `check_availability` returned — anything else fails with `"Slot unavailable"`.
 After a successful booking, run `check_availability` again to confirm that slot is gone.
 
 ### Trigger a validation error
@@ -175,8 +174,9 @@ than an HTTP error — the JSON-RPC call still "succeeds" at the transport level
 
 ## 4. Testing rate limits
 
-Two limiters guard the endpoint, keyed by `x-forwarded-for` / `x-real-ip` (requests with neither
-header skip rate limiting entirely):
+Two limiters guard the endpoint, keyed by the request's real connection IP (`request.remote_ip`,
+which honors `x-forwarded-for`/`x-real-ip` only when sent by a trusted proxy — see
+`config.action_dispatch.trusted_proxies`):
 
 - **General**: 30 requests/minute for any MCP call
 - **Schedule**: 3 requests/10 minutes, specifically for `schedule_meeting`
