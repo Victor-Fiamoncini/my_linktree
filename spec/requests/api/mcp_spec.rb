@@ -121,4 +121,33 @@ RSpec.describe "Api::Mcp", type: :request do
     post "/api/mcp", params: rpc(id: 31, method: "tools/list"), headers: headers
     expect(response).to have_http_status(:too_many_requests)
   end
+
+  it "sets permissive CORS headers on a JSON-RPC response" do
+    post "/api/mcp", params: rpc(id: 1, method: "tools/list"), headers: headers
+
+    expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+  end
+
+  it "answers an OPTIONS preflight with 200 and CORS headers, without touching the MCP server" do
+    options "/api/mcp"
+
+    expect(response).to have_http_status(:ok)
+    expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+    expect(response.headers["Access-Control-Allow-Methods"]).to include("POST")
+  end
+
+  it "answers a GET with a plain server description instead of the gem's 405" do
+    get "/api/mcp"
+
+    expect(response).to have_http_status(:ok)
+    expect(response.parsed_body["tools"]).to contain_exactly("get_resume", "list_services", "check_availability", "schedule_meeting")
+  end
+
+  it "accepts the bare apex host in addition to the canonical www host" do
+    host! "victorfiamon.com.br"
+
+    post "/api/mcp", params: rpc(id: 1, method: "tools/list"), headers: headers
+
+    expect(response).to have_http_status(:ok)
+  end
 end

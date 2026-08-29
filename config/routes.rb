@@ -19,6 +19,6 @@ Rails.application.routes.draw do
   namespace :api do
     get "telemetry" => "telemetry#index"
     get "profile" => "profile#show"
-    match "mcp" => "mcp#create", via: [ :post, :get ]
+    match "mcp" => "mcp#create", via: [ :post, :get, :options ]
   end
 end
