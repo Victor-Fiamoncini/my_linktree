@@ -12,12 +12,22 @@ module Api
 
     ALLOWED_HOSTS = [ SITE_HOST, SITE_HOST.delete_prefix("www.") ].freeze
 
+    # In-process store instead of the app-wide Solid Cache store: Solid Cache round-trips to the
+    # Postgres cache database, which for this app is a separate managed instance reachable only
+    # over the public internet (measured 300ms-4s per query from the Hetzner VPS, vs. Solid
+    # Cache's own local-network expectations) — latency this endpoint can't absorb, since external
+    # MCP harnesses (Claude, ChatGPT, etc.) apply their own short timeouts when probing a connector.
+    # A single Kamal server with no WEB_CONCURRENCY runs Puma in one process, so an in-memory store
+    # is already shared across every thread handling these requests; resetting counters on deploy
+    # is an acceptable trade-off for a short-window rate limit.
+    RATE_LIMIT_STORE = ActiveSupport::Cache::MemoryStore.new
+
     before_action :set_cors_headers
 
     rate_limit to: 30, within: 1.minute, by: -> { rate_limit_identifier }, only: :create,
-               unless: -> { request.options? }
+               unless: -> { request.options? }, store: RATE_LIMIT_STORE
     rate_limit to: 3, within: 10.minutes, name: "schedule_meeting", by: -> { rate_limit_identifier },
-               unless: -> { !schedule_meeting_call? }, only: :create
+               unless: -> { !schedule_meeting_call? }, only: :create, store: RATE_LIMIT_STORE
 
     rescue_from ActionController::TooManyRequests, with: :render_too_many_requests
 
