@@ -15,7 +15,9 @@ servers:
 # Note: If using Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
 proxy:
   ssl: true
-  host: victorfiamon.com.br
+  host:
+    - victorfiamon.com.br
+    - www.victorfiamon.com.br
   healthcheck:
     timeout: 120
   # Proxy connects to your container on port 80 by default (matches Dockerfile's EXPOSE 80 / Thruster).
