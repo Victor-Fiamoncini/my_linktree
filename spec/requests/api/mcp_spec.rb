@@ -143,6 +143,13 @@ RSpec.describe "Api::Mcp", type: :request do
     expect(response.parsed_body["tools"]).to contain_exactly("get_resume", "list_services", "check_availability", "schedule_meeting")
   end
 
+  it "answers a stream-opening GET (Accept: text/event-stream) with the gem's native 405, not the plain description" do
+    get "/api/mcp", headers: { "Accept" => "text/event-stream" }
+
+    expect(response).to have_http_status(:method_not_allowed)
+    expect(response.parsed_body.dig("error", "message")).to eq("Method not allowed")
+  end
+
   it "accepts the bare apex host in addition to the canonical www host" do
     host! "victorfiamon.com.br"
 

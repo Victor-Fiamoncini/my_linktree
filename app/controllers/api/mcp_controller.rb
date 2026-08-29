@@ -34,7 +34,7 @@ module Api
     def create
       return head :ok if request.options?
 
-      return render(json: server_description) if request.get?
+      return render(json: server_description) if request.get? && !event_stream_request?
 
       server = MCP::Server.new(name: "my_linktree", tools: TOOLS)
       transport = MCP::Server::Transports::StreamableHTTPTransport.new(
@@ -51,6 +51,17 @@ module Api
 
     def set_cors_headers
       CORS_HEADERS.each { |key, value| response.set_header(key, value) }
+    end
+
+    # In stateless mode the gem answers every GET with a spec-compliant 405 (`handle_get` short-circuits
+    # before even checking `Accept`) — real MCP clients open the legacy GET SSE stream with
+    # `Accept: text/event-stream` (`REQUIRED_GET_ACCEPT_TYPES` in the gem) and are expected to handle that
+    # 405 gracefully as "no stream support". Serving `server_description` unconditionally on GET, as this
+    # controller used to, replaced that 405 with a 200 `application/json` body neither SSE nor what the
+    # client asked for — for a plain browser/curl GET this is harmless and friendlier, but for a real
+    # client's stream-open probe it's a non-conforming response instead of the signal it expects.
+    def event_stream_request?
+      request.accept.to_s.include?("text/event-stream")
     end
 
     def server_description
