@@ -26,12 +26,17 @@ default: &default
 # `bin/rails credentials:edit --environment development`) rather than the ENV-based
 # `default` anchor above, so local Postgres setup doesn't depend on a .env file.
 development:
-  <<: *default
-  database: my_linktree_development
-  host: <%= Rails.application.credentials.dig(:database, :host) %>
-  port: <%= Rails.application.credentials.dig(:database, :port) %>
-  username: <%= Rails.application.credentials.dig(:database, :username) %>
-  password: <%= Rails.application.credentials.dig(:database, :password) %>
+  primary: &primary_development
+    <<: *default
+    database: my_linktree_development
+    host: <%= Rails.application.credentials.dig(:database, :host) %>
+    port: <%= Rails.application.credentials.dig(:database, :port) %>
+    username: <%= Rails.application.credentials.dig(:database, :username) %>
+    password: <%= Rails.application.credentials.dig(:database, :password) %>
+  cache:
+    <<: *primary_development
+    database: my_linktree_development_cache
+    migrations_paths: db/cache_migrate
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
