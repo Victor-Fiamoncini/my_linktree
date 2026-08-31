@@ -1,10 +1,6 @@
 require "rails_helper"
 
 RSpec.describe "Api::Mcp", type: :request do
-  # The mcp gem's DNS-rebinding protection only allows loopback Host headers by default;
-  # Rails' request-spec default (www.example.com) gets rejected with 403.
-  before { host! "127.0.0.1" }
-
   let(:headers) { { "Content-Type" => "application/json", "Accept" => "application/json, text/event-stream" } }
 
   def rpc(id:, method:, params: {})
@@ -145,13 +141,13 @@ RSpec.describe "Api::Mcp", type: :request do
     expect(response.headers["Access-Control-Allow-Origin"]).to eq("https://victorfiamon.com.br")
   end
 
-  it "rejects a request from a disallowed Origin via the transport's own DNS-rebinding protection" do
+  it "reflects back an arbitrary Origin (e.g. an AI agent client's) and lets the transport allow it through" do
     post "/api/mcp", params: rpc(id: 1, method: "tools/list"),
-      headers: headers.merge("Origin" => "https://evil.example.com")
+      headers: headers.merge("Origin" => "https://claude.ai")
 
-    expect(response).to have_http_status(:forbidden)
-    expect(response.headers["Access-Control-Allow-Origin"]).to be_nil
-    expect(response.parsed_body.dig("error", "message")).to eq("Forbidden: Invalid Origin header")
+    expect(response).to have_http_status(:ok)
+    expect(response.headers["Access-Control-Allow-Origin"]).to eq("https://claude.ai")
+    expect(response.headers["Vary"]).to eq("Origin")
   end
 
   it "answers an OPTIONS preflight with 200 and CORS method/header advertisements, without touching the MCP server" do

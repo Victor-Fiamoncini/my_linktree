@@ -7,11 +7,6 @@ module Api
       "Access-Control-Allow-Headers" => "Content-Type, Accept, Mcp-Session-Id, Mcp-Protocol-Version"
     }.freeze
 
-    SITE_HOST = URI.parse(SeoConfig::SITE_URL).host
-
-    ALLOWED_HOSTS = [ SITE_HOST, SITE_HOST.delete_prefix("www.") ].freeze
-    ALLOWED_ORIGINS = ALLOWED_HOSTS.map { |host| "https://#{host}" }.freeze
-
     before_action :set_cors_headers
 
     rate_limit to: 30, within: 1.minute, by: -> { rate_limit_identifier }, only: :create, unless: -> { request.options? }
@@ -24,7 +19,7 @@ module Api
 
       server = MCP::Server.new(name: "my_linktree", tools: TOOLS)
       transport = MCP::Server::Transports::StreamableHTTPTransport.new(
-        server, stateless: true, allowed_hosts: ALLOWED_HOSTS, allowed_origins: ALLOWED_ORIGINS
+        server, stateless: true, dns_rebinding_protection: false
       )
       status, headers, body = transport.handle_request(request)
 
@@ -39,7 +34,7 @@ module Api
       CORS_METHOD_HEADERS.each { |key, value| response.set_header(key, value) }
 
       origin = request.headers["Origin"]
-      return unless origin && ALLOWED_ORIGINS.include?(origin)
+      return unless origin
 
       response.set_header("Access-Control-Allow-Origin", origin)
       response.set_header("Vary", "Origin")

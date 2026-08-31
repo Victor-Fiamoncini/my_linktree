@@ -152,9 +152,14 @@ config/
   its Rack `[status, headers, body]` triple straight through the Rails response (`self.status=`,
   `response.set_header`, `self.response_body=`) rather than using `render`, so both the plain-JSON
   and SSE response shapes pass through untouched. The transport is constructed with
-  `allowed_hosts: [URI.parse(SeoConfig::SITE_URL).host]` — the gem's DNS-rebinding protection only
-  accepts loopback `Host` headers by default, which would reject every real production request
-  without this. The 4 `MCP::Tool` subclasses deliberately don't declare `required:` in their
+  `dns_rebinding_protection: false` — the gem's default protection (`Host`/`Origin` allow-listing)
+  guards against DNS-rebinding attacks on a *loopback-bound* server, which doesn't apply here: this
+  is a public, unauthenticated, cookie-free endpoint meant to be called by arbitrary external MCP
+  clients (Claude, ChatGPT, etc.) whose `Origin` values can't be enumerated in advance, and `Host`
+  is already validated independently by Rails' own `config.hosts` in
+  `config/environments/production.rb`. `set_cors_headers` reflects whatever `Origin` header is
+  present (rather than allow-listing) for the same reason — safe because the endpoint never sets
+  `Access-Control-Allow-Credentials`. The 4 `MCP::Tool` subclasses deliberately don't declare `required:` in their
   `input_schema` — the gem short-circuits before calling the tool when required args are missing,
   but the original behavior (and this port's) records the agent connection *before* validating,
   even for calls that go on to fail. Validation instead happens inside the use cases, with domain
@@ -172,9 +177,6 @@ RSpec, with specs co-located by type under `spec/` (`spec/models`, `spec/service
 - `Rails.cache.clear` runs before every example (`spec/rails_helper.rb`) — Rails' `rate_limit`
   macro shares the process-wide cache for its counters, so state must be reset between examples or
   one spec's requests would count toward another spec's rate limit.
-- The `mcp` gem's DNS-rebinding protection only allows loopback `Host` headers by default; request
-  specs against `/api/mcp` need `host! "127.0.0.1"` (Rails' request-spec default host,
-  `www.example.com`, gets rejected with 403).
 - Use `travel_to`/`around { |example| travel_to(...) { example.run } }`
   (`ActiveSupport::Testing::TimeHelpers`, included globally) for anything touching
   `CheckAvailabilityUseCase` or `GetXpYearsUseCase` — both are date-sensitive.
