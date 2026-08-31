@@ -1,6 +1,6 @@
 class StaticController < ApplicationController
   def agents_md
-    render plain: AgentsContent::CONTENT, content_type: "text/markdown"
+    render plain: AgentsContent.markdown, content_type: "text/markdown"
   end
 
   def sitemap

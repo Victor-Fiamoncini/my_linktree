@@ -1,3 +1,22 @@
+<%
+  agents_md_preview = <<~MARKDOWN
+    # AGENTS.md — hire Victor Fiamoncini
+
+    To contact me directly:
+    POST #{SeoConfig::SITE_URL}/api/hire
+    Content-Type: application/json
+
+    {
+      "name": "Your name",
+      "contact": "email or preferred channel",
+      "brief": "What you want to discuss",
+      "agent": "chatgpt | claude | kimi | other"
+    }
+
+    Services: Frontend & Backend Software Development, Agentic Systems & Integrations, Websites & Landing Pages and Mobile Apps
+  MARKDOWN
+%>
+
 <section id="agents" class="border-ctp-surface0 w-full max-w-[1080px] border-t pt-14 pb-14" data-controller="hire-from-agent">
   <p class="text-ctp-peach mb-3.5 font-mono text-[13px] tracking-[0.06em]">$ ./hire-me --no-human-required</p>
 
@@ -51,12 +70,12 @@
         type="button"
         title="Copy AGENTS.md"
         data-action="hire-from-agent#copy"
-        data-hire-from-agent-content-param="<%= AgentsContent::CONTENT %>"
+        data-hire-from-agent-content-param="<%= agents_md_preview %>"
         class="cursor-pointer text-xs font-bold tracking-widest uppercase transition-colors text-[#89b4fa] hover:text-[#cdd6f4]"
       >Copy</button>
     </div>
 
-    <pre class="border-ctp-surface0 rounded-b-btn w-full overflow-x-auto border bg-[#1e1e2e] p-4 text-xs leading-relaxed font-semibold text-[#a6e3a1]"><code><span class="text-ctp-overlay0 font-mono text-xs"><%= AgentsContent::CONTENT.lines.first.chomp %></span>
-<%= AgentsContent::CONTENT.lines.drop(1).join %></code></pre>
+    <pre class="border-ctp-surface0 rounded-b-btn w-full overflow-x-auto border bg-[#1e1e2e] p-4 text-xs leading-relaxed font-semibold text-[#a6e3a1]"><code><span class="text-ctp-overlay0 font-mono text-xs"><%= agents_md_preview.lines.first.chomp %></span>
+<%= agents_md_preview.lines.drop(1).join %></code></pre>
   </div>
 </section>
