@@ -147,6 +147,34 @@ Before the first deploy: export `KAMAL_REGISTRY_PASSWORD` locally, fill in the p
 `config/deploy.yml` (Docker Hub username, VPS IP), and fill in the production credentials above
 with real database connection details.
 
+### Cloudflare
+
+`victorfiamon.com.br` is proxied through Cloudflare (Free plan). Two settings matter for this app:
+
+- **SSL/TLS mode** must be **Full** (not Flexible), so Cloudflare-to-origin traffic is encrypted —
+  see the note in `config/deploy.yml`.
+- **Block AI bots** (Security → AI Crawl Control) is enabled site-wide, which would otherwise 403
+  every AI-agent request to `/api/mcp` (Claude, ChatGPT, etc. connector infra) at the edge, before
+  it ever reaches Rails. A Custom Rule ("Allow AI agents on MCP endpoint", under Security →
+  Security rules → Custom rules) exempts just that path: `http.request.uri.path eq "/api/mcp"` →
+  **Skip**, with both **All managed rules** and **All Super Bot Fight Mode Rules** checked — both
+  are required, since the AI-bots block runs under Cloudflare's Bot Management ruleset, not the
+  general managed-rules category — checking only "All managed rules" looks correct but still
+  403s. This rule lives only in the Cloudflare dashboard; there's no Terraform/API config for it
+  in this repo.
+
+  Verify it's still active:
+
+  ```bash
+  curl -s -o /dev/null -w "%{http_code}\n" -X POST https://www.victorfiamon.com.br/api/mcp \
+    -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' \
+    -H 'User-Agent: Claude-User' \
+    -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
+  ```
+
+  `200` means it's working; `403` means the exception rule is missing, disabled, or the Skip
+  checkboxes regressed to just "All managed rules".
+
 ---
 
 Released in 2021.

@@ -165,6 +165,18 @@ config/
   even for calls that go on to fail. Validation instead happens inside the use cases, with domain
   errors caught in the tool's `call` and turned into `MCP::Tool::Response.new(..., error: true)`
   rather than raised.
+- **Edge WAF (Cloudflare)**: production (`victorfiamon.com.br`) sits behind Cloudflare with
+  **Block AI bots** enabled site-wide, which blocks agent-style clients (e.g. Anthropic's connector
+  infra, `User-Agent: Claude-User`) via the `Cloudflare Bot Management rules for all plans`
+  ruleset's `Manage AI bots` rule — before the request ever reaches this app, so no app-side header
+  or IP check can see or fix it. Since `/api/mcp` exists specifically to be called by AI agents,
+  it's exempted via a Cloudflare Custom Rule (Security → Security rules → Custom rules — dashboard
+  only, no Terraform/API config in this repo): expression `http.request.uri.path eq "/api/mcp"`,
+  action **Skip**, with both **All managed rules** and **All Super Bot Fight Mode Rules** checked.
+  Both are required — the AI-bots block runs under Bot Management, so skipping only "All managed
+  rules" leaves it in effect and 403s the same request right after. Every other path keeps the
+  site-wide AI-bot block. See [README's Deployment section](README.md#cloudflare) for how to verify
+  the rule is active.
 - **`@/` alias**: none — this is a standard Rails app, autoloaded via Zeitwerk from `app/*`.
   `app/services/use_cases/*.rb` autoloads as `UseCases::*` (the `use_cases` subdirectory becomes an
   implicit namespace under the `app/services` root).
