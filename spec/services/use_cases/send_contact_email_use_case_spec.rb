@@ -12,6 +12,13 @@ RSpec.describe UseCases::SendContactEmailUseCase do
     expect(mail.subject).to eq("My Linktree - New contact from Jane")
   end
 
+  it "enqueues a background job to deliver the email with the given params" do
+    described_class.new.execute(name: "Jane", email: "jane@example.com", message: "Hello!")
+
+    assert_enqueued_email_with ContactMailer, :new_contact,
+      args: [ { name: "Jane", email: "jane@example.com", message: "Hello!" } ]
+  end
+
   it "raises a ValidationError (a kind of ArgumentError) with a name error when name is blank" do
     expect {
       described_class.new.execute(name: "", email: "jane@example.com", message: "Hello!")

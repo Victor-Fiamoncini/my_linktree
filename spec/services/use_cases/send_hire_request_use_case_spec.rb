@@ -22,6 +22,20 @@ RSpec.describe UseCases::SendHireRequestUseCase do
     }.not_to raise_error
   end
 
+  it "enqueues a background job to deliver the email with the given params" do
+    described_class.new.execute(**valid_params, agent: "claude")
+
+    assert_enqueued_email_with ContactMailer, :agent_hire_request,
+      args: [ { name: "Jane", contact: "jane@example.com", brief: "Build me a thing", agent: "claude" } ]
+  end
+
+  it "enqueues the background job with a nil agent when the field is omitted" do
+    described_class.new.execute(**valid_params)
+
+    assert_enqueued_email_with ContactMailer, :agent_hire_request,
+      args: [ { name: "Jane", contact: "jane@example.com", brief: "Build me a thing", agent: nil } ]
+  end
+
   it "raises a ValidationError (a kind of ArgumentError) with a name error when name is blank" do
     expect {
       described_class.new.execute(**valid_params.merge(name: ""))

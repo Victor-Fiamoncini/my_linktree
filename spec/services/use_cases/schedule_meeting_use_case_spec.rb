@@ -18,6 +18,15 @@ RSpec.describe UseCases::ScheduleMeetingUseCase do
     expect(subjects).to eq([ "My Linktree - Meeting scheduled", "My Linktree - New meeting booked by Jane" ])
   end
 
+  it "enqueues confirmation and notification mailer jobs with the given params" do
+    use_case.execute(name: "Jane", email: "jane@example.com", company: "Acme", slot_start: slot_start)
+
+    assert_enqueued_email_with MeetingMailer, :confirmation,
+      args: [ { name: "Jane", email: "jane@example.com", slot_start: slot_start } ]
+    assert_enqueued_email_with MeetingMailer, :notification,
+      args: [ { name: "Jane", email: "jane@example.com", company: "Acme", slot_start: slot_start } ]
+  end
+
   it "raises ArgumentError when a required field is missing" do
     expect {
       use_case.execute(name: "", email: "jane@example.com", slot_start: slot_start)

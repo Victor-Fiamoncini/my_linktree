@@ -47,7 +47,7 @@ rescue ActiveRecord::PendingMigrationError => e
 end
 RSpec.configure do |config|
   config.include ActiveSupport::Testing::TimeHelpers
-  config.include ActiveJob::TestHelper
+  config.include ActionMailer::TestHelper
 
   # Rails' rate_limit macro shares the process-wide Rails.cache (MemoryStore in test) for its
   # counters, so state must be cleared between examples or one spec's requests would count
