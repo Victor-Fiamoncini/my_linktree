@@ -28,11 +28,12 @@
 			>Copy</button>
 		</div>
 
-		<pre class="border-ctp-surface0 rounded-b-btn w-full overflow-x-auto border bg-[#1e1e2e] p-4 text-xs leading-relaxed font-semibold text-[#a6e3a1]"><code><%= SeoConfig::MCP_ENDPOINT %> <span class="text-ctp-overlay0 font-mono text-xs"># No account or authentication required</span></code></pre>
+		<pre class="border-ctp-surface0 rounded-b-btn w-full overflow-x-auto border bg-[#1e1e2e] p-4 text-xs leading-relaxed font-semibold text-[#a6e3a1]"><code><%= SeoConfig::MCP_ENDPOINT %> <span class="text-ctp-overlay0 font-mono text-xs"># No account or authentication required</span>
+			<span class="text-ctp-overlay0 font-mono text-xs block"># Watch live agentic connections: <%= SeoConfig::SITE_URL %>/telemetry</span></code></pre>
 	</div>
 
   <p class="text-ctp-subtext0 mb-8 w-full text-[17px] leading-[1.7] text-pretty text-justify">
-		You can also paste this brief into your agent. They can read it and execute any available tool through my API.
+		You can also paste this brief into your agent. Any agent can read it and reach me directly via my API (no MCP connector setup required).
   </p>
 
   <div class="w-full text-left">
@@ -55,6 +56,7 @@
       >Copy</button>
     </div>
 
-    <pre class="border-ctp-surface0 rounded-b-btn w-full overflow-x-auto border bg-[#1e1e2e] p-4 text-xs leading-relaxed font-semibold text-[#a6e3a1]"><code><%= AgentsContent::CONTENT %></code></pre>
+    <pre class="border-ctp-surface0 rounded-b-btn w-full overflow-x-auto border bg-[#1e1e2e] p-4 text-xs leading-relaxed font-semibold text-[#a6e3a1]"><code><span class="text-ctp-overlay0 font-mono text-xs"><%= AgentsContent::CONTENT.lines.first.chomp %></span>
+<%= AgentsContent::CONTENT.lines.drop(1).join %></code></pre>
   </div>
 </section>

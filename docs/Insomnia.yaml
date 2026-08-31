@@ -109,10 +109,10 @@ collection:
               modified: 1787945572764
               isPrivate: false
               description: "No arguments. Returns GetProfileUseCase's output (name, experiences,
-                education, services — same shape as GET /api/profile) as the
-                tool's text content. Also records an AgentConnection telemetry
-                row ({ tool: 'get_resume', timestamp }), visible via GET
-                /api/telemetry, before any validation runs."
+                education) as the tool's text content. Also records an
+                AgentConnection telemetry row ({ tool: 'get_resume',
+                timestamp }), visible via GET /api/telemetry, before any
+                validation runs."
               sortKey: -1787945572760
             method: POST
             body:
@@ -321,27 +321,42 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-      - name: Profile
+      - name: Hire
         meta:
-          id: fld_7ad01c26bb6bd3b7c26cab611dfe77e3
+          id: fld_8be12d37cc7ce4c8d37dbc722e88f8f4
           created: 1787945572764
           modified: 1787945572764
           sortKey: -1787945572755
-          description: Plain REST/JSON mirror of the resume data — no MCP envelope.
+          description: Plain REST/JSON endpoint letting any AI agent email the site owner on a
+            visitor's behalf — no MCP envelope, documented directly in AGENTS.md.
         children:
-          - url: "{{base_url}}/api/profile"
-            name: Get Profile
+          - url: "{{base_url}}/api/hire"
+            name: Send Hire Request
             meta:
-              id: req_f3a25f5561eb1827f40ff2acdd965cf9
+              id: req_04b36672eb1c48f7a19ffed83edc76e0
               created: 1787945572764
               modified: 1787945572764
               isPrivate: false
-              description: "Returns GetProfileUseCase's output — name, experiences (each with
-                backend/frontend/infra/other_tools arrays), education, services
-                — sourced from config/profile.yml. No auth, no rate limit."
+              description: "Validates name/contact/brief (agent is optional), sends an
+                email via ContactMailer#agent_hire_request, and records an
+                AgentConnection telemetry row ({ tool: 'hire', timestamp })
+                before validation runs — visible via GET /api/telemetry. Rate
+                limited to 2 requests / 10 minutes per IP; returns 422 with a
+                per-field errors hash on validation failure."
               sortKey: -1787945572754
-            method: GET
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                  "name": "Jane Doe",
+                  "contact": "jane@example.com",
+                  "brief": "I want to build an AI-powered landing page.",
+                  "agent": "claude"
+                }
             headers:
+              - name: Content-Type
+                value: application/json
               - name: Accept
                 value: application/json
             settings:

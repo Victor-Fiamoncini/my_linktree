@@ -20,7 +20,7 @@ the app had before this migration:
 ```
 app/
 ├── controllers/
-│   ├── api/                   # telemetry#index, mcp#create, profile#show
+│   ├── api/                   # telemetry#index, mcp#create, hire#create
 │   ├── pages_controller.rb    # home page
 │   ├── contacts_controller.rb # POST /contact — redirect + flash
 │   └── telemetry_page_controller.rb
