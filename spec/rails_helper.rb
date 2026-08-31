@@ -51,10 +51,8 @@ RSpec.configure do |config|
 
   # Rails' rate_limit macro shares the process-wide Rails.cache (MemoryStore in test) for its
   # counters, so state must be cleared between examples or one spec's requests would count
-  # toward another spec's rate limit. Api::McpController uses its own MemoryStore instead of
-  # Rails.cache (see its RATE_LIMIT_STORE constant), so it needs clearing separately.
+  # toward another spec's rate limit.
   config.before { Rails.cache.clear }
-  config.before { Api::McpController::RATE_LIMIT_STORE.clear }
 
   config.before(:each, type: :system) { driven_by(:cuprite) }
 
