@@ -10,19 +10,12 @@ module Api
     SITE_HOST = URI.parse(SeoConfig::SITE_URL).host
 
     ALLOWED_HOSTS = [ SITE_HOST, SITE_HOST.delete_prefix("www.") ].freeze
-
     ALLOWED_ORIGINS = ALLOWED_HOSTS.map { |host| "https://#{host}" }.freeze
-
-    RATE_LIMIT_STORE = ActiveSupport::Cache::MemoryStore.new
 
     before_action :set_cors_headers
 
-    rate_limit to: 30, within: 1.minute, by: -> { rate_limit_identifier }, only: :create,
-               unless: -> { request.options? }, store: RATE_LIMIT_STORE
-    rate_limit to: 3, within: 10.minutes, name: "schedule_meeting", by: -> { rate_limit_identifier },
-               unless: -> { !schedule_meeting_call? }, only: :create, store: RATE_LIMIT_STORE
-
-    rescue_from ActionController::TooManyRequests, with: :render_too_many_requests
+    rate_limit to: 30, within: 1.minute, by: -> { rate_limit_identifier }, only: :create, unless: -> { request.options? }
+    rate_limit to: 3, within: 10.minutes, name: "schedule_meeting", by: -> { rate_limit_identifier }, unless: -> { !schedule_meeting_call? }, only: :create
 
     def create
       return head :ok if request.options?
@@ -63,10 +56,6 @@ module Api
         usage: "POST JSON-RPC 2.0: initialize, tools/list, tools/call",
         tools: TOOLS.map(&:tool_name)
       }
-    end
-
-    def render_too_many_requests
-      render json: { message: "Too many requests", action: "Please wait a moment before trying again." }, status: :too_many_requests
     end
 
     def schedule_meeting_call?
