@@ -2,9 +2,8 @@ module Api
   class McpController < BaseController
     TOOLS = [ GetResumeTool, ListServicesTool, CheckAvailabilityTool, ScheduleMeetingTool ].freeze
 
-    CORS_HEADERS = {
-      "Access-Control-Allow-Origin" => "*",
-      "Access-Control-Allow-Methods" => "POST, GET, OPTIONS",
+    CORS_METHOD_HEADERS = {
+      "Access-Control-Allow-Methods" => "POST, GET, DELETE, OPTIONS",
       "Access-Control-Allow-Headers" => "Content-Type, Accept, Mcp-Session-Id, Mcp-Protocol-Version"
     }.freeze
 
@@ -12,14 +11,8 @@ module Api
 
     ALLOWED_HOSTS = [ SITE_HOST, SITE_HOST.delete_prefix("www.") ].freeze
 
-    # In-process store instead of the app-wide Solid Cache store: Solid Cache round-trips to the
-    # Postgres cache database, which for this app is a separate managed instance reachable only
-    # over the public internet (measured 300ms-4s per query from the Hetzner VPS, vs. Solid
-    # Cache's own local-network expectations) — latency this endpoint can't absorb, since external
-    # MCP harnesses (Claude, ChatGPT, etc.) apply their own short timeouts when probing a connector.
-    # A single Kamal server with no WEB_CONCURRENCY runs Puma in one process, so an in-memory store
-    # is already shared across every thread handling these requests; resetting counters on deploy
-    # is an acceptable trade-off for a short-window rate limit.
+    ALLOWED_ORIGINS = ALLOWED_HOSTS.map { |host| "https://#{host}" }.freeze
+
     RATE_LIMIT_STORE = ActiveSupport::Cache::MemoryStore.new
 
     before_action :set_cors_headers
@@ -38,7 +31,7 @@ module Api
 
       server = MCP::Server.new(name: "my_linktree", tools: TOOLS)
       transport = MCP::Server::Transports::StreamableHTTPTransport.new(
-        server, stateless: true, allowed_hosts: ALLOWED_HOSTS
+        server, stateless: true, allowed_hosts: ALLOWED_HOSTS, allowed_origins: ALLOWED_ORIGINS
       )
       status, headers, body = transport.handle_request(request)
 
@@ -50,16 +43,15 @@ module Api
     private
 
     def set_cors_headers
-      CORS_HEADERS.each { |key, value| response.set_header(key, value) }
+      CORS_METHOD_HEADERS.each { |key, value| response.set_header(key, value) }
+
+      origin = request.headers["Origin"]
+      return unless origin && ALLOWED_ORIGINS.include?(origin)
+
+      response.set_header("Access-Control-Allow-Origin", origin)
+      response.set_header("Vary", "Origin")
     end
 
-    # In stateless mode the gem answers every GET with a spec-compliant 405 (`handle_get` short-circuits
-    # before even checking `Accept`) — real MCP clients open the legacy GET SSE stream with
-    # `Accept: text/event-stream` (`REQUIRED_GET_ACCEPT_TYPES` in the gem) and are expected to handle that
-    # 405 gracefully as "no stream support". Serving `server_description` unconditionally on GET, as this
-    # controller used to, replaced that 405 with a 200 `application/json` body neither SSE nor what the
-    # client asked for — for a plain browser/curl GET this is harmless and friendlier, but for a real
-    # client's stream-open probe it's a non-conforming response instead of the signal it expects.
     def event_stream_request?
       request.accept.to_s.include?("text/event-stream")
     end

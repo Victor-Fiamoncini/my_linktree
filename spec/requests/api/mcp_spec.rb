@@ -122,18 +122,50 @@ RSpec.describe "Api::Mcp", type: :request do
     expect(response).to have_http_status(:too_many_requests)
   end
 
-  it "sets permissive CORS headers on a JSON-RPC response" do
+  it "does not advertise an Access-Control-Allow-Origin when no Origin header is sent" do
     post "/api/mcp", params: rpc(id: 1, method: "tools/list"), headers: headers
 
-    expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+    expect(response.headers["Access-Control-Allow-Origin"]).to be_nil
   end
 
-  it "answers an OPTIONS preflight with 200 and CORS headers, without touching the MCP server" do
+  it "reflects back an allowed Origin (canonical www host) and lets the transport allow it through" do
+    post "/api/mcp", params: rpc(id: 1, method: "tools/list"),
+      headers: headers.merge("Origin" => "https://www.victorfiamon.com.br")
+
+    expect(response).to have_http_status(:ok)
+    expect(response.headers["Access-Control-Allow-Origin"]).to eq("https://www.victorfiamon.com.br")
+    expect(response.headers["Vary"]).to eq("Origin")
+  end
+
+  it "reflects back an allowed Origin (bare apex host) and lets the transport allow it through" do
+    post "/api/mcp", params: rpc(id: 1, method: "tools/list"),
+      headers: headers.merge("Origin" => "https://victorfiamon.com.br")
+
+    expect(response).to have_http_status(:ok)
+    expect(response.headers["Access-Control-Allow-Origin"]).to eq("https://victorfiamon.com.br")
+  end
+
+  it "rejects a request from a disallowed Origin via the transport's own DNS-rebinding protection" do
+    post "/api/mcp", params: rpc(id: 1, method: "tools/list"),
+      headers: headers.merge("Origin" => "https://evil.example.com")
+
+    expect(response).to have_http_status(:forbidden)
+    expect(response.headers["Access-Control-Allow-Origin"]).to be_nil
+    expect(response.parsed_body.dig("error", "message")).to eq("Forbidden: Invalid Origin header")
+  end
+
+  it "answers an OPTIONS preflight with 200 and CORS method/header advertisements, without touching the MCP server" do
     options "/api/mcp"
 
     expect(response).to have_http_status(:ok)
-    expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
-    expect(response.headers["Access-Control-Allow-Methods"]).to include("POST")
+    expect(response.headers["Access-Control-Allow-Methods"]).to include("POST", "GET", "DELETE", "OPTIONS")
+  end
+
+  it "answers a DELETE with the transport's stateless-mode success response" do
+    delete "/api/mcp"
+
+    expect(response).to have_http_status(:ok)
+    expect(response.parsed_body["success"]).to be true
   end
 
   it "answers a GET with a plain server description instead of the gem's 405" do
