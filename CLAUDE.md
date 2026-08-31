@@ -100,8 +100,10 @@ app/
       send_contact_email_use_case.rb
       record_agent_connection_use_case.rb
       list_recent_connections_use_case.rb
-    seo_config.rb
-    agents_content.rb           # AGENTS.md content, shared by the UI snippet and /AGENTS.md route
+    agents_content.rb           # renders config/agents.yml into the /AGENTS.md and /llms.txt
+                                 # response body only — the "Hire me from your agent" UI snippet on
+                                 # the homepage has its own inline copy, deliberately decoupled so
+                                 # each can evolve independently
   mcp_tools/                    # MCP::Tool subclasses: get_resume, list_services,
                                  # check_availability, schedule_meeting
   javascript/controllers/       # Stimulus: telemetry_feed, mobile_nav, experiences_tabs,
@@ -111,9 +113,17 @@ app/
     pages/                      # home.html.erb + partials (hero, experiences, contact, etc.)
     telemetry_page/show.html.erb
     shared/                     # header, footer, flash, external_link, person_json_ld partials
+lib/
+  seo_config.rb                 # SeoConfig — plain constants module (site URL, author, MCP
+                                 # endpoint, sitemap lastmod), no request-scoped behavior, so it
+                                 # lives in `lib/` rather than `app/services/` (which this app
+                                 # reserves for UseCases-style behavior objects). Autoloaded via
+                                 # `config.autoload_lib` in config/application.rb — no `Lib::`
+                                 # namespace since it's a top-level file directly under `lib/`.
 config/
   profile.yml                  # static resume/services data (was memory-database.js)
   availability.yml             # timezone, weekly windows, slot duration, booking horizon
+  agents.yml                   # AGENTS.md / llms.txt body, read by AgentsContent
   database.yml                 # dev/test use ENV-driven Postgres connection
 ```
 

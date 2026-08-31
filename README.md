@@ -26,11 +26,16 @@ app/
 │   └── telemetry_page_controller.rb
 ├── services/
 │   ├── use_cases/             # framework-agnostic business logic (constructor-injected deps)
-│   └── seo_config.rb
+│   └── agents_content.rb      # renders config/agents.yml into AGENTS.md / llms.txt
 ├── mcp_tools/                 # get_resume, list_services, check_availability, schedule_meeting
 ├── mailers/                   # ContactMailer, MeetingMailer
 ├── models/                    # Booking (unique slot_start), AgentConnection
 └── javascript/controllers/    # 4 Stimulus controllers (telemetry polling, mobile nav, etc.)
+
+lib/
+└── seo_config.rb              # SeoConfig — plain constants (site URL, MCP endpoint, etc.),
+                                # autoloaded via config.autoload_lib; not a use case, so it lives
+                                # outside app/services/
 ```
 
 **Layers:**
