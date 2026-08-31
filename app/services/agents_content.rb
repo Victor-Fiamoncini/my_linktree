@@ -18,8 +18,8 @@ module AgentsContent
     - check_availability     Open meeting slots (America/Sao_Paulo)
     - schedule_meeting       Book a meeting
 
-    Services: Frontend & Backend Software Development, Agentic Systems & Integrations, Websites & Landing Pages, Mobile Apps
+    Services: Frontend & Backend Software Development, Agentic Systems & Integrations, Websites & Landing Pages and Mobile Apps
 
-    Watch live agent connections: #{SeoConfig::SITE_URL}/telemetry
+    Bonus: Watch live agent connections: #{SeoConfig::SITE_URL}/telemetry
   MARKDOWN
 end
