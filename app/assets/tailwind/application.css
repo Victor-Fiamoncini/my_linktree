@@ -82,3 +82,28 @@ html {
     transform: none;
   }
 }
+
+.cursor-trail-pixel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transform: translate(-50%, -50%);
+  animation: cursor-trail-fade 650ms steps(6, end) forwards;
+}
+
+@keyframes cursor-trail-fade {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2);
+  }
+}
