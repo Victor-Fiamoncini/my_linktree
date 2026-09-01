@@ -1,4 +1,4 @@
-<section id="about" class="grid w-full max-w-[1080px] items-center gap-12 pt-16 pb-14 min-[900px]:grid-cols-[1fr_260px] min-[900px]:gap-16 min-[900px]:pt-24">
+<section id="about" class="grid w-full max-w-[1080px] items-center gap-12 pt-16 pb-14 min-[900px]:grid-cols-[1fr_320px] min-[900px]:gap-16 min-[900px]:pt-24">
   <div>
     <p class="text-ctp-green mb-5 font-mono text-[13px] tracking-[0.06em]">$ whoami</p>
 
@@ -16,6 +16,7 @@
         href="https://rubyonrails.org/"
         target="_blank"
         rel="noopener noreferrer"
+        title="Ruby on Rails official website"
         class="text-ctp-text hover:text-ctp-red after:bg-ctp-red relative inline-flex items-center gap-1 font-semibold transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:transition-all after:duration-300 hover:after:w-full"
       >
         <span class="text-ctp-red h-[13px] w-[13px]"><%= svg_icon(:gem) %></span>Ruby on Rails
@@ -25,6 +26,7 @@
         href="https://nextjs.org/"
         target="_blank"
         rel="noopener noreferrer"
+        title="Next.js official website"
         class="text-ctp-text hover:text-ctp-blue after:bg-ctp-blue relative inline-flex items-center gap-1 font-semibold transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:transition-all after:duration-300 hover:after:w-full"
       >
         <span class="h-[13px] w-[13px]"><%= svg_icon(:nextjs) %></span>Next.js
@@ -56,6 +58,7 @@
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Victor Fiamoncini on LinkedIn"
+      title="Victor Fiamoncini on LinkedIn"
       class="group rounded-card relative block"
       data-controller="photo-pixelate"
     >
@@ -63,17 +66,17 @@
         data-photo-pixelate-target="source"
         src="/photo.jpg"
         alt="Victor Fiamoncini"
-        width="240"
-        height="280"
-        class="border-ctp-surface1 rounded-card relative block h-[280px] w-[240px] border object-cover transition-opacity duration-500 group-hover:opacity-0"
+        width="300"
+        height="350"
+        class="border-ctp-surface1 rounded-card relative block h-[350px] w-[300px] border object-cover transition-opacity duration-500 group-hover:opacity-0"
       >
 
       <canvas
         data-photo-pixelate-target="canvas"
-        width="240"
-        height="280"
+        width="300"
+        height="350"
         aria-hidden="true"
-        class="border-ctp-surface1 rounded-card pointer-events-none absolute inset-0 block h-[280px] w-[240px] border opacity-0 transition-opacity duration-500 [image-rendering:pixelated] group-hover:opacity-100"
+        class="border-ctp-surface1 rounded-card pointer-events-none absolute inset-0 block h-[350px] w-[300px] border opacity-0 transition-opacity duration-500 [image-rendering:pixelated] group-hover:opacity-100"
       ></canvas>
     </a>
   </div>

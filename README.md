@@ -53,8 +53,7 @@ lib/
 - **MCP server** (`Api::McpController`) drives the `mcp` gem's `StreamableHTTPTransport` in
   stateless mode with 4 registered tools. Every tool call is recorded through
   `RecordAgentConnectionUseCase` before validation runs, so even failed calls show up on
-  `/telemetry`. `schedule_meeting` has its own, stricter rate limit on top of the general one. See
-  [`docs/testing-mcp.md`](docs/testing-mcp.md) for what MCP is and how to call it by hand.
+  `/telemetry`. `schedule_meeting` has its own, stricter rate limit on top of the general one.
 
 ## Getting Started
 
