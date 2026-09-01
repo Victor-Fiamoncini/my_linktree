@@ -25,6 +25,12 @@ Postgres 16 is required for local development — run `docker compose up -d` (se
 There is no Redis anywhere in this app: rate limiting, background jobs, and (in production)
 ActionCable all ride on Rails 8's Postgres-backed Solid Cache / Solid Queue / Solid Cable.
 
+Always scaffold new Rails components (migrations, models, controllers, mailers, jobs, etc.) with
+the Rails CLI generators — `bin/rails generate migration ...`, `bin/rails generate model ...`,
+`bin/rails generate controller ...`, and so on — instead of hand-writing the file from scratch.
+Generators keep migration timestamps, naming conventions, and file layout consistent with Rails
+conventions; edit the generated file afterward for the specifics this app needs.
+
 ## Credentials
 
 There is no `.env`/`dotenv-rails` anymore — all per-environment config (database connection,
@@ -70,7 +76,7 @@ shared master key — see `.kamal/secrets`) to decrypt `production.yml.enc` at b
 
 This is a Rails 8 personal landing page using Hotwire (Turbo + Stimulus via importmap — no Node,
 no JS bundler). It also serves an MCP server so AI agents can read the resume, check availability,
-and book a meeting — see `docs/testing-mcp.md` for what MCP is and how to exercise it manually.
+and book a meeting.
 
 ```
 app/
