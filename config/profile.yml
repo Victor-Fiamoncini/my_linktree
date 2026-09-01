@@ -8,7 +8,7 @@ shared: &shared
       backend: [PHP, Laravel, Next.js, Postgres, MongoDB, Auth0, Postmark]
       frontend: [React, Vue, Tailwind CSS, SCSS, TypeScript, Cypress]
       infra: [AWS, Render Cloud, Docker, Docker Compose, Nginx, Sentry, LogRocket]
-      other_tools: [Git, GitHub, Claude Code, Postman, Figma, Linear]
+      other_tools: [Git, GitHub, Claude Code, Open Code, GitHub Copilot, CodeRabbit, Postman, Figma, Linear]
       country_flag: "🇺🇸"
       country_name: United States
       location: Rodeio, Santa Catarina, Brazil
