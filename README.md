@@ -145,11 +145,15 @@ Secrets split across two mechanisms, depending on who needs them and when:
   `KAMAL_REGISTRY_PASSWORD` (a Docker Hub access token, exported in your shell before deploying) and
   `RAILS_MASTER_KEY` (read straight from `config/credentials/production.key` on disk — note this is
   the production-scoped key, not `config/master.key`). This is what lets the container decrypt the
-  credentials file above at boot — it's the only env var `config/deploy.yml` injects.
+  credentials file above at boot — it's the only env var `config/deploy.yml` injects into the app
+  container. `KAMAL_SERVER_IP` is also exported here — not a credential, but kept out of
+  `config/deploy.yml` (`servers: web: - <%= ENV.fetch("KAMAL_SERVER_IP") %>`) since that file is
+  committed to a public repo and the origin otherwise isn't discoverable except through Cloudflare's
+  proxy — see the origin firewall note under Cloudflare below.
 
-Before the first deploy: export `KAMAL_REGISTRY_PASSWORD` locally, fill in the placeholders in
-`config/deploy.yml` (Docker Hub username, VPS IP), and fill in the production credentials above
-with real database connection details.
+Before the first deploy: export `KAMAL_REGISTRY_PASSWORD` and `KAMAL_SERVER_IP` locally, fill in
+the Docker Hub username placeholder in `config/deploy.yml`, and fill in the production credentials
+above with real database connection details.
 
 ### Cloudflare
 
@@ -178,6 +182,40 @@ with real database connection details.
 
   `200` means it's working; `403` means the exception rule is missing, disabled, or the Skip
   checkboxes regressed to just "All managed rules".
+
+  **Note**: Cloudflare is deprecating the standalone "Block AI bots" toggle on 2026-09-15 in favor
+  of a "mixed-purpose crawlers" preference under AI Crawl Control. Re-check this exemption still
+  passes the `curl` above after that date.
+
+- **Rate limiting rule** (Security → Security rules → Rate limiting rules) throttles floods at the
+  edge before they reach Rails: `not http.request.uri.path eq "/api/mcp"` (all traffic except the
+  MCP endpoint) → block an IP once it crosses the configured threshold. `/api/mcp` is deliberately
+  excluded — the "Allow AI agents on MCP endpoint" Skip rule above does **not** check "All rate
+  limiting rules", so a zone-wide rate limit would otherwise throttle legitimate AI-agent traffic
+  the Bot Management exemption is meant to protect. App-level rate limiting
+  (`ContactsController`/`Api::McpController`'s `rate_limit` macro, see Architecture below) still
+  covers `/api/mcp` and `/contact` specifically; this edge rule is a coarser flood guard for
+  everything else.
+- **Bot Fight Mode** (Security → Settings, under "Bot traffic") is safe to enable here specifically
+  *because* the MCP exemption rule already checks "All Super Bot Fight Mode Rules" — confirm that
+  checkbox is still checked before turning this on, or it will 403 AI-agent traffic to `/api/mcp`
+  the same way "Block AI bots" would.
+- **Origin firewall**: none of the above matters if the origin VPS accepts direct connections —
+  Cloudflare's proxy, DDoS protection, and every rule above are bypassed by anyone who requests the
+  IP directly instead of the domain (Kamal auto-provisions a real Let's Encrypt cert on the VPS
+  itself, so the origin answers with a valid 200 to any `Host: victorfiamon.com.br` request, cert
+  included — that cert is also logged in public Certificate Transparency logs, independently of
+  whether the IP ever leaks elsewhere). The origin's firewall (Hetzner Cloud Firewall, or `ufw` on
+  the box) should allow inbound 80/443 **only** from
+  [Cloudflare's published IP ranges](https://www.cloudflare.com/ips/), plus SSH from a trusted IP.
+  This isn't configured from this repo — set it up in the Hetzner console or over SSH. Verify with:
+
+  ```bash
+  curl -s -o /dev/null -w "%{http_code}\n" -k -H "Host: victorfiamon.com.br" https://<VPS_IP>/
+  ```
+
+  A connection timeout/refusal means the firewall is working; a `200` means direct-to-origin access
+  is still open.
 
 ---
 
