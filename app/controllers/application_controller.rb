@@ -19,9 +19,10 @@ class ApplicationController < ActionController::Base
   end
 
   # Rails' own trusted-proxy-aware IP resolution — honors X-Forwarded-For/X-Real-IP only when
-  # they come from a trusted proxy (loopback/private ranges by default; see
-  # config.action_dispatch.trusted_proxies), and otherwise falls back to the real connection IP.
-  # Unlike reading those headers directly, a client can't spoof this to dodge rate limiting.
+  # they come from a trusted proxy (loopback/private ranges, plus Cloudflare's published ranges —
+  # see config/initializers/trusted_proxies.rb, since production sits entirely behind Cloudflare),
+  # and otherwise falls back to the real connection IP. Unlike reading those headers directly, a
+  # client can't spoof this to dodge rate limiting.
   def rate_limit_identifier
     request.remote_ip
   end

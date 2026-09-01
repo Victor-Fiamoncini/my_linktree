@@ -157,8 +157,13 @@ config/
   trusted-proxy-aware IP resolution — rather than reading `X-Forwarded-For`/`X-Real-IP` directly, so
   a client can't spoof or omit those headers to dodge the limit; every request is rate-limited by
   its real connection IP (or the proxy-forwarded IP, only when the connection comes from a trusted
-  proxy — see `config.action_dispatch.trusted_proxies` if this app ever sits behind a public-IP
-  reverse proxy/CDN, which needs to be added to that list to be trusted).
+  proxy — see `config.action_dispatch.trusted_proxies`). Since production sits entirely behind
+  Cloudflare, `config/initializers/trusted_proxies.rb` extends Rails' default trusted list (which
+  only covers loopback/private ranges) with Cloudflare's published IP ranges — without it,
+  kamal-proxy's own appended hop makes Rails stop at Cloudflare's edge IP and treat every visitor
+  as the same rate-limit identifier. This is only safe because the origin firewall (see README's
+  Cloudflare section) restricts inbound 80/443 to Cloudflare's ranges, so that hop can't be forged
+  by connecting directly to the origin.
   `Api::McpController` declares two named limiters on the same action — a general one and a
   `schedule_meeting`-specific one — and the schedule-specific limiter's `unless:` proc calls
   `schedule_meeting_call?` (which parses and rewinds the JSON-RPC request body) so it only counts
