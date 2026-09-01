@@ -70,7 +70,9 @@ gem's Railtie-registered ActionMailer delivery method).
 
 Kamal only needs `RAILS_MASTER_KEY` (set to the *production* credentials key's contents, not the
 shared master key — see `.kamal/secrets`) to decrypt `production.yml.enc` at boot, plus
-`KAMAL_REGISTRY_PASSWORD` to pull the image; see `config/deploy.yml`.
+`KAMAL_REGISTRY_PASSWORD` to pull the image; see `config/deploy.yml`. `KAMAL_SERVER_IP` (also in
+`.kamal/secrets`) is the VPS IP fed into `servers: web:` via ERB — not a credential, but kept out of
+`deploy.yml` itself since that file is committed to a public repo.
 
 ## Architecture
 
@@ -155,8 +157,13 @@ config/
   trusted-proxy-aware IP resolution — rather than reading `X-Forwarded-For`/`X-Real-IP` directly, so
   a client can't spoof or omit those headers to dodge the limit; every request is rate-limited by
   its real connection IP (or the proxy-forwarded IP, only when the connection comes from a trusted
-  proxy — see `config.action_dispatch.trusted_proxies` if this app ever sits behind a public-IP
-  reverse proxy/CDN, which needs to be added to that list to be trusted).
+  proxy — see `config.action_dispatch.trusted_proxies`). Since production sits entirely behind
+  Cloudflare, `config/initializers/trusted_proxies.rb` extends Rails' default trusted list (which
+  only covers loopback/private ranges) with Cloudflare's published IP ranges — without it,
+  kamal-proxy's own appended hop makes Rails stop at Cloudflare's edge IP and treat every visitor
+  as the same rate-limit identifier. This is only safe because the origin firewall (see README's
+  Cloudflare section) restricts inbound 80/443 to Cloudflare's ranges, so that hop can't be forged
+  by connecting directly to the origin.
   `Api::McpController` declares two named limiters on the same action — a general one and a
   `schedule_meeting`-specific one — and the schedule-specific limiter's `unless:` proc calls
   `schedule_meeting_call?` (which parses and rewinds the JSON-RPC request body) so it only counts
@@ -192,7 +199,12 @@ config/
   Both are required — the AI-bots block runs under Bot Management, so skipping only "All managed
   rules" leaves it in effect and 403s the same request right after. Every other path keeps the
   site-wide AI-bot block. See [README's Deployment section](README.md#cloudflare) for how to verify
-  the rule is active.
+  the rule is active. That Skip rule does **not** check "All rate limiting rules", so the edge-level
+  rate limiting rule (also documented there) is scoped to exclude `/api/mcp` rather than relying on
+  this rule to exempt it. Cloudflare's DDoS protection and Bot Management only see traffic that
+  actually goes through its proxy — the origin's own firewall (outside this repo, see README) needs
+  to restrict inbound 80/443 to Cloudflare's IP ranges, or all of the above is bypassable by anyone
+  who requests the origin IP directly.
 - **`@/` alias**: none — this is a standard Rails app, autoloaded via Zeitwerk from `app/*`.
   `app/services/use_cases/*.rb` autoloads as `UseCases::*` (the `use_cases` subdirectory becomes an
   implicit namespace under the `app/services` root).

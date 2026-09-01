@@ -35,4 +35,20 @@ RSpec.describe "Api::Telemetry", type: :request do
 
     expect(response).to have_http_status(:too_many_requests)
   end
+
+  it "rate limits by the real visitor IP, not Cloudflare's edge IP, when proxied through Cloudflare" do
+    # kamal-proxy appends its previous hop (Cloudflare's edge) to X-Forwarded-For, so Rails sees
+    # "<visitor ip>, <cloudflare ip>" — trusted_proxies (config/initializers/trusted_proxies.rb)
+    # must walk past the Cloudflare hop or every visitor collapses into one shared bucket.
+    cloudflare_edge_ip = "173.245.48.1"
+    visitor_a = { "X-Forwarded-For" => "1.1.1.1, #{cloudflare_edge_ip}" }
+    visitor_b = { "X-Forwarded-For" => "2.2.2.2, #{cloudflare_edge_ip}" }
+
+    60.times { get "/api/telemetry", headers: visitor_a }
+    get "/api/telemetry", headers: visitor_a
+    expect(response).to have_http_status(:too_many_requests)
+
+    get "/api/telemetry", headers: visitor_b
+    expect(response).to have_http_status(:ok)
+  end
 end
