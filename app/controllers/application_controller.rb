@@ -6,6 +6,7 @@ class ApplicationController < ActionController::Base
   stale_when_importmap_changes
 
   before_action :set_default_description
+  after_action :add_temporary_ip_debug_headers, if: -> { params[:_debug_ip].present? }
 
   private
 
@@ -25,5 +26,15 @@ class ApplicationController < ActionController::Base
   # client can't spoof this to dodge rate limiting.
   def rate_limit_identifier
     request.remote_ip
+  end
+
+  # TEMPORARY — diagnosing why request.remote_ip resolves to Cloudflare's edge IP instead of the
+  # real visitor IP in production. Remove once resolved.
+  def add_temporary_ip_debug_headers
+    response.headers["X-Debug-Xff"] = request.headers["X-Forwarded-For"].inspect
+    response.headers["X-Debug-Remote-Addr"] = request.remote_addr.inspect
+    response.headers["X-Debug-Remote-Ip"] = request.remote_ip.inspect
+    response.headers["X-Debug-Trusted-Proxies"] =
+      Rails.application.config.action_dispatch.trusted_proxies.inspect
   end
 end
