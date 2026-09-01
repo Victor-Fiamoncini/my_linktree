@@ -7,7 +7,13 @@
 
   <div class="bg-ctp-mantle border-ctp-surface0 rounded-btn border px-5 py-[18px]">
     <p class="text-ctp-overlay0 mb-2 font-mono text-xs tracking-[0.08em] uppercase">Theme</p>
-    <p class="text-ctp-subtext0 mb-3.5 text-sm">Catppuccin Frappé</p>
+    <a
+      href="<%= SeoConfig::CATPPUCCIN_URL %>"
+      target="_blank"
+      rel="noopener noreferrer"
+      title="Catppuccin official theme page"
+      class="text-ctp-subtext0 hover:text-ctp-text mb-3.5 inline-block text-sm transition-colors"
+    >Catppuccin Frappé</a>
     <div class="flex gap-1.5">
       <% swatch_classes.each do |klass| %>
         <span class="rounded-chip h-5 w-5 <%= klass %>"></span>
