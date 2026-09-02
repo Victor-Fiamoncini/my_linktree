@@ -187,15 +187,18 @@ above with real database connection details.
   of a "mixed-purpose crawlers" preference under AI Crawl Control. Re-check this exemption still
   passes the `curl` above after that date.
 
-- **Rate limiting rule** (Security → Security rules → Rate limiting rules) throttles floods at the
-  edge before they reach Rails: `not http.request.uri.path eq "/api/mcp"` (all traffic except the
-  MCP endpoint) → block an IP once it crosses the configured threshold. `/api/mcp` is deliberately
-  excluded — the "Allow AI agents on MCP endpoint" Skip rule above does **not** check "All rate
-  limiting rules", so a zone-wide rate limit would otherwise throttle legitimate AI-agent traffic
-  the Bot Management exemption is meant to protect. App-level rate limiting
+- **Rate limiting rule** ("Flood protection (all paths)", Security → Security rules → Rate
+  limiting rules) throttles floods at the edge before they reach Rails: expression `true` (every
+  path, `/api/mcp` included) → block an IP for 10 seconds once it crosses 60 requests/10 seconds.
+  Free plan allows only **one** rate limiting rule per zone, so `/api/mcp` can't get its own
+  separately-tuned rule without upgrading — it shares this one. That's deliberately safe for
+  legitimate AI-agent traffic: the "Allow AI agents on MCP endpoint" Skip rule above does **not**
+  check "All rate limiting rules" (so it can't exempt `/api/mcp` from this one even if we wanted
+  it to), but 60 req/10s per IP is far more than a normal agent session's handful of tool calls
+  would ever hit — only an actual flood trips it. App-level rate limiting
   (`ContactsController`/`Api::McpController`'s `rate_limit` macro, see Architecture below) still
-  covers `/api/mcp` and `/contact` specifically; this edge rule is a coarser flood guard for
-  everything else.
+  layers on top for `/api/mcp` and `/contact` with tighter, tool-aware thresholds (e.g. a stricter
+  limit specifically on `schedule_meeting` calls) that this coarse edge rule can't express.
 - **Bot Fight Mode** (Security → Settings, under "Bot traffic") is safe to enable here specifically
   *because* the MCP exemption rule already checks "All Super Bot Fight Mode Rules" — confirm that
   checkbox is still checked before turning this on, or it will 403 AI-agent traffic to `/api/mcp`
