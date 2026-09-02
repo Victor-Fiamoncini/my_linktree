@@ -34,7 +34,9 @@ class ApplicationController < ActionController::Base
     response.headers["X-Debug-Xff"] = request.headers["X-Forwarded-For"].inspect
     response.headers["X-Debug-Remote-Addr"] = request.remote_addr.inspect
     response.headers["X-Debug-Remote-Ip"] = request.remote_ip.inspect
-    response.headers["X-Debug-Trusted-Proxies"] =
-      Rails.application.config.action_dispatch.trusted_proxies.inspect
+    response.headers["X-Debug-Cf-Connecting-Ip"] = request.headers["CF-Connecting-IP"].inspect
+    response.headers["X-Debug-True-Client-Ip"] = request.headers["True-Client-IP"].inspect
+    response.headers["X-Debug-X-Real-Ip"] = request.headers["X-Real-IP"].inspect
+    response.headers["X-Debug-Cf-Ray"] = request.headers["CF-RAY"].inspect
   end
 end
