@@ -38,8 +38,8 @@ mailer sender/recipient, Resend API key) lives in Rails' per-environment encrypt
 under `config/credentials/`, not env vars:
 
 - `config/credentials/development.yml.enc` (key: `config/credentials/development.key`) — holds
-  `database.host/port/username/password` (matching `compose.yml`'s `my_linktree`/`my_linktree`)
-  and `mailer.sender_email`/`mailer.recipient_email`. Edit with
+  `database.host/port/username/password` (matching `compose.yml`'s `my_linktree`/`my_linktree`),
+  `mailer.sender_email`/`mailer.recipient_email`, and `sentry_dsn`. Edit with
   `bin/rails credentials:edit --environment development`.
 - `config/credentials/production.yml.enc` (key: `config/credentials/production.key`) — same shape,
   plus `mailer.resend_api_key`. Edit with `bin/rails credentials:edit --environment production`.
@@ -62,7 +62,9 @@ values already equal `compose.yml`'s, so it needs no credentials file or env var
 (`app/mailers/application_mailer.rb`, `contact_mailer.rb`, `meeting_mailer.rb`) read
 `Rails.application.credentials.dig(:mailer, :sender_email)` / `:recipient_email` in every
 environment. `config/initializers/resend.rb` reads `Rails.application.credentials.dig(:mailer,
-:resend_api_key)`.
+:resend_api_key)`. `config/initializers/sentry.rb` reads `Rails.application.credentials.dig(:sentry_dsn)`
+the same way — `test` has no `sentry_dsn` in the shared `credentials.yml.enc`, so `Sentry.init` gets a
+`nil` DSN there and the SDK no-ops (never sends events) rather than raising.
 
 `config.action_mailer.delivery_method` is `:test` in development (mail is captured in
 `ActionMailer::Base.deliveries`, nothing is sent) and `:resend` in production (via the `resend`
@@ -212,6 +214,20 @@ config/
   actually goes through its proxy — the origin's own firewall (outside this repo, see README) needs
   to restrict inbound 80/443 to Cloudflare's IP ranges, or all of the above is bypassable by anyone
   who requests the origin IP directly.
+- **Error monitoring (Sentry)**: `config/initializers/sentry.rb` calls `Sentry.init` (via the
+  `sentry-ruby`/`sentry-rails` gems) with the DSN from `Rails.application.credentials.dig(:sentry_dsn)`
+  rather than hardcoding it, so it can be rotated/scoped per environment like every other credential
+  even though a DSN itself isn't secret. `breadcrumbs_logger` is `[:active_support_logger,
+  :http_logger]` (ActiveSupport instrumentation + outbound HTTP calls become breadcrumbs on captured
+  events), `send_default_pii = true` (Sentry-rails deprecation warning aside — request headers/IP are
+  still attached to events), and `enabled_patches = [:logger]` patches Ruby's `Logger` so calls to
+  `Rails.logger` are forwarded to Sentry as structured logs. `app/views/layouts/application.html.erb`
+  also emits `Sentry.get_trace_propagation_meta` into `<head>` on every page, so a future
+  browser-side Sentry SDK could stitch frontend spans onto the same backend trace — there's no JS
+  SDK wired up yet, this just keeps the meta tag ready. The installed `sentry-ruby` version (7.0.0,
+  pinned by `Gemfile.lock`) predates the `config.enable_logs` flag from newer releases — log
+  forwarding here is on by default via `enabled_patches`, not that flag; don't reintroduce it without
+  bumping the gem.
 - **`@/` alias**: none — this is a standard Rails app, autoloaded via Zeitwerk from `app/*`.
   `app/services/use_cases/*.rb` autoloads as `UseCases::*` (the `use_cases` subdirectory becomes an
   implicit namespace under the `app/services` root).

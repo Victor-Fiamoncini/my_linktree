@@ -10,6 +10,7 @@ AI agents can read the resume, check availability, and book a meeting directly.
 - **Tailwind CSS** — hand-rolled Catppuccin Frappé theme, via the `tailwindcss-rails` gem
 - **`mcp`** — official Ruby MCP SDK, driving the MCP server (`/api/mcp`)
 - **Resend** — transactional email for the contact form and meeting bookings (`:test` delivery in development)
+- **Sentry** (`sentry-ruby`/`sentry-rails`) — error monitoring and log forwarding, DSN pulled from encrypted credentials
 - **RSpec** — model, service, and request specs
 
 ## Architecture
@@ -104,6 +105,7 @@ should contain:
 | `mailer.sender_email`         | `dev@example.com`                      |
 | `mailer.recipient_email`      | any address you want test emails addressed to |
 | `mailer.resend_api_key`       | placeholder (unused locally — `:test` delivery never calls Resend) |
+| `sentry_dsn`                  | placeholder, or a real DSN from your own Sentry project if you want local errors reported |
 
 `config/credentials/production.yml.enc` has the same shape, but with real production values
 (external Postgres connection, real sender/recipient addresses, and a real
@@ -130,16 +132,18 @@ Secrets split across two mechanisms, depending on who needs them and when:
 - **Rails encrypted credentials** (`config/credentials/production.yml.enc`, decrypted by
   `config/credentials/production.key`) hold everything the *app* needs once it's running:
   production Postgres `host`/`port`/`username`/`password`, mailer `sender_email`/`recipient_email`,
-  and the Resend `resend_api_key`. These are per-environment credentials, separate from the shared
-  `config/master.key` used as `test`'s fallback — a leaked dev/test key can't decrypt production
-  secrets. Edit with:
+  the Resend `resend_api_key`, and `sentry_dsn`. These are per-environment credentials, separate
+  from the shared `config/master.key` used as `test`'s fallback — a leaked dev/test key can't
+  decrypt production secrets. Edit with:
 
   ```bash
   bin/rails credentials:edit --environment production
   ```
 
-  `config/database.yml`'s production block, the mailer classes, and `config/initializers/resend.rb`
-  all read these via `Rails.application.credentials.dig(...)`. None of it is a plain env var.
+  `config/database.yml`'s production block, the mailer classes, `config/initializers/resend.rb`,
+  and `config/initializers/sentry.rb` all read these via `Rails.application.credentials.dig(...)`.
+  None of it is a plain env var. `test` has no `sentry_dsn` (the shared `credentials.yml.enc`
+  doesn't define one), so Sentry is a silent no-op there rather than sending events.
 
 - **Kamal secrets** (`.kamal/secrets`) hold what's needed *before* the app can decrypt anything:
   `KAMAL_REGISTRY_PASSWORD` (a Docker Hub access token, exported in your shell before deploying) and
