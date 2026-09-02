@@ -50,6 +50,7 @@
     <%= javascript_importmap_tags %>
 
     <%= render "shared/person_json_ld" %>
+    <%= Sentry.get_trace_propagation_meta.html_safe %>
   </head>
 
   <body class="bg-ctp-base flex min-h-screen flex-col font-sans antialiased" data-controller="cursor-trail">
