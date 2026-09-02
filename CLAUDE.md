@@ -153,17 +153,21 @@ config/
 - **Rate limiting**: uses Rails 8's declarative `rate_limit` class macro
   (`ActionController::RateLimiting`) in `ContactsController` and `Api::McpController`, backed by
   `Rails.cache` — Solid Cache (Postgres-backed) in development/production, `MemoryStore` in test.
-  `ApplicationController#rate_limit_identifier` returns `request.remote_ip` — Rails' own
-  trusted-proxy-aware IP resolution — rather than reading `X-Forwarded-For`/`X-Real-IP` directly, so
-  a client can't spoof or omit those headers to dodge the limit; every request is rate-limited by
-  its real connection IP (or the proxy-forwarded IP, only when the connection comes from a trusted
-  proxy — see `config.action_dispatch.trusted_proxies`). Since production sits entirely behind
-  Cloudflare, `config/initializers/trusted_proxies.rb` extends Rails' default trusted list (which
-  only covers loopback/private ranges) with Cloudflare's published IP ranges — without it,
-  kamal-proxy's own appended hop makes Rails stop at Cloudflare's edge IP and treat every visitor
-  as the same rate-limit identifier. This is only safe because the origin firewall (see README's
-  Cloudflare section) restricts inbound 80/443 to Cloudflare's ranges, so that hop can't be forged
-  by connecting directly to the origin.
+  `ApplicationController#rate_limit_identifier` prefers the `CF-Connecting-IP` request header —
+  Cloudflare's own dedicated header for the true visitor IP — falling back to `request.remote_ip`
+  (Rails' `X-Forwarded-For`-based resolution) only when it's absent, i.e. local dev/test where
+  there's no Cloudflare in front at all. `X-Forwarded-For` was the original approach but was found
+  empirically to arrive corrupted in production — some hop between Cloudflare and the origin
+  replaces the real visitor IP with a Cloudflare-owned one, most visibly for IPv6 clients hitting
+  this IPv4-only origin (no AAAA record) — collapsing every visitor into the same rate-limit
+  bucket regardless of `trusted_proxies` tuning, since the real IP was never in the header to
+  begin with. `config/initializers/trusted_proxies.rb` still extends Rails' default trusted list
+  (loopback/private only) with Cloudflare's published ranges, so the `X-Forwarded-For` fallback
+  path degrades gracefully rather than falling all the way back to Cloudflare's edge IP. Trusting
+  `CF-Connecting-IP` unconditionally is safe only because the origin firewall (see README's
+  Cloudflare section) restricts inbound 80/443 to Cloudflare's ranges — nobody can reach the app
+  to forge that header without going through Cloudflare's edge, which always sets it to the true
+  connecting IP itself and cannot be overridden by a client-supplied value.
   `Api::McpController` declares two named limiters on the same action — a general one and a
   `schedule_meeting`-specific one — and the schedule-specific limiter's `unless:` proc calls
   `schedule_meeting_call?` (which parses and rewinds the JSON-RPC request body) so it only counts
