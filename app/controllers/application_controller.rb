@@ -6,7 +6,6 @@ class ApplicationController < ActionController::Base
   stale_when_importmap_changes
 
   before_action :set_default_description
-  after_action :add_temporary_ip_debug_headers, if: -> { params[:_debug_ip].present? }
 
   private
 
@@ -19,24 +18,17 @@ class ApplicationController < ActionController::Base
       "building personal projects with Ruby on Rails and Next.js."
   end
 
-  # Rails' own trusted-proxy-aware IP resolution — honors X-Forwarded-For/X-Real-IP only when
-  # they come from a trusted proxy (loopback/private ranges, plus Cloudflare's published ranges —
-  # see config/initializers/trusted_proxies.rb, since production sits entirely behind Cloudflare),
-  # and otherwise falls back to the real connection IP. Unlike reading those headers directly, a
-  # client can't spoof this to dodge rate limiting.
+  # Prefers Cloudflare's CF-Connecting-IP over Rails' X-Forwarded-For-based request.remote_ip.
+  # Confirmed empirically (both from this sandbox and from a real browser session) that
+  # X-Forwarded-For arrives corrupted — some hop between Cloudflare and the origin replaces the
+  # real visitor IP with a Cloudflare-owned one, most visibly for IPv6 clients hitting this
+  # IPv4-only origin. CF-Connecting-IP is Cloudflare's own dedicated header for this exact
+  # purpose and isn't subject to that corruption. It's safe to trust unconditionally here because
+  # the origin firewall (see README's Cloudflare section) only accepts connections from
+  # Cloudflare's IP ranges — nobody can reach this app to forge the header without going through
+  # Cloudflare's edge, which always sets it to the true connecting IP itself. Falls back to
+  # request.remote_ip for local dev/test, where there's no Cloudflare in front at all.
   def rate_limit_identifier
-    request.remote_ip
-  end
-
-  # TEMPORARY — diagnosing why request.remote_ip resolves to Cloudflare's edge IP instead of the
-  # real visitor IP in production. Remove once resolved.
-  def add_temporary_ip_debug_headers
-    response.headers["X-Debug-Xff"] = request.headers["X-Forwarded-For"].inspect
-    response.headers["X-Debug-Remote-Addr"] = request.remote_addr.inspect
-    response.headers["X-Debug-Remote-Ip"] = request.remote_ip.inspect
-    response.headers["X-Debug-Cf-Connecting-Ip"] = request.headers["CF-Connecting-IP"].inspect
-    response.headers["X-Debug-True-Client-Ip"] = request.headers["True-Client-IP"].inspect
-    response.headers["X-Debug-X-Real-Ip"] = request.headers["X-Real-IP"].inspect
-    response.headers["X-Debug-Cf-Ray"] = request.headers["CF-RAY"].inspect
+    request.headers["CF-Connecting-IP"].presence || request.remote_ip
   end
 end
