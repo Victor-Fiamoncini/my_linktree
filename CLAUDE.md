@@ -203,9 +203,12 @@ config/
   Both are required — the AI-bots block runs under Bot Management, so skipping only "All managed
   rules" leaves it in effect and 403s the same request right after. Every other path keeps the
   site-wide AI-bot block. See [README's Deployment section](README.md#cloudflare) for how to verify
-  the rule is active. That Skip rule does **not** check "All rate limiting rules", so the edge-level
-  rate limiting rule (also documented there) is scoped to exclude `/api/mcp` rather than relying on
-  this rule to exempt it. Cloudflare's DDoS protection and Bot Management only see traffic that
+  the rule is active. That Skip rule does **not** check "All rate limiting rules", so it can't be
+  used to exempt `/api/mcp` from the edge-level rate limiting rule (also documented there) even if
+  we wanted to. Free plan allows only one rate limiting rule per zone, so `/api/mcp` shares the
+  single zone-wide rule (`true` → block over 60 req/10s per IP) rather than getting its own —
+  deliberately generous relative to a normal agent session, so only an actual flood trips it.
+  Cloudflare's DDoS protection and Bot Management only see traffic that
   actually goes through its proxy — the origin's own firewall (outside this repo, see README) needs
   to restrict inbound 80/443 to Cloudflare's IP ranges, or all of the above is bypassable by anyone
   who requests the origin IP directly.
