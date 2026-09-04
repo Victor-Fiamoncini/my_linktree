@@ -53,19 +53,19 @@ RSpec.describe "Api::Mcp", type: :request do
     availability = JSON.parse(call_tool("check_availability").dig("result", "content", 0, "text"))
     slot = availability["slots"].first
 
-    body = call_tool("schedule_meeting", { name: "Jane", email: "jane@example.com", slotStart: slot })
+    body = call_tool("schedule_meeting", { name: "Jane", email: "jane@example.com", slot_start: slot })
 
     expect(body.dig("result", "isError")).to be false
     booking = JSON.parse(body.dig("result", "content", 0, "text"))
-    expect(booking["slotStart"]).to eq(slot)
+    expect(booking["slot_start"]).to eq(slot)
   end
 
   it "returns isError true (not an HTTP error) for a double-booked slot" do
     availability = JSON.parse(call_tool("check_availability").dig("result", "content", 0, "text"))
     slot = availability["slots"].first
-    call_tool("schedule_meeting", { name: "Jane", email: "jane@example.com", slotStart: slot })
+    call_tool("schedule_meeting", { name: "Jane", email: "jane@example.com", slot_start: slot })
 
-    body = call_tool("schedule_meeting", { name: "Bob", email: "bob@example.com", slotStart: slot })
+    body = call_tool("schedule_meeting", { name: "Bob", email: "bob@example.com", slot_start: slot })
 
     expect(response).to have_http_status(:ok)
     expect(body.dig("result", "isError")).to be true
@@ -97,13 +97,13 @@ RSpec.describe "Api::Mcp", type: :request do
 
     3.times do
       post "/api/mcp",
-        params: rpc(id: 1, method: "tools/call", params: { name: "schedule_meeting", arguments: { name: "X", email: "x@x.com", slotStart: "2099-01-01T00:00:00.000Z" } }),
+        params: rpc(id: 1, method: "tools/call", params: { name: "schedule_meeting", arguments: { name: "X", email: "x@x.com", slot_start: "2099-01-01T00:00:00.000Z" } }),
         headers: ip_headers
       expect(response).to have_http_status(:ok)
     end
 
     post "/api/mcp",
-      params: rpc(id: 1, method: "tools/call", params: { name: "schedule_meeting", arguments: { name: "X", email: "x@x.com", slotStart: "2099-01-01T00:00:00.000Z" } }),
+      params: rpc(id: 1, method: "tools/call", params: { name: "schedule_meeting", arguments: { name: "X", email: "x@x.com", slot_start: "2099-01-01T00:00:00.000Z" } }),
       headers: ip_headers
     expect(response).to have_http_status(:too_many_requests)
   end

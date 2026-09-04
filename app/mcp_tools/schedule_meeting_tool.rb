@@ -6,16 +6,16 @@ class ScheduleMeetingTool < MCP::Tool
       name: { type: "string" },
       email: { type: "string" },
       company: { type: "string" },
-      slotStart: { type: "string" }
+      slot_start: { type: "string" }
     }
   )
 
-  def self.call(name: nil, email: nil, company: nil, slotStart: nil, **)
+  def self.call(name: nil, email: nil, company: nil, slot_start: nil, **)
     UseCases::RecordAgentConnectionUseCase.new.execute(tool: "schedule_meeting")
 
-    booking = UseCases::ScheduleMeetingUseCase.new.execute(name: name, email: email, company: company, slot_start: slotStart)
+    booking = UseCases::ScheduleMeetingUseCase.new.execute(name: name, email: email, company: company, slot_start: slot_start)
 
-    payload = { name: booking[:name], email: booking[:email], company: booking[:company], slotStart: booking[:slot_start] }
+    payload = { name: booking[:name], email: booking[:email], company: booking[:company], slot_start: booking[:slot_start] }
     MCP::Tool::Response.new([ { type: "text", text: payload.to_json } ])
   rescue ArgumentError => e
     MCP::Tool::Response.new([ { type: "text", text: e.message } ], error: true)
