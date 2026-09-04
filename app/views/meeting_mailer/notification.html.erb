@@ -1,4 +1,4 @@
 <p>Name: <%= @name %></p>
 <p>Email: <%= @email %></p>
-<p>Company: <%= @company || "-" %></p>
+<% if @company.present? %><p>Company: <%= @company %></p><% end %>
 <p>Slot: <%= @slot_start %></p>

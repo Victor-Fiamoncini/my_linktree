@@ -35,6 +35,8 @@ export default class extends Controller {
       return
     }
 
+    const previousScrollTop = this.listTarget.scrollTop
+
     this.listTarget.innerHTML = connections
       .map(
         connection => `
@@ -50,6 +52,7 @@ export default class extends Controller {
     this.#showOnly(this.listTarget)
     this.listTarget.classList.remove("hidden")
     this.listTarget.classList.add("flex")
+    this.listTarget.scrollTop = previousScrollTop
   }
 
   #showOnly(target) {
