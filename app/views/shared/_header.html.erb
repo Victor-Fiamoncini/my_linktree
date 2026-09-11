@@ -1,10 +1,14 @@
 <%
   section_links = [
-    { label: "#about", href: "/#about", accent: "blue", title: "Go to About section" },
-    { label: "#experience", href: "/#experience", accent: "mauve", title: "Go to Experience section" },
-    { label: "#hire-me", href: "/#agents", accent: "peach", title: "Go to Hire Me section" },
-    { label: "#contact", href: "/#contact", accent: "pink", title: "Go to Contact section" },
+    { label: t("shared.header.nav_about_label"), href: "#{root_path}#about", accent: "blue", title: t("shared.header.nav_about_title") },
+    { label: t("shared.header.nav_experience_label"), href: "#{root_path}#experience", accent: "mauve", title: t("shared.header.nav_experience_title") },
+    { label: t("shared.header.nav_hire_label"), href: "#{root_path}#agents", accent: "peach", title: t("shared.header.nav_hire_title") },
+    { label: t("shared.header.nav_contact_label"), href: "#{root_path}#contact", accent: "pink", title: t("shared.header.nav_contact_title") },
   ]
+  other_locale = I18n.locale == :en ? "pt-BR" : "en"
+  other_language_name = t("shared.header.other_language_name")
+  switch_label = I18n.locale == :en ? "PT-BR" : "EN"
+  switch_path = request.path.sub(%r{\A/(en|pt-BR)}, "/#{other_locale}")
   nav_link_classes = {
     "blue" => "text-ctp-subtext0 hover:text-ctp-blue relative pb-0.5 transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-ctp-blue after:transition-all after:duration-300 hover:after:w-full",
     "mauve" => "text-ctp-subtext0 hover:text-ctp-mauve relative pb-0.5 transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-ctp-mauve after:transition-all after:duration-300 hover:after:w-full",
@@ -19,30 +23,35 @@
   class="border-ctp-surface0 bg-ctp-mantle/86 sticky top-0 z-20 w-full border-b backdrop-blur-md"
 >
   <nav class="mx-auto flex max-w-[1080px] items-center justify-between gap-4 px-6 py-[18px] min-[900px]:px-8">
-    <%= link_to root_path, title: "Victor Fiamoncini - Home", class: "flex items-center gap-3" do %>
+    <%= link_to root_path, title: t("shared.header.home_title"), class: "flex items-center gap-3" do %>
       <span class="bg-ctp-blue text-ctp-crust rounded-chip flex h-[26px] w-[26px] items-center justify-center font-mono text-xs font-bold">vf</span>
-      <span class="text-ctp-text text-base font-semibold">Victor Fiamoncini</span>
+      <span class="text-ctp-text max-[424px]:hidden text-base font-semibold">Victor Fiamoncini</span>
     <% end %>
 
     <ul class="hidden items-center gap-x-7 font-mono text-[13px] min-[900px]:flex">
       <% section_links.each do |link| %>
         <li><%= link_to link[:label], link[:href], title: link[:title], class: nav_link_classes.fetch(link[:accent]) %></li>
       <% end %>
-      <li><%= link_to telemetry_path, title: "View live telemetry", class: telemetry_button_class do %>/telemetry <span class="text-ctp-crust/70">↗</span><% end %></li>
+      <li><%= link_to telemetry_path, title: t("shared.header.telemetry_title"), class: telemetry_button_class do %><%= t("shared.header.telemetry_button_label") %> <span class="text-ctp-crust/70">↗</span><% end %></li>
+      <li><%= link_to switch_label, switch_path, title: t("shared.header.switch_language", language: other_language_name), rel: "alternate", hreflang: other_locale, class: "text-ctp-subtext0 hover:text-ctp-text font-mono text-[13px] transition-colors" %></li>
     </ul>
 
-    <button
-      type="button"
-      data-action="mobile-nav#toggle"
-      data-mobile-nav-target="toggleButton"
-      aria-expanded="false"
-      aria-label="Toggle navigation menu"
-      title="Toggle navigation menu"
-      class="border-ctp-surface1 text-ctp-text rounded-btn hover:border-ctp-blue flex h-9 w-9 cursor-pointer items-center justify-center border transition-all duration-200 hover:scale-105 min-[900px]:hidden"
-    >
-      <span data-mobile-nav-target="openIcon" class="h-4 w-4"><%= svg_icon(:bars) %></span>
-      <span data-mobile-nav-target="closeIcon" class="hidden h-4 w-4"><%= svg_icon(:times) %></span>
-    </button>
+    <div class="flex items-center gap-3 min-[900px]:hidden">
+      <%= link_to switch_label, switch_path, title: t("shared.header.switch_language", language: other_language_name), rel: "alternate", hreflang: other_locale, class: "text-ctp-subtext0 hover:text-ctp-text font-mono text-[13px] transition-colors" %>
+
+      <button
+        type="button"
+        data-action="mobile-nav#toggle"
+        data-mobile-nav-target="toggleButton"
+        aria-expanded="false"
+        aria-label="<%= t("shared.header.toggle_nav") %>"
+        title="<%= t("shared.header.toggle_nav") %>"
+        class="border-ctp-surface1 text-ctp-text rounded-btn hover:border-ctp-blue flex h-9 w-9 cursor-pointer items-center justify-center border transition-all duration-200 hover:scale-105"
+      >
+        <span data-mobile-nav-target="openIcon" class="h-4 w-4"><%= svg_icon(:bars) %></span>
+        <span data-mobile-nav-target="closeIcon" class="hidden h-4 w-4"><%= svg_icon(:times) %></span>
+      </button>
+    </div>
   </nav>
 
   <div data-mobile-nav-target="menu" class="border-ctp-surface0 bg-ctp-mantle hidden border-t px-6 py-5 min-[900px]:hidden">
@@ -50,7 +59,7 @@
       <% section_links.each do |link| %>
         <li><%= link_to link[:label], link[:href], title: link[:title], class: nav_link_classes.fetch(link[:accent]), data: { action: "mobile-nav#close" } %></li>
       <% end %>
-      <li><%= link_to telemetry_path, title: "View live telemetry", class: telemetry_button_class, data: { action: "mobile-nav#close" } do %>/telemetry <span class="text-ctp-crust/70">↗</span><% end %></li>
+      <li><%= link_to telemetry_path, title: t("shared.header.telemetry_title"), class: telemetry_button_class, data: { action: "mobile-nav#close" } do %><%= t("shared.header.telemetry_button_label") %> <span class="text-ctp-crust/70">↗</span><% end %></li>
     </ul>
   </div>
 </header>

@@ -41,6 +41,19 @@ RSpec.describe "Api::Mcp", type: :request do
     expect(JSON.parse(text)).to be_an(Array)
   end
 
+  it "returns get_resume/list_services content in English regardless of the caller's Accept-Language" do
+    pt_headers = headers.merge("Accept-Language" => "pt-BR")
+
+    post "/api/mcp", params: rpc(id: 1, method: "tools/call", params: { name: "get_resume", arguments: {} }), headers: pt_headers
+    resume = JSON.parse(response.parsed_body.dig("result", "content", 0, "text"))
+
+    post "/api/mcp", params: rpc(id: 2, method: "tools/call", params: { name: "list_services", arguments: {} }), headers: pt_headers
+    services = JSON.parse(response.parsed_body.dig("result", "content", 0, "text"))
+
+    expect(resume["experiences"].first["role"]).to eq("Fullstack Software Engineer")
+    expect(services.first["name"]).to eq("Frontend & Backend Software Development")
+  end
+
   it "calls check_availability" do
     body = call_tool("check_availability")
 

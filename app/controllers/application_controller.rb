@@ -5,17 +5,27 @@ class ApplicationController < ActionController::Base
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
 
+  around_action :switch_locale
   before_action :set_default_description
 
+  def default_url_options
+    { locale: I18n.locale }
+  end
+
   private
+
+  # Reads params[:locale] generically, so it works both from the "/:locale" route
+  # segment on page requests and from a "locale" field in a JSON POST body (e.g.
+  # the contact form) — no per-controller override needed either way.
+  def switch_locale(&action)
+    locale = params[:locale].presence_in(I18n.available_locales.map(&:to_s)) || I18n.default_locale
+    I18n.with_locale(locale, &action)
+  end
 
   def set_default_description
     xp_years = UseCases::GetXpYearsUseCase.new.execute
 
-    @default_description =
-      "Software Engineer with #{xp_years} years of experience in both companies and freelance projects. " \
-      "Currently focused on back-end development using PHP (Laravel/Symfony) and NodeJS, while also " \
-      "building personal projects with Ruby on Rails and Next.js."
+    @default_description = t("seo.default_description", xp_years: xp_years)
   end
 
   # Prefers Cloudflare's CF-Connecting-IP over Rails' X-Forwarded-For-based request.remote_ip.

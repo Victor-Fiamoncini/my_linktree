@@ -51,6 +51,13 @@ RSpec.describe "Contacts", type: :request do
     expect(response.parsed_body["errors"].keys).to contain_exactly("name", "email", "message")
   end
 
+  it "returns translated messages when locale is pt-BR" do
+    post_contact(valid_params.merge(name: "", locale: "pt-BR"))
+
+    expect(response).to have_http_status(:unprocessable_content)
+    expect(response.parsed_body["errors"]).to eq("name" => "não pode ficar em branco")
+  end
+
   it "rate limits after 2 requests from the same IP within the window" do
     headers = json_headers.merge("X-Forwarded-For" => "9.9.9.9")
 

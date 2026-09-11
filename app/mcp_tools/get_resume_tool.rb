@@ -6,7 +6,7 @@ class GetResumeTool < MCP::Tool
   def self.call(**)
     UseCases::RecordAgentConnectionUseCase.new.execute(tool: "get_resume")
 
-    profile = UseCases::GetProfileUseCase.new.execute
+    profile = UseCases::GetProfileUseCase.new.execute(locale: :en)
     MCP::Tool::Response.new([ { type: "text", text: profile.to_json } ])
   end
 end

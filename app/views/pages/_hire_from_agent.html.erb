@@ -17,14 +17,20 @@
   MARKDOWN
 %>
 
-<section id="agents" class="border-ctp-surface0 w-full max-w-[1080px] border-t pt-14 pb-14" data-controller="hire-from-agent">
-  <p class="text-ctp-peach mb-3.5 font-mono text-[13px] tracking-[0.06em]">$ ./hire-me --no-human-required</p>
+<section id="agents" class="border-ctp-surface0 w-full max-w-[1080px] border-t pt-14 pb-14"
+  data-controller="hire-from-agent"
+  data-hire-from-agent-copy-label-value="<%= t("pages.hire_from_agent.copy") %>"
+  data-hire-from-agent-copied-label-value="<%= t("pages.hire_from_agent.copied") %>">
+  <p class="text-ctp-peach mb-3.5 font-mono text-[13px] tracking-[0.06em]"><%= t("pages.hire_from_agent.prompt") %></p>
 
-  <h2 class="text-ctp-text mb-4 text-[28px] font-semibold tracking-[-0.025em] min-[900px]:text-[34px]">Hire me from your agent</h2>
+  <h2 class="text-ctp-text mb-4 text-[28px] font-semibold tracking-[-0.025em] min-[900px]:text-[34px]"><%= t("pages.hire_from_agent.heading") %></h2>
 
+	<%
+	  mcp_link = link_to("MCP", "https://modelcontextprotocol.io/", target: "_blank", rel: "noreferrer", title: t("pages.hire_from_agent.mcp_link_title"), class: "text-ctp-mauve hover:text-ctp-pink transition-colors")
+	  mcp_server = content_tag(:span, t("pages.hire_from_agent.mcp_server"), class: "text-ctp-text font-semibold")
+	%>
 	<p class="text-ctp-subtext0 mb-8 w-full text-[17px] leading-[1.7] text-pretty text-justify">
-		This portfolio speaks <a href="https://modelcontextprotocol.io/" target="_blank" rel="noreferrer" title="Model Context Protocol" class="text-ctp-mauve hover:text-ctp-pink transition-colors">MCP</a>! It exposes an <span class="text-ctp-text font-semibold">MCP server</span> alongside the site
-		itself, with four tools. You can add this portfolio as a connector on your favorite Harness (Claude, ChatGPT, Deepseek, Kimi, etc). Your agent will be able to verify my work, check my availability and book a meeting.
+		<%= t("pages.hire_from_agent.intro_html", mcp_link: mcp_link, mcp_server: mcp_server) %>
 	</p>
 
 	<div class="mt-6 w-full text-left mb-8">
@@ -40,19 +46,19 @@
 
 			<button
 				type="button"
-				title="Copy MCP endpoint"
+				title="<%= t("pages.hire_from_agent.copy_endpoint_title") %>"
 				data-action="hire-from-agent#copy"
 				data-hire-from-agent-content-param="<%= SeoConfig::MCP_ENDPOINT %>"
 				class="cursor-pointer text-xs font-bold tracking-widest uppercase transition-colors text-[#89b4fa] hover:text-[#cdd6f4]"
-			>Copy</button>
+			><%= t("pages.hire_from_agent.copy") %></button>
 		</div>
 
-		<pre class="border-ctp-surface0 rounded-b-btn w-full overflow-x-auto border bg-[#1e1e2e] p-4 text-xs leading-relaxed font-semibold text-[#a6e3a1]"><code><%= SeoConfig::MCP_ENDPOINT %> <span class="text-ctp-overlay0 font-mono text-xs"># No account or authentication required</span>
-			<span class="text-ctp-overlay0 font-mono text-xs block"># Watch live agentic connections: <%= SeoConfig::SITE_URL %>/telemetry</span></code></pre>
+		<pre class="border-ctp-surface0 rounded-b-btn w-full overflow-x-auto border bg-[#1e1e2e] p-4 text-xs leading-relaxed font-semibold text-[#a6e3a1]"><code><%= SeoConfig::MCP_ENDPOINT %> <span class="text-ctp-overlay0 font-mono text-xs"><%= t("pages.hire_from_agent.no_auth_note") %></span>
+			<span class="text-ctp-overlay0 font-mono text-xs block"><%= t("pages.hire_from_agent.watch_telemetry_note_html", url: "#{SeoConfig::SITE_URL}/telemetry") %></span></code></pre>
 	</div>
 
   <p class="text-ctp-subtext0 mb-8 w-full text-[17px] leading-[1.7] text-pretty text-justify">
-		You can also paste this brief into your agent. Any agent can read it and reach me directly via my API (no MCP connector setup required).
+		<%= t("pages.hire_from_agent.follow_up") %>
   </p>
 
   <div class="w-full text-left">
@@ -68,11 +74,11 @@
 
       <button
         type="button"
-        title="Copy AGENTS.md"
+        title="<%= t("pages.hire_from_agent.copy_agents_md_title") %>"
         data-action="hire-from-agent#copy"
         data-hire-from-agent-content-param="<%= agents_md_preview %>"
         class="cursor-pointer text-xs font-bold tracking-widest uppercase transition-colors text-[#89b4fa] hover:text-[#cdd6f4]"
-      >Copy</button>
+      ><%= t("pages.hire_from_agent.copy") %></button>
     </div>
 
     <pre class="border-ctp-surface0 rounded-b-btn w-full overflow-x-auto border bg-[#1e1e2e] p-4 text-xs leading-relaxed font-semibold text-[#a6e3a1]"><code><span class="text-ctp-overlay0 font-mono text-xs"><%= agents_md_preview.lines.first.chomp %></span>

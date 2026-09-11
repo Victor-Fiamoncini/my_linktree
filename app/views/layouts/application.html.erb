@@ -1,12 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= I18n.locale %>">
   <head>
     <meta charset="utf-8">
-    <title><%= content_for(:title) || "#{SeoConfig::AUTHOR_NAME} - #{SeoConfig::JOB_TITLE}" %></title>
+    <title><%= content_for(:title) || t("layouts.application.title_fallback", author: SeoConfig::AUTHOR_NAME, job_title: t("seo.job_title")) %></title>
     <meta name="description" content="<%= content_for(:description) || @default_description %>">
     <meta name="author" content="Victor Fiamoncini">
     <meta name="robots" content="<%= content_for(:robots) || "index, follow, max-image-preview:large" %>">
-    <link rel="canonical" href="<%= SeoConfig::SITE_URL %><%= content_for(:canonical) || "/" %>">
+    <link rel="canonical" href="<%= SeoConfig::SITE_URL %><%= content_for(:canonical) || request.path %>">
+    <% I18n.available_locales.each do |locale| %>
+      <link rel="alternate" hreflang="<%= locale %>" href="<%= SeoConfig::SITE_URL %><%= (content_for(:canonical) || request.path).sub(%r{\A/(en|pt-BR)}, "/#{locale}") %>">
+    <% end %>
+    <link rel="alternate" hreflang="x-default" href="<%= SeoConfig::SITE_URL %><%= (content_for(:canonical) || request.path).sub(%r{\A/(en|pt-BR)}, "/en") %>">
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="theme-color" content="#8caaee">
@@ -18,17 +22,17 @@
     <meta name="application-name" content="Victor Fiamoncini">
 
     <meta property="og:type" content="website">
-    <meta property="og:locale" content="en_US">
+    <meta property="og:locale" content="<%= I18n.locale == :"pt-BR" ? "pt_BR" : "en_US" %>">
     <meta property="og:site_name" content="Victor Fiamoncini">
-    <meta property="og:url" content="<%= SeoConfig::SITE_URL %><%= content_for(:canonical) || "/" %>">
-    <meta property="og:title" content="<%= content_for(:og_title) || content_for(:title) || "#{SeoConfig::AUTHOR_NAME} - #{SeoConfig::JOB_TITLE}" %>">
+    <meta property="og:url" content="<%= SeoConfig::SITE_URL %><%= content_for(:canonical) || request.path %>">
+    <meta property="og:title" content="<%= content_for(:og_title) || content_for(:title) || t("layouts.application.title_fallback", author: SeoConfig::AUTHOR_NAME, job_title: t("seo.job_title")) %>">
     <meta property="og:description" content="<%= content_for(:description) || @default_description %>">
     <meta property="og:image" content="<%= SeoConfig::SITE_URL %>/opengraph-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Victor Fiamoncini">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="<%= content_for(:og_title) || content_for(:title) || "#{SeoConfig::AUTHOR_NAME} - #{SeoConfig::JOB_TITLE}" %>">
+    <meta name="twitter:title" content="<%= content_for(:og_title) || content_for(:title) || t("layouts.application.title_fallback", author: SeoConfig::AUTHOR_NAME, job_title: t("seo.job_title")) %>">
     <meta name="twitter:description" content="<%= content_for(:description) || @default_description %>">
     <meta name="twitter:image" content="<%= SeoConfig::SITE_URL %>/opengraph-image.png">
 

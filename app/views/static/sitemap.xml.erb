@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc><%= SeoConfig::SITE_URL %></loc>
-    <lastmod><%= SeoConfig::SITE_LAST_MODIFIED %></lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
-  </url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <% [ [ "", "1.0" ], [ "/telemetry", "0.5" ] ].each do |page, priority| %>
+    <% I18n.available_locales.each do |locale| %>
+      <url>
+        <loc><%= SeoConfig::SITE_URL %>/<%= locale %><%= page %></loc>
+        <% I18n.available_locales.each do |alt_locale| %>
+          <xhtml:link rel="alternate" hreflang="<%= alt_locale %>" href="<%= SeoConfig::SITE_URL %>/<%= alt_locale %><%= page %>"/>
+        <% end %>
+        <lastmod><%= SeoConfig::SITE_LAST_MODIFIED %></lastmod>
+        <changefreq>monthly</changefreq>
+        <priority><%= priority %></priority>
+      </url>
+    <% end %>
+  <% end %>
 </urlset>

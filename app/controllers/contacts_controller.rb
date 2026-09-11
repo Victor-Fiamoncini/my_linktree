@@ -9,7 +9,7 @@ class ContactsController < ApplicationController
   def create
     UseCases::SendContactEmailUseCase.new.execute(**contact_params)
 
-    render json: { message: "Thank you for your message! I'll get back to you as soon as possible." }, status: :ok
+    render json: { message: t("contacts.success") }, status: :ok
   end
 
   private
@@ -19,19 +19,19 @@ class ContactsController < ApplicationController
   end
 
   def render_validation_error(e)
-    render json: { message: "Check the highlighted fields and try again.", errors: e.errors }, status: :unprocessable_content
+    render json: { message: t("contacts.validation_failed"), errors: e.errors }, status: :unprocessable_content
   end
 
   def render_too_many_requests
-    render json: { message: "Too many requests. Please wait a moment before trying again." }, status: :too_many_requests
+    render json: { message: t("contacts.too_many_requests") }, status: :too_many_requests
   end
 
   def render_invalid_authenticity_token
-    render json: { message: "Your session expired. Please refresh the page and try again." }, status: :unprocessable_content
+    render json: { message: t("contacts.invalid_authenticity_token") }, status: :unprocessable_content
   end
 
   def render_internal_error(e)
     Rails.logger.error(e)
-    render json: { message: "Internal Server Error", action: "Please contact the administrator of the application." }, status: :internal_server_error
+    render json: { message: t("contacts.internal_error"), action: t("contacts.internal_error_action") }, status: :internal_server_error
   end
 end
