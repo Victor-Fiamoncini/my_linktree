@@ -17,7 +17,16 @@ module Api
 
       return render(json: server_description) if request.get? && !event_stream_request?
 
-      server = MCP::Server.new(name: "my_linktree", tools: TOOLS)
+      server = MCP::Server.new(
+        name: "my_linktree",
+        title: SeoConfig::SITE_NAME,
+        website_url: SeoConfig::SITE_URL,
+        icons: [
+          MCP::Icon.new(src: SeoConfig::MCP_ICON_192, mime_type: "image/png", sizes: "192x192"),
+          MCP::Icon.new(src: SeoConfig::MCP_ICON_512, mime_type: "image/png", sizes: "512x512")
+        ],
+        tools: TOOLS
+      )
       transport = MCP::Server::Transports::StreamableHTTPTransport.new(
         server, stateless: true, dns_rebinding_protection: false
       )

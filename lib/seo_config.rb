@@ -6,6 +6,8 @@ module SeoConfig
   GITHUB_URL = "https://github.com/Victor-Fiamoncini"
   CATPPUCCIN_URL = "https://catppuccin.com/palette/?flavor=frappe"
   MCP_ENDPOINT = "#{SITE_URL}/api/mcp".freeze
+  MCP_ICON_192 = "#{SITE_URL}/web-app-manifest-192x192.png".freeze
+  MCP_ICON_512 = "#{SITE_URL}/web-app-manifest-512x512.png".freeze
 
   # Bump this when page content meaningfully changes — used as the sitemap's
   # <lastmod>, which should reflect real content changes, not request time.

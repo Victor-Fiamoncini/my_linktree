@@ -21,6 +21,29 @@ RSpec.describe "Api::Mcp", type: :request do
     expect(response.parsed_body.dig("result", "serverInfo", "name")).to eq("my_linktree")
   end
 
+  it "includes server icons/title/websiteUrl when the client negotiates a protocol version newer than 2025-06-18" do
+    post "/api/mcp",
+      params: rpc(id: 1, method: "initialize", params: { protocolVersion: "2025-11-25", capabilities: {}, clientInfo: { name: "rspec", version: "1.0" } }),
+      headers: headers
+
+    server_info = response.parsed_body.dig("result", "serverInfo")
+    expect(server_info["title"]).to eq(SeoConfig::SITE_NAME)
+    expect(server_info["websiteUrl"]).to eq(SeoConfig::SITE_URL)
+    expect(server_info["icons"]).to contain_exactly(
+      { "mimeType" => "image/png", "sizes" => "192x192", "src" => SeoConfig::MCP_ICON_192 },
+      { "mimeType" => "image/png", "sizes" => "512x512", "src" => SeoConfig::MCP_ICON_512 }
+    )
+  end
+
+  it "omits icons/title/websiteUrl for the legacy 2025-06-18 handshake (documents the gem's version gate)" do
+    post "/api/mcp",
+      params: rpc(id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "rspec", version: "1.0" } }),
+      headers: headers
+
+    server_info = response.parsed_body.dig("result", "serverInfo")
+    expect(server_info).not_to have_key("icons")
+  end
+
   it "lists all 4 tools" do
     post "/api/mcp", params: rpc(id: 1, method: "tools/list"), headers: headers
 
