@@ -1,31 +1,112 @@
-# Files in the config/locales directory are used for internationalization and
-# are automatically loaded by Rails. If you want to use locales other than
-# English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t "hello"
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t("hello") %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more about the API, please read the Rails Internationalization guide
-# at https://guides.rubyonrails.org/i18n.html.
-#
-# Be aware that YAML interprets the following case-insensitive strings as
-# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
-# must be quoted to be interpreted as strings. For example:
-#
-#     en:
-#       "yes": yup
-#       enabled: "ON"
-
 en:
-  hello: "Hello world"
+  layouts:
+    application:
+      title_fallback: "%{author} - %{job_title}"
+
+  shared:
+    header:
+      home_title: "Victor Fiamoncini - Home"
+      other_language_name: "Portuguese"
+      nav_about_label: "#about"
+      nav_about_title: "Go to About section"
+      nav_experience_label: "#experience"
+      nav_experience_title: "Go to Experience section"
+      nav_hire_label: "#hire-me"
+      nav_hire_title: "Go to Hire Me section"
+      nav_contact_label: "#contact"
+      nav_contact_title: "Go to Contact section"
+      telemetry_button_label: "/telemetry"
+      telemetry_title: "View live telemetry"
+      toggle_nav: "Toggle navigation menu"
+      switch_language: "View in %{language}"
+    footer:
+      copyright: "© %{year} Victor Fiamoncini"
+      built_with: "built with"
+    get_in_touch_button:
+      label: "Get in touch"
+      title: "Go to contact section"
+    contact_aside:
+      theme_label: "Theme"
+      theme_link_title: "Catppuccin official theme page"
+
+  pages:
+    hero:
+      lede: "Software Engineer since %{year}, across company and freelance projects."
+      intro_html: "I build full-stack products mostly using %{rails_link} and %{nextjs_link}, from relational schema design and background jobs to server components and everything in between, with end-to-end ownership all the way to production."
+      rails_link_title: "Ruby on Rails official website"
+      nextjs_link_title: "Next.js official website"
+      pull_quote: "Fixed-scope engagements, senior execution, no hand-holding."
+      agents_note: "Lately that includes shipping things AI agents can talk to directly, like the MCP server running this very page."
+      photo_alt: "Victor Fiamoncini"
+      photo_link_title: "Victor Fiamoncini on LinkedIn"
+    experiences:
+      prompt: "$ cat career.log"
+      heading: "Where I've worked"
+    contact_form_section:
+      prompt: "$ echo \"let's talk\""
+      heading: "Reach out"
+      intro: "Working on something interesting? I'm always open to remote roles, freelance work, and fullstack collaboration from frontend and backend development to agentic systems, landing pages, and mobile apps. Drop a few details below if you have a project in mind, and I'll get back to you ASAP. Let's talk!"
+    contact_form:
+      name_label: "name"
+      email_label: "email"
+      message_label: "message"
+      submit: "Reach Out"
+      submit_title: "Send Message"
+      sending: "Sending..."
+      generic_error: "Something went wrong. Please check your connection and try again."
+    hire_from_agent:
+      prompt: "$ ./hire-me --no-human-required"
+      heading: "Hire me from your agent"
+      intro_html: "This portfolio speaks %{mcp_link}! It exposes an %{mcp_server} alongside the site itself, with four tools. You can add this portfolio as a connector on your favorite Harness (Claude, ChatGPT, Deepseek, Kimi, etc). Your agent will be able to verify my work, check my availability and book a meeting."
+      mcp_link_title: "Model Context Protocol"
+      mcp_server: "MCP server"
+      copy_endpoint_title: "Copy MCP endpoint"
+      no_auth_note: "# No account or authentication required"
+      watch_telemetry_note_html: "# Watch live agentic connections: %{url}"
+      follow_up: "You can also paste this brief into your agent. Any agent can read it and reach me directly via my API (no MCP connector setup required)."
+      copy_agents_md_title: "Copy AGENTS.md"
+      copy: "Copy"
+      copied: "Copied!"
+
+  telemetry_page:
+    title: "Live Agent Telemetry"
+    og_title: "Live Agent Telemetry — Victor Fiamoncini"
+    description: "Watch AI agents connect to Victor Fiamoncini's MCP server in real time — tool calls, timestamps, and live activity."
+    prompt: "$ tail -f /var/log/agents.log"
+    heading: "Live Agent Telemetry"
+    intro_html: "A live feed of the most recent %{mcp} tool calls hitting this portfolio, refreshed as they happen. Each entry shows which tool an agent called and when, whether it's reading my resume, checking availability, or booking a meeting."
+    live: "live"
+    loading: "# loading live telemetry..."
+    error: "# error: something went wrong while loading live telemetry."
+    empty: "# no agent connections yet."
+
+  experiences_helper:
+    present: "Present"
+    tech_categories:
+      backend: "Backend"
+      frontend: "Frontend"
+      infra: "Infra"
+      tools: "Tools"
+    duration:
+      less_than_a_month: "Less than a month"
+      year:
+        one: "%{count} year"
+        other: "%{count} years"
+      month:
+        one: "%{count} month"
+        other: "%{count} months"
+
+  contacts:
+    success: "Thank you for your message! I'll get back to you as soon as possible."
+    validation_failed: "Check the highlighted fields and try again."
+    too_many_requests: "Too many requests. Please wait a moment before trying again."
+    invalid_authenticity_token: "Your session expired. Please refresh the page and try again."
+    internal_error: "Internal Server Error"
+    internal_error_action: "Please contact the administrator of the application."
+    errors:
+      blank: "can't be blank"
+      invalid_email: "is invalid"
+
+  seo:
+    job_title: "Software Engineer"
+    default_description: "Software Engineer with %{xp_years} years of experience in both companies and freelance projects. Currently focused on back-end development using PHP (Laravel/Symfony) and NodeJS, while also building personal projects with Ruby on Rails and Next.js."

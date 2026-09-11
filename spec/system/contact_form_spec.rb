@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe "Contact form", type: :system do
-  before { visit root_path }
+  before { visit root_path(locale: "en") }
 
   it "submits via JS, hides the button, and shows a success message in its place" do
     fill_in "name", with: "Jane"
@@ -12,7 +12,7 @@ RSpec.describe "Contact form", type: :system do
 
     expect(page).to have_content("Thank you for your message!")
     expect(page).not_to have_button("Reach Out")
-    expect(page).to have_current_path(root_path)
+    expect(page).to have_current_path(root_path(locale: "en"))
     perform_enqueued_jobs
     expect(ActionMailer::Base.deliveries.size).to eq(1)
   end

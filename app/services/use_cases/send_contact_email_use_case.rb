@@ -13,15 +13,15 @@ module UseCases
 
     def execute(name:, email:, message:)
       errors = {}
-      errors[:name] = "can't be blank" if name.blank?
+      errors[:name] = I18n.t("contacts.errors.blank") if name.blank?
 
       if email.blank?
-        errors[:email] = "can't be blank"
+        errors[:email] = I18n.t("contacts.errors.blank")
       elsif !email.match?(EMAIL_FORMAT)
-        errors[:email] = "is invalid"
+        errors[:email] = I18n.t("contacts.errors.invalid_email")
       end
 
-      errors[:message] = "can't be blank" if message.blank?
+      errors[:message] = I18n.t("contacts.errors.blank") if message.blank?
 
       raise ValidationError, errors if errors.any?
 

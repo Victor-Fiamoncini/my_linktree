@@ -8,6 +8,13 @@ RSpec.describe "Static", type: :request do
     expect(response.media_type).to eq("application/xml")
   end
 
+  it "lists both locales in the sitemap" do
+    get "/sitemap.xml"
+
+    expect(response.body).to include("<loc>https://www.victorfiamon.com.br/en</loc>")
+    expect(response.body).to include("<loc>https://www.victorfiamon.com.br/pt-BR</loc>")
+  end
+
   it "returns AGENTS.md as markdown" do
     get "/AGENTS.md"
 

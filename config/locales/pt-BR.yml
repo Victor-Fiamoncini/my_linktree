@@ -1,0 +1,112 @@
+pt-BR:
+  layouts:
+    application:
+      title_fallback: "%{author} - %{job_title}"
+
+  shared:
+    header:
+      home_title: "Victor Fiamoncini - Início"
+      other_language_name: "Inglês"
+      nav_about_label: "#sobre"
+      nav_about_title: "Ir para a seção Sobre"
+      nav_experience_label: "#experiencia"
+      nav_experience_title: "Ir para a seção Experiência"
+      nav_hire_label: "#contrate-me"
+      nav_hire_title: "Ir para a seção Contrate-me"
+      nav_contact_label: "#contato"
+      nav_contact_title: "Ir para a seção Contato"
+      telemetry_button_label: "/telemetria"
+      telemetry_title: "Ver telemetria ao vivo"
+      toggle_nav: "Abrir/fechar menu de navegação"
+      switch_language: "Ver em %{language}"
+    footer:
+      copyright: "© %{year} Victor Fiamoncini"
+      built_with: "feito com"
+    get_in_touch_button:
+      label: "Entre em contato"
+      title: "Ir para a seção de contato"
+    contact_aside:
+      theme_label: "Tema"
+      theme_link_title: "Página oficial do tema Catppuccin"
+
+  pages:
+    hero:
+      lede: "Engenheiro de Software desde %{year}, em empresas e projetos freelance."
+      intro_html: "Eu construo produtos full-stack majoritariamente com %{rails_link} e %{nextjs_link}, desde o design de esquemas relacionais e jobs em background até server components e tudo o que há no meio, com responsabilidade de ponta a ponta até a produção."
+      rails_link_title: "Site oficial do Ruby on Rails"
+      nextjs_link_title: "Site oficial do Next.js"
+      pull_quote: "Projetos de escopo fechado, execução sênior, sem necessidade de acompanhamento constante."
+      agents_note: "Ultimamente isso inclui lançar coisas com as quais agentes de IA podem conversar diretamente, como o servidor MCP que roda esta própria página."
+      photo_alt: "Victor Fiamoncini"
+      photo_link_title: "Victor Fiamoncini no LinkedIn"
+    experiences:
+      prompt: "$ cat career.log"
+      heading: "Onde eu trabalhei"
+    contact_form_section:
+      prompt: "$ echo \"vamos conversar\""
+      heading: "Vamos conversar"
+      intro: "Trabalhando em algo interessante? Estou sempre aberto a vagas remotas, trabalhos freelance e colaborações fullstack — do desenvolvimento frontend e backend a sistemas agênticos, landing pages e aplicativos mobile. Deixe alguns detalhes abaixo se você tiver um projeto em mente, e eu retornarei o mais rápido possível. Vamos conversar!"
+    contact_form:
+      name_label: "nome"
+      email_label: "email"
+      message_label: "mensagem"
+      submit: "Enviar"
+      submit_title: "Enviar Mensagem"
+      sending: "Enviando..."
+      generic_error: "Algo deu errado. Verifique sua conexão e tente novamente."
+    hire_from_agent:
+      prompt: "$ ./hire-me --no-human-required"
+      heading: "Contrate-me pelo seu agente"
+      intro_html: "Este portfólio fala %{mcp_link}! Ele expõe um %{mcp_server} junto com o próprio site, com quatro ferramentas. Você pode adicionar este portfólio como um conector no seu agente favorito (Claude, ChatGPT, Deepseek, Kimi, etc). Seu agente poderá verificar meu trabalho, checar minha disponibilidade e agendar uma reunião."
+      mcp_link_title: "Model Context Protocol"
+      mcp_server: "servidor MCP"
+      copy_endpoint_title: "Copiar endpoint do MCP"
+      no_auth_note: "# Não é necessária conta ou autenticação"
+      watch_telemetry_note_html: "# Acompanhe conexões de agentes ao vivo: %{url}"
+      follow_up: "Você também pode colar este briefing no seu agente. Qualquer agente pode lê-lo e falar comigo diretamente pela minha API (sem necessidade de configurar um conector MCP)."
+      copy_agents_md_title: "Copiar AGENTS.md"
+      copy: "Copiar"
+      copied: "Copiado!"
+
+  telemetry_page:
+    title: "Telemetria de Agentes ao Vivo"
+    og_title: "Telemetria de Agentes ao Vivo — Victor Fiamoncini"
+    description: "Acompanhe agentes de IA se conectando ao servidor MCP de Victor Fiamoncini em tempo real — chamadas de ferramentas, horários e atividade ao vivo."
+    prompt: "$ tail -f /var/log/agents.log"
+    heading: "Telemetria de Agentes ao Vivo"
+    intro_html: "Um feed ao vivo das chamadas de ferramentas %{mcp} mais recentes recebidas por este portfólio, atualizado em tempo real. Cada entrada mostra qual ferramenta um agente chamou e quando, seja lendo meu currículo, checando disponibilidade ou agendando uma reunião."
+    live: "ao vivo"
+    loading: "# carregando telemetria ao vivo..."
+    error: "# erro: algo deu errado ao carregar a telemetria ao vivo."
+    empty: "# nenhuma conexão de agente ainda."
+
+  experiences_helper:
+    present: "Atual"
+    tech_categories:
+      backend: "Backend"
+      frontend: "Frontend"
+      infra: "Infra"
+      tools: "Tools"
+    duration:
+      less_than_a_month: "Menos de um mês"
+      year:
+        one: "%{count} ano"
+        other: "%{count} anos"
+      month:
+        one: "%{count} mês"
+        other: "%{count} meses"
+
+  contacts:
+    success: "Obrigado pela sua mensagem! Retornarei o mais rápido possível."
+    validation_failed: "Verifique os campos destacados e tente novamente."
+    too_many_requests: "Muitas solicitações. Aguarde um momento antes de tentar novamente."
+    invalid_authenticity_token: "Sua sessão expirou. Atualize a página e tente novamente."
+    internal_error: "Erro Interno do Servidor"
+    internal_error_action: "Entre em contato com o administrador da aplicação."
+    errors:
+      blank: "não pode ficar em branco"
+      invalid_email: "é inválido"
+
+  seo:
+    job_title: "Engenheiro de Software"
+    default_description: "Engenheiro de Software com %{xp_years} anos de experiência em empresas e projetos freelance. Atualmente focado em desenvolvimento back-end com PHP (Laravel/Symfony) e NodeJS, além de construir projetos pessoais com Ruby on Rails e Next.js."

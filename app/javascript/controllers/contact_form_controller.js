@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["input", "fieldError", "submit", "banner"]
+  static values = { sending: String, submitLabel: String, genericError: String, locale: String }
 
   async submit(event) {
     event.preventDefault()
@@ -32,14 +33,15 @@ export default class extends Controller {
         this.#showBanner(body.message, "error")
       }
     } catch {
-      this.#showBanner("Something went wrong. Please check your connection and try again.", "error")
+      this.#showBanner(this.genericErrorValue, "error")
     } finally {
       this.#setLoading(false)
     }
   }
 
   #formData() {
-    return Object.fromEntries(this.inputTargets.map(input => [input.dataset.field, input.value]))
+    const data = Object.fromEntries(this.inputTargets.map(input => [input.dataset.field, input.value]))
+    return { ...data, locale: this.localeValue }
   }
 
   #csrfToken() {
@@ -74,6 +76,6 @@ export default class extends Controller {
 
   #setLoading(isLoading) {
     this.submitTarget.disabled = isLoading
-    this.submitTarget.textContent = isLoading ? "Sending..." : "Reach Out"
+    this.submitTarget.textContent = isLoading ? this.sendingValue : this.submitLabelValue
   }
 }

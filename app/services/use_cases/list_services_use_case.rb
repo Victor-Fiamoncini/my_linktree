@@ -4,8 +4,11 @@ module UseCases
       @config = config
     end
 
-    def execute
-      @config[:services]
+    def execute(locale: I18n.locale)
+      @config[:services].map do |service|
+        translation = service[:translations][locale.to_sym] || service[:translations][:en]
+        service.except(:translations).merge(translation)
+      end
     end
   end
 end

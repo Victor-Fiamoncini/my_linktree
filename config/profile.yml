@@ -4,131 +4,215 @@ shared: &shared
   experiences:
     - id: 1
       company: Breaker19
-      role: Fullstack Software Engineer
       backend: [PHP, Laravel, Next.js, Postgres, MongoDB, Auth0, Postmark]
       frontend: [React, Vue, Tailwind CSS, SCSS, TypeScript, Cypress]
       infra: [AWS, Render Cloud, Docker, Docker Compose, Nginx, Sentry, LogRocket]
       other_tools: [Git, GitHub, Claude Code, Open Code, GitHub Copilot, CodeRabbit, Postman, Figma, Linear]
       country_flag: "🇺🇸"
-      country_name: United States
-      location: Rodeio, Santa Catarina, Brazil
       start_date: "2024-12"
       end_date:
       current: true
-      duration_label: 1 year 4 months
-      description: >-
-        Contributing to a large Laravel monolith and multiple front-end web applications that enable
-        customers to schedule FTL and Hotshot trucking orders, connecting them with carriers and
-        drivers. Built a new Next.js carrier app featuring real-time driver location tracking via
-        Mapbox SDK and WebSocket-based chats. Implemented asynchronous Laravel background jobs for
-        driver route check-in/check-out validation, set up a CI environment with Jenkins integrated
-        with the Render Application Platform, and introduced integration testing using PHPUnit and
-        Cypress.
+      translations:
+        en:
+          role: Fullstack Software Engineer
+          location: Rodeio, Santa Catarina, Brazil
+          country_name: United States
+          description: >-
+            Contributing to a large Laravel monolith and multiple front-end web applications that enable
+            customers to schedule FTL and Hotshot trucking orders, connecting them with carriers and
+            drivers. Built a new Next.js carrier app featuring real-time driver location tracking via
+            Mapbox SDK and WebSocket-based chats. Implemented asynchronous Laravel background jobs for
+            driver route check-in/check-out validation, set up a CI environment with Jenkins integrated
+            with the Render Application Platform, and introduced integration testing using PHPUnit and
+            Cypress.
+        pt-BR:
+          role: Engenheiro de Software Fullstack
+          location: Rodeio, Santa Catarina, Brasil
+          country_name: Estados Unidos
+          description: >-
+            Contribuindo em um grande monolito Laravel e em múltiplas aplicações web front-end que
+            permitem que clientes agendem cargas FTL e Hotshot, conectando-os a transportadoras e
+            motoristas. Construí um novo aplicativo de transportadoras em Next.js com rastreamento de
+            localização do motorista em tempo real via Mapbox SDK e chats baseados em WebSocket.
+            Implementei jobs assíncronos em background no Laravel para validação de check-in/check-out
+            de rotas dos motoristas, configurei um ambiente de CI com Jenkins integrado à Render
+            Application Platform e introduzi testes de integração usando PHPUnit e Cypress.
 
     - id: 2
       company: Rede Vistorias
-      role: Fullstack Software Engineer
       backend: [Python, Flask, PHP, Laravel, Symfony, Postgres, MongoDB, Redis, RabbitMQ, Snowflake]
       frontend: [React, Twig, Tailwind CSS, SCSS, TypeScript, Cypress]
       infra: [AWS, Docker, Docker Compose, Nginx, Sentry, "Elastic (ELK)"]
       other_tools: [Git, Gitea, Postman, Figma, Jira]
       country_flag: "🇧🇷"
-      country_name: Brazil
-      location: Rodeio, Santa Catarina, Brazil
       start_date: "2021-01"
       end_date: "2024-12"
       current: false
-      duration_label: 4 years
-      description: >-
-        Built and maintained API microservices and front-end dashboards to enhance the experience of
-        customers and franchisees managing real estate inspections. Led migrations of PHP (Symfony
-        and Laravel) microservices to version 8 with FrankenPHP, Python (Flask) services to version 3
-        with Gunicorn, and React repositories to version 18 with TypeScript and Vite. Developed
-        event-driven architectures using RabbitMQ and Redis (push/pull pattern) and implemented
-        extensive automated testing with Cypress, Pytest, and PHPUnit.
+      translations:
+        en:
+          role: Fullstack Software Engineer
+          location: Rodeio, Santa Catarina, Brazil
+          country_name: Brazil
+          description: >-
+            Built and maintained API microservices and front-end dashboards to enhance the experience of
+            customers and franchisees managing real estate inspections. Led migrations of PHP (Symfony
+            and Laravel) microservices to version 8 with FrankenPHP, Python (Flask) services to version 3
+            with Gunicorn, and React repositories to version 18 with TypeScript and Vite. Developed
+            event-driven architectures using RabbitMQ and Redis (push/pull pattern) and implemented
+            extensive automated testing with Cypress, Pytest, and PHPUnit.
+        pt-BR:
+          role: Engenheiro de Software Fullstack
+          location: Rodeio, Santa Catarina, Brasil
+          country_name: Brasil
+          description: >-
+            Construí e mantive microsserviços de API e dashboards front-end para melhorar a experiência
+            de clientes e franqueados na gestão de vistorias imobiliárias. Liderei migrações de
+            microsserviços PHP (Symfony e Laravel) para a versão 8 com FrankenPHP, serviços Python
+            (Flask) para a versão 3 com Gunicorn, e repositórios React para a versão 18 com TypeScript e
+            Vite. Desenvolvi arquiteturas orientadas a eventos usando RabbitMQ e Redis (padrão push/pull)
+            e implementei testes automatizados extensivos com Cypress, Pytest e PHPUnit.
 
     - id: 3
       company: Vexta
-      role: Backend Software Engineer
       backend: [NodeJS, Express, TypeScript, PostgreSQL, MongoDB, Redis]
       frontend: []
       infra: [Azure, Docker, Docker Compose, Nginx]
       other_tools: [Git, Bitbucket, Postman, Jira]
       country_flag: "🇧🇷"
-      country_name: Brazil
-      location: Rio do Sul, Santa Catarina, Brazil
       start_date: "2020-07"
       end_date: "2021-01"
       current: false
-      duration_label: 7 months
-      description: >-
-        Contributed to a new Node.js back-end focused on authentication and financial features for an
-        existing fashion ERP system. Designed and implemented a full authentication API with
-        PostgreSQL, integrated Redis for push/pull messaging to handle email and notification
-        delivery, and built a private Node.js NPM logging library that centralized backend logs in
-        MongoDB. Wrote unit tests for new services using Jest.
+      translations:
+        en:
+          role: Backend Software Engineer
+          location: Rio do Sul, Santa Catarina, Brazil
+          country_name: Brazil
+          description: >-
+            Contributed to a new Node.js back-end focused on authentication and financial features for an
+            existing fashion ERP system. Designed and implemented a full authentication API with
+            PostgreSQL, integrated Redis for push/pull messaging to handle email and notification
+            delivery, and built a private Node.js NPM logging library that centralized backend logs in
+            MongoDB. Wrote unit tests for new services using Jest.
+        pt-BR:
+          role: Engenheiro de Software Backend
+          location: Rio do Sul, Santa Catarina, Brasil
+          country_name: Brasil
+          description: >-
+            Contribuí em um novo back-end Node.js focado em autenticação e funcionalidades financeiras
+            para um ERP de moda já existente. Projetei e implementei uma API de autenticação completa
+            com PostgreSQL, integrei Redis para mensageria push/pull no envio de emails e notificações, e
+            construí uma biblioteca privada de logging em Node.js/NPM que centralizava os logs do
+            backend no MongoDB. Escrevi testes unitários para os novos serviços usando Jest.
 
     - id: 4
       company: Área Local
-      role: Fullstack Web Developer
       backend: [PHP, WordPress, Laravel, MySQL]
       frontend: [HTML, CSS, JavaScript, JQuery, SCSS, React]
       infra: []
       other_tools: [Git, GitHub, Postman, Trello, Filezilla]
       country_flag: "🇧🇷"
-      country_name: Brazil
-      location: Rio do Sul, Santa Catarina, Brazil
       start_date: "2019-02"
       end_date: "2020-06"
       current: false
-      duration_label: 1 year 5 months
-      description: >-
-        Primarily developed websites, landing pages, and custom WordPress themes using PHP.
-        Implemented front-end features with jQuery, SCSS, and React, and delivered small projects
-        using Laravel. Provided customer support through client calls, production bug fixes, and
-        resolving third-party integration issues.
+      translations:
+        en:
+          role: Fullstack Web Developer
+          location: Rio do Sul, Santa Catarina, Brazil
+          country_name: Brazil
+          description: >-
+            Primarily developed websites, landing pages, and custom WordPress themes using PHP.
+            Implemented front-end features with jQuery, SCSS, and React, and delivered small projects
+            using Laravel. Provided customer support through client calls, production bug fixes, and
+            resolving third-party integration issues.
+        pt-BR:
+          role: Desenvolvedor Web Fullstack
+          location: Rio do Sul, Santa Catarina, Brasil
+          country_name: Brasil
+          description: >-
+            Desenvolvi principalmente sites, landing pages e temas WordPress personalizados usando PHP.
+            Implementei funcionalidades front-end com jQuery, SCSS e React, e entreguei pequenos
+            projetos usando Laravel. Prestei suporte a clientes por meio de chamadas, correções de bugs
+            em produção e resolução de problemas de integração com terceiros.
 
     - id: 5
       company: Área Local
-      role: Internship in Web Development
       backend: []
       frontend: []
       infra: []
       other_tools: []
       country_flag: "🇧🇷"
-      country_name: Brazil
-      location: Rio do Sul, Santa Catarina, Brazil
       start_date: "2018-10"
       end_date: "2019-01"
       current: false
-      duration_label: 4 months
-      description: >-
-        Completed an internship as part of my university degree, focusing on web development with
-        PHP, WordPress, jQuery, and SCSS.
+      translations:
+        en:
+          role: Internship in Web Development
+          location: Rio do Sul, Santa Catarina, Brazil
+          country_name: Brazil
+          description: >-
+            Completed an internship as part of my university degree, focusing on web development with
+            PHP, WordPress, jQuery, and SCSS.
+        pt-BR:
+          role: Estágio em Desenvolvimento Web
+          location: Rio do Sul, Santa Catarina, Brasil
+          country_name: Brasil
+          description: >-
+            Realizei um estágio como parte da minha graduação, com foco em desenvolvimento web usando
+            PHP, WordPress, jQuery e SCSS.
 
   education:
     - id: 1
       institution: Instituto Federal Catarinense
-      degree: Bachelor
-      field: Computer Science
+      translations:
+        en:
+          degree: Bachelor
+          field: Computer Science
+        pt-BR:
+          degree: Bacharelado
+          field: Ciência da Computação
     - id: 2
       institution: Instituto Federal Catarinense
-      degree: Technical Agriculture
-      field: Complete Technical High School
+      translations:
+        en:
+          degree: Technical Agriculture
+          field: Complete Technical High School
+        pt-BR:
+          degree: Técnico em Agropecuária
+          field: Ensino Médio Técnico Completo
 
   services:
     - id: 1
-      name: Frontend & Backend Software Development
-      description: Full-stack web systems — from user interfaces to APIs and databases.
+      translations:
+        en:
+          name: Frontend & Backend Software Development
+          description: Full-stack web systems — from user interfaces to APIs and databases.
+        pt-BR:
+          name: Desenvolvimento de Software Frontend & Backend
+          description: Sistemas web full-stack — de interfaces de usuário a APIs e bancos de dados.
     - id: 2
-      name: Agentic Systems & Integrations
-      description: AI agent workflows, MCP servers, and LLM-powered integrations.
+      translations:
+        en:
+          name: Agentic Systems & Integrations
+          description: AI agent workflows, MCP servers, and LLM-powered integrations.
+        pt-BR:
+          name: Sistemas Agênticos & Integrações
+          description: Fluxos de agentes de IA, servidores MCP e integrações com LLMs.
     - id: 3
-      name: Websites & Landing Pages
-      description: Fast, responsive marketing sites and landing pages.
+      translations:
+        en:
+          name: Websites & Landing Pages
+          description: Fast, responsive marketing sites and landing pages.
+        pt-BR:
+          name: Sites & Landing Pages
+          description: Sites institucionais e landing pages rápidos e responsivos.
     - id: 4
-      name: Mobile Apps
-      description: Cross-platform apps for iOS and Android.
+      translations:
+        en:
+          name: Mobile Apps
+          description: Cross-platform apps for iOS and Android.
+        pt-BR:
+          name: Aplicativos Mobile
+          description: Aplicativos multiplataforma para iOS e Android.
 
 development:
   <<: *shared

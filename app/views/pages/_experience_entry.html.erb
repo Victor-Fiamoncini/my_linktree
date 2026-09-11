@@ -2,6 +2,7 @@
   <div class="mb-1.5 flex flex-wrap items-baseline gap-2.5">
     <h3 class="text-ctp-text text-[23px] font-semibold"><%= experience[:role] %></h3>
     <span class="text-ctp-mauve text-[19px] font-medium">@ <%= experience[:company] %></span>
+    <% if experience[:country_flag].present? %><span title="<%= experience[:country_name] %>"><%= experience[:country_flag] %></span><% end %>
   </div>
 
   <p class="text-ctp-subtext0 mb-1 font-mono text-[13px]">
@@ -9,9 +10,8 @@
     <span class="text-ctp-overlay0 ml-2">(<%= experience_duration(experience[:start_date], experience[:end_date]) %>)</span>
   </p>
 
-  <p class="text-ctp-overlay0 mb-[22px] flex items-center gap-2 font-mono text-[13px]">
-    <span><%= experience[:location] %></span>
-    <% if experience[:country_flag].present? %><span title="<%= experience[:country_name] %>"><%= experience[:country_flag] %></span><% end %>
+  <p class="text-ctp-overlay0 mb-[22px] font-mono text-[13px]">
+    <%= experience[:location] %>
   </p>
 
   <% if experience[:description].present? %>
@@ -23,7 +23,7 @@
       <% items = experience[category[:key]] %>
       <% if items.present? %>
         <div>
-          <p class="mb-2.5 font-mono text-[11px] font-medium tracking-[0.12em] uppercase <%= category[:accent_class] %>"><%= category[:label] %></p>
+          <p class="mb-2.5 font-mono text-[11px] font-medium tracking-[0.12em] uppercase <%= category[:accent_class] %>"><%= t(category[:label_key]) %></p>
           <div class="flex flex-wrap gap-2">
             <% items.each do |tech| %>
               <span class="bg-ctp-base border-ctp-surface1 text-ctp-text rounded-chip border px-3 py-1.5 font-mono text-[13px]"><%= tech %></span>

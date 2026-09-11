@@ -6,7 +6,7 @@ class ListServicesTool < MCP::Tool
   def self.call(**)
     UseCases::RecordAgentConnectionUseCase.new.execute(tool: "list_services")
 
-    services = UseCases::ListServicesUseCase.new.execute
+    services = UseCases::ListServicesUseCase.new.execute(locale: :en)
     MCP::Tool::Response.new([ { type: "text", text: services.to_json } ])
   end
 end

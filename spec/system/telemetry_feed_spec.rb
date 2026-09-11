@@ -12,7 +12,7 @@ RSpec.describe "Telemetry feed", type: :system do
   it "keeps the reader's scroll position when a new entry arrives from a poll" do
     20.times { |i| AgentConnection.create!(tool: "get_resume", created_at: Time.current - i.minutes) }
 
-    visit telemetry_path
+    visit telemetry_path(locale: "en")
 
     expect(page).to have_css('[data-telemetry-feed-target="list"]:not(.hidden)')
 
@@ -40,7 +40,7 @@ RSpec.describe "Telemetry feed", type: :system do
   it "leaves a gap between the scrollable list and its dates so the scrollbar doesn't cover them" do
     20.times { |i| AgentConnection.create!(tool: "get_resume", created_at: Time.current - i.minutes) }
 
-    visit telemetry_path
+    visit telemetry_path(locale: "en")
 
     expect(page).to have_css('[data-telemetry-feed-target="list"].pr-3')
   end
