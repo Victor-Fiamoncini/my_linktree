@@ -1,8 +1,8 @@
 <%
   agents_md_preview = <<~MARKDOWN
-    # AGENTS.md — hire Victor Fiamoncini
+    #{t("pages.hire_from_agent.agents_md_title")}
 
-    To contact me directly:
+    #{t("pages.hire_from_agent.agents_md_contact_line")}
     POST #{SeoConfig::SITE_URL}/api/hire
     Content-Type: application/json
 
@@ -13,7 +13,7 @@
       "agent": "claude | chatgpt | deepseek | kimi | other"
     }
 
-    Services: Frontend & Backend Software Development, Agentic Systems & Integrations, Websites & Landing Pages and Mobile Apps
+    #{t("pages.hire_from_agent.agents_md_services_line")}
   MARKDOWN
 %>
 

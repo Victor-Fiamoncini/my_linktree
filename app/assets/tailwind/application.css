@@ -8,9 +8,9 @@ html {
   --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-  --radius-card: 8px;
-  --radius-btn: 6px;
-  --radius-chip: 4px;
+  --radius-card: 0px;
+  --radius-btn: 0px;
+  --radius-chip: 0px;
 }
 
 @theme {
