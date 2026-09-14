@@ -65,6 +65,9 @@ en:
       watch_telemetry_note_html: "# Watch live agentic connections: %{url}"
       follow_up: "You can also paste this brief into your agent. Any agent can read it and reach me directly via my API (no MCP connector setup required)."
       copy_agents_md_title: "Copy AGENTS.md"
+      agents_md_title: "# AGENTS.md — hire Victor Fiamoncini"
+      agents_md_contact_line: "To contact me directly:"
+      agents_md_services_line: "Services: Frontend & Backend Software Development, Agentic Systems & Integrations, Websites & Landing Pages and Mobile Apps"
       copy: "Copy"
       copied: "Copied!"
 

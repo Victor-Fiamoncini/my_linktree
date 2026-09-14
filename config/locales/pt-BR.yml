@@ -65,6 +65,9 @@ pt-BR:
       watch_telemetry_note_html: "# Acompanhe conexões de agentes ao vivo: %{url}"
       follow_up: "Você também pode colar este briefing no seu agente. Qualquer agente pode lê-lo e falar comigo diretamente pela minha API (sem necessidade de configurar um conector MCP)."
       copy_agents_md_title: "Copiar AGENTS.md"
+      agents_md_title: "# AGENTS.md — contrate Victor Fiamoncini"
+      agents_md_contact_line: "Para me contatar diretamente:"
+      agents_md_services_line: "Serviços: Desenvolvimento de Software Frontend & Backend, Sistemas Agênticos & Integrações, Sites & Landing Pages e Aplicativos Mobile"
       copy: "Copiar"
       copied: "Copiado!"
 
