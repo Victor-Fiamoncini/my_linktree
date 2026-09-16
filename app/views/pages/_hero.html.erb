@@ -42,7 +42,7 @@
   </div>
 
   <div class="relative order-first justify-self-center min-[900px]:order-none min-[900px]:justify-self-end">
-    <div class="absolute -inset-2.5 rounded-card bg-[linear-gradient(150deg,var(--color-ctp-blue),var(--color-ctp-mauve)_55%,var(--color-ctp-green))] opacity-50"></div>
+    <div class="absolute -inset-1 rounded-card bg-[linear-gradient(150deg,var(--color-ctp-blue),var(--color-ctp-mauve)_55%,var(--color-ctp-green))] opacity-50"></div>
 
     <a
       href="<%= SeoConfig::LINKEDIN_URL %>"
@@ -59,7 +59,7 @@
         alt="<%= t("pages.hero.photo_alt") %>"
         width="300"
         height="350"
-        class="border-ctp-surface1 rounded-card relative block h-[350px] w-[300px] border object-cover transition-opacity duration-500 group-hover:opacity-0"
+        class="border-ctp-surface1 rounded-card relative block h-[350px] w-[300px] border object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
       >
 
       <canvas
@@ -67,7 +67,7 @@
         width="300"
         height="350"
         aria-hidden="true"
-        class="border-ctp-surface1 rounded-card pointer-events-none absolute inset-0 block h-[350px] w-[300px] border opacity-0 transition-opacity duration-500 [image-rendering:pixelated] group-hover:opacity-100"
+        class="border-ctp-surface1 rounded-card pointer-events-none absolute inset-0 block h-[350px] w-[300px] border opacity-100 transition-opacity duration-500 group-hover:opacity-0"
       ></canvas>
     </a>
   </div>
