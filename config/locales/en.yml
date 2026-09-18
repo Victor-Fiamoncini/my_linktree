@@ -104,8 +104,8 @@ en:
     validation_failed: "Check the highlighted fields and try again."
     too_many_requests: "Too many requests. Please wait a moment before trying again."
     invalid_authenticity_token: "Your session expired. Please refresh the page and try again."
-    internal_error: "Internal Server Error"
-    internal_error_action: "Please contact the administrator of the application."
+    internal_error: "Something went wrong on our end and your message couldn't be sent."
+    internal_error_action: "Please try again in a moment, or reach out directly by email."
     errors:
       blank: "can't be blank"
       invalid_email: "is invalid"
