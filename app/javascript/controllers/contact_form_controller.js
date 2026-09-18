@@ -29,6 +29,8 @@ export default class extends Controller {
       } else if (body.errors) {
         this.#showFieldErrors(body.errors)
         this.#showBanner(body.message, "error")
+      } else if (response.status === 500) {
+        this.#showBanner(this.genericErrorValue, "error")
       } else {
         this.#showBanner(body.message, "error")
       }
