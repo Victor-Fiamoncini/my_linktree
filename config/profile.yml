@@ -4,10 +4,10 @@ shared: &shared
   experiences:
     - id: 1
       company: Breaker19
-      backend: [PHP, Laravel, Next.js, Postgres, MongoDB, Auth0, Postmark]
-      frontend: [React, Vue, Tailwind CSS, SCSS, TypeScript, Cypress]
-      infra: [AWS, Render Cloud, Docker, Docker Compose, Nginx, Sentry, LogRocket]
-      other_tools: [Git, GitHub, Claude Code, Open Code, GitHub Copilot, CodeRabbit, Postman, Figma, Linear]
+      backend: [PHP, Laravel, Next.js, Postgres, MongoDB, Pusher, Auth0, Postmark, PHPUnit, Auth0, Twilio, MailMason, Highway, FrontApp]
+      frontend: [React, Vue, Tailwind CSS, SCSS, TypeScript, Cypress, Jest, Mapbox]
+      infra: [AWS, Render Cloud, Docker, Docker Compose, Nginx, Sentry, LogRocket, Jenkins]
+      other_tools: [Git, GitHub, Claude Code, Open Code, GitHub Copilot, CodeRabbit, Postman, Figma, Linear, Lambdatest, Mailosaur]
       country_flag: "🇺🇸"
       start_date: "2024-12"
       end_date:
@@ -40,9 +40,9 @@ shared: &shared
 
     - id: 2
       company: Rede Vistorias
-      backend: [Python, Flask, PHP, Laravel, Symfony, Postgres, MongoDB, Redis, RabbitMQ, Snowflake]
-      frontend: [React, Twig, Tailwind CSS, SCSS, TypeScript, Cypress]
-      infra: [AWS, Docker, Docker Compose, Nginx, Sentry, "Elastic (ELK)"]
+      backend: [Python, Flask, PHP, Laravel, Symfony, Postgres, MongoDB, Redis, RabbitMQ, Snowflake, Swagger, PHPUnit, Pytest]
+      frontend: [React, Twig, Tailwind CSS, SCSS, TypeScript, Cypress, Jest]
+      infra: [AWS, Docker, Docker Compose, Docker Swarm, Nginx, Sentry, "Elastic (ELK)"]
       other_tools: [Git, Gitea, Postman, Figma, Jira]
       country_flag: "🇧🇷"
       start_date: "2021-01"
@@ -74,9 +74,9 @@ shared: &shared
 
     - id: 3
       company: Vexta
-      backend: [NodeJS, Express, TypeScript, PostgreSQL, MongoDB, Redis]
+      backend: [NodeJS, Express, TypeScript, PostgreSQL, MongoDB, Redis, Jest, Swagger]
       frontend: []
-      infra: [Azure, Docker, Docker Compose, Nginx]
+      infra: [Azure, VPS, Docker, Docker Compose, Nginx, PM2]
       other_tools: [Git, Bitbucket, Postman, Jira]
       country_flag: "🇧🇷"
       start_date: "2020-07"
@@ -107,9 +107,9 @@ shared: &shared
     - id: 4
       company: Área Local
       backend: [PHP, WordPress, Laravel, MySQL]
-      frontend: [HTML, CSS, JavaScript, JQuery, SCSS, React]
-      infra: []
-      other_tools: [Git, GitHub, Postman, Trello, Filezilla]
+      frontend: [HTML, CSS, JavaScript, JQuery, SCSS, React, Gulp]
+      infra: [VPS, Hostinger, Hostgator, Localweb]
+      other_tools: [Git, GitHub, Postman, Trello, FileZilla]
       country_flag: "🇧🇷"
       start_date: "2019-02"
       end_date: "2020-06"
