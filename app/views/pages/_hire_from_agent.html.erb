@@ -54,7 +54,7 @@
 		</div>
 
 		<pre class="border-ctp-surface0 rounded-b-btn w-full overflow-x-auto border bg-[#1e1e2e] p-4 text-xs leading-relaxed font-semibold text-[#a6e3a1]"><code><%= SeoConfig::MCP_ENDPOINT %> <span class="text-ctp-overlay0 font-mono text-xs"><%= t("pages.hire_from_agent.no_auth_note") %></span>
-			<span class="text-ctp-overlay0 font-mono text-xs block"><%= t("pages.hire_from_agent.watch_telemetry_note_html", url: "#{SeoConfig::SITE_URL}/telemetry") %></span></code></pre>
+			<span class="text-ctp-overlay0 font-mono text-xs block"><%= t("pages.hire_from_agent.watch_telemetry_note_html", url: "#{SeoConfig::SITE_URL}/#{I18n.locale}/telemetry") %></span></code></pre>
 	</div>
 
   <p class="text-ctp-subtext0 mb-8 w-full text-[17px] leading-[1.7] text-pretty text-justify">

@@ -34,15 +34,18 @@ conventions; edit the generated file afterward for the specifics this app needs.
 ## Credentials
 
 There is no `.env`/`dotenv-rails` anymore — all per-environment config (database connection,
-mailer sender/recipient, Resend API key) lives in Rails' per-environment encrypted credentials
+mailer sender/recipient, Resend API key, Better Stack source token) lives in Rails'
+per-environment encrypted credentials
 under `config/credentials/`, not env vars:
 
 - `config/credentials/development.yml.enc` (key: `config/credentials/development.key`) — holds
   `database.host/port/username/password` (matching `compose.yml`'s `my_linktree`/`my_linktree`),
-  `mailer.sender_email`/`mailer.recipient_email`, and `sentry_dsn`. Edit with
-  `bin/rails credentials:edit --environment development`.
+  `mailer.sender_email`/`mailer.recipient_email`, and `sentry_dsn` (no `better_stack` — the log
+  drain is production-only). Edit with `bin/rails credentials:edit --environment development`.
 - `config/credentials/production.yml.enc` (key: `config/credentials/production.key`) — same shape,
-  plus `mailer.resend_api_key`. Edit with `bin/rails credentials:edit --environment production`.
+  plus `mailer.resend_api_key` and `better_stack.source_token`/`better_stack.ingesting_host` (from
+  the Better Stack source's setup page; the log drain stays off until `source_token` is present).
+  Edit with `bin/rails credentials:edit --environment production`.
 - `config/credentials.yml.enc` (the shared file, key: `config/master.key`) — only used as a
   fallback for environments without their own file, i.e. `test`. Holds `secret_key_base` plus a
   `mailer` block (test doesn't need a real inbox, just non-nil values so `mail()` doesn't raise).
@@ -87,15 +90,16 @@ app/
   controllers/
     application_controller.rb   # sets @default_description, allow_browser :modern
     pages_controller.rb         # GET / (home)
-    contacts_controller.rb      # POST /contact — redirect + flash
+    contacts_controller.rb      # POST /contact — JSON response
     telemetry_page_controller.rb # GET /telemetry
     static_controller.rb        # AGENTS.md, llms.txt, sitemap.xml
     api/
       telemetry_controller.rb   # GET /api/telemetry — last 50 {tool, timestamp}, no auth
       mcp_controller.rb         # POST/GET /api/mcp — see "MCP server" below
-      profile_controller.rb     # GET /api/profile
+      hire_controller.rb        # POST /api/hire — the endpoint /AGENTS.md points agents at
+      base_controller.rb        # shared rescue_from + Rails.event error/rate-limit reporting
   mailers/
-    contact_mailer.rb           # new_contact
+    contact_mailer.rb           # new_contact, agent_hire_request
     meeting_mailer.rb           # confirmation, notification
   models/
     booking.rb                  # unique index on slot_start prevents double-booking
@@ -108,21 +112,26 @@ app/
       check_availability_use_case.rb   # timezone-aware slot generation (ActiveSupport::TimeZone)
       schedule_meeting_use_case.rb     # composes CheckAvailabilityUseCase, books + emails
       send_contact_email_use_case.rb
+      send_hire_request_use_case.rb
       record_agent_connection_use_case.rb
       list_recent_connections_use_case.rb
-    agents_content.rb           # renders config/agents.yml into the /AGENTS.md and /llms.txt
-                                 # response body only — the "Hire me from your agent" UI snippet on
-                                 # the homepage has its own inline copy, deliberately decoupled so
-                                 # each can evolve independently
+    event_subscribers/          # Rails.event subscribers
+      log_event_subscriber.rb   # dev/test only — production uses the logtail-rails one
+    log_redaction.rb            # LogRedaction — contact -> domain + digest, for event payloads
+    agents_content.rb           # .markdown -> /AGENTS.md, .llms_txt -> /llms.txt; renders the two
+                                 # config/agents.yml bodies. Response bodies only — the "Hire me
+                                 # from your agent" UI snippet on the homepage has its own inline
+                                 # copy, deliberately decoupled so each can evolve independently
   mcp_tools/                    # MCP::Tool subclasses: get_resume, list_services,
                                  # check_availability, schedule_meeting
   javascript/controllers/       # Stimulus: telemetry_feed, mobile_nav, experiences_tabs,
-                                 # hire_from_agent
+                                 # hire_from_agent, contact_form, cursor_trail, photo_pixelate
   views/
     layouts/application.html.erb
     pages/                      # home.html.erb + partials (hero, experiences, contact, etc.)
     telemetry_page/show.html.erb
-    shared/                     # header, footer, flash, external_link, person_json_ld partials
+    shared/                     # header, footer, get_in_touch_button, external_link,
+                                 # person_json_ld partials
 lib/
   seo_config.rb                 # SeoConfig — plain constants module (site URL, author, MCP
                                  # endpoint, sitemap lastmod), no request-scoped behavior, so it
@@ -133,8 +142,15 @@ lib/
 config/
   profile.yml                  # static resume/services data (was memory-database.js)
   availability.yml             # timezone, weekly windows, slot duration, booking horizon
-  agents.yml                   # AGENTS.md / llms.txt body, read by AgentsContent
+  agents.yml                   # two bodies read by AgentsContent: `content` (/AGENTS.md prose)
+                                 # and `llms_content` (/llms.txt link index). Both interpolate
+                                 # %{site_url}/%{mcp_endpoint}/%{github_url}/%{linkedin_url} from
+                                 # SeoConfig, so a literal "%" in either would raise on render
   database.yml                 # dev/test use ENV-driven Postgres connection
+  initializers/
+    logtail.rb                 # scopes the logtail-rails railtie (prod: logrageify!, else off)
+    event_reporter.rb          # registers the local Rails.event subscriber outside production
+    mcp.rb                     # MCP.configure around_request/exception_reporter -> Rails.event
 ```
 
 ### Key design decisions
@@ -143,8 +159,11 @@ config/
   dependency. They're unit-tested in isolation using RSpec with doubles/instance_doubles for
   collaborators. `GetProfileUseCase` and `ListServicesUseCase` load `config/profile.yml` directly
   via `Rails.application.config_for(:profile)` — there's no `ConfigDatabase` wrapper class.
-- **Errors**: no custom error hierarchy — use cases raise plain `ArgumentError` (with a message
-  like `"Missing required fields"` or `"Slot unavailable"`) for validation/business-rule failures.
+- **Errors**: no error hierarchy to speak of — use cases raise plain `ArgumentError` (with a
+  message like `"Missing required fields"` or `"Slot unavailable"`) for validation/business-rule
+  failures. The two exceptions are `UseCases::SendContactEmailUseCase::ValidationError` and
+  `UseCases::SendHireRequestUseCase::ValidationError`, which subclass `ArgumentError` and carry a
+  per-field `errors` hash so the contact and hire forms can highlight the offending inputs.
   Controllers catch it via `rescue_from ArgumentError` (`ContactsController`); `ScheduleMeetingTool`
   catches it directly (`rescue ArgumentError => e`) and turns it into an MCP `isError: true`
   response using `e.message`. `ContactsController` also has a dedicated
@@ -194,6 +213,23 @@ config/
   even for calls that go on to fail. Validation instead happens inside the use cases, with domain
   errors caught in the tool's `call` and turned into `MCP::Tool::Response.new(..., error: true)`
   rather than raised.
+- **Agent-facing surface**: `/AGENTS.md` and `/llms.txt` are two *different* bodies for two
+  different conventions, both in `config/agents.yml` and rendered by `AgentsContent`.
+  `content` -> `/AGENTS.md` is prose instructions (`text/markdown`); `llms_content` ->
+  `/llms.txt` is the [llmstxt.org](https://llmstxt.org) shape — H1, a `>` summary, then sections
+  of markdown links, with `## Optional` as that spec's keyword for what a short context may skip
+  (`text/plain`, since the extension is `.txt`). Both lead with the MCP endpoint and its four
+  tools and keep `POST /api/hire` as the fallback for clients that don't speak MCP. Keeping two
+  hand-written bodies means two chances to drift, so `spec/requests/static_spec.rb` runs the same
+  guards over *both*: every `Api::McpController::TOOLS` name must appear, and every
+  `SeoConfig::SITE_URL` link must recognize under some HTTP verb (verb-agnostic because
+  `/api/hire` is POST-only; this is what catches a bare `/telemetry`, which 404s since telemetry
+  is locale-scoped). URLs are never typed by hand in the YAML — they interpolate from
+  `SeoConfig`. `public/robots.txt` keeps
+  `Disallow: /api/` but adds a more specific `Allow: /api/mcp`, since the MCP endpoint is exactly
+  what this site wants agents reaching; the longest-match rule wins per the robots spec. The
+  homepage's "Hire me from your agent" section keeps its own inline copy of the snippet on
+  purpose, so the marketing panel and the machine-readable file can evolve independently.
 - **Edge WAF (Cloudflare)**: production (`victorfiamon.com.br`) sits behind Cloudflare with
   **Block AI bots** enabled site-wide, which blocks agent-style clients (e.g. Anthropic's connector
   infra, `User-Agent: Claude-User`) via the `Cloudflare Bot Management rules for all plans`
@@ -219,15 +255,52 @@ config/
   rather than hardcoding it, so it can be rotated/scoped per environment like every other credential
   even though a DSN itself isn't secret. `breadcrumbs_logger` is `[:active_support_logger,
   :http_logger]` (ActiveSupport instrumentation + outbound HTTP calls become breadcrumbs on captured
-  events), `send_default_pii = true` (Sentry-rails deprecation warning aside — request headers/IP are
-  still attached to events), and `enabled_patches = [:logger]` patches Ruby's `Logger` so calls to
-  `Rails.logger` are forwarded to Sentry as structured logs. `app/views/layouts/application.html.erb`
+  events) and `send_default_pii = true` (Sentry-rails deprecation warning aside — request headers/IP
+  are still attached to events). Those three settings are the whole file: there is deliberately no
+  `enabled_patches = [:logger]`, so `Rails.logger` output is *not* mirrored into Sentry as logs —
+  application logs go to Better Stack instead (see the next bullet), and Sentry stays scoped to
+  exceptions. `app/views/layouts/application.html.erb`
   also emits `Sentry.get_trace_propagation_meta` into `<head>` on every page, so a future
   browser-side Sentry SDK could stitch frontend spans onto the same backend trace — there's no JS
-  SDK wired up yet, this just keeps the meta tag ready. The installed `sentry-ruby` version (7.0.0,
-  pinned by `Gemfile.lock`) predates the `config.enable_logs` flag from newer releases — log
-  forwarding here is on by default via `enabled_patches`, not that flag; don't reintroduce it without
-  bumping the gem.
+  SDK wired up yet, this just keeps the meta tag ready.
+- **Log drain + structured events (Better Stack)**: `config/environments/production.rb` swaps
+  `config.logger` for `Logtail::Logger.create_default_logger` (the `logtail-rails` gem) when
+  `credentials.better_stack.source_token` is present, and `broadcast_to`s a STDOUT logger so
+  `kamal app logs` keeps working. Production only — dev/test never ship anywhere. Two non-obvious
+  details: the level has to be assigned by hand (`initialize_logger` skips `config.log_level` for
+  anything reporting itself as a `BroadcastLogger`, which this logger does, so it would otherwise
+  sit at Logtail's own DEBUG default), and the token is absent during `assets:precompile` in the
+  Docker build, which the `present?` guard covers.
+
+  `config/initializers/logtail.rb` scopes the gem's railtie, which otherwise replaces Rails' log
+  subscribers and installs five Rack middlewares in *every* environment: production gets
+  `logrageify!` (one `http.request` event per request instead of per-SQL/render/action lines),
+  everything else gets `Integrations::Rails.enabled = false` and keeps Rails' normal log output.
+
+  Application-level logs are emitted with **Rails 8.1's `Rails.event.notify`**, never the gem's
+  API, so no app code names Logtail. In production the gem's own subscriber (registered inside
+  `create_default_logger`) forwards them; elsewhere `config/initializers/event_reporter.rb`
+  registers `EventSubscribers::LogEventSubscriber`, filtered by `source_location` to this app's
+  own events — Rails 8.1 emits framework events (`action_controller.request_started`,
+  `active_record.sql`) through the same reporter as soon as any subscriber exists, and locally
+  those only duplicate the text lines Rails already prints. `ApplicationController#set_event_context`
+  attaches `request_id`/`ip`/`path`/`user_agent` to every event in a request.
+
+  The events: `mcp.request` and `mcp.exception` (both from `config/initializers/mcp.rb`, via the
+  `mcp` gem's `around_request`/`exception_reporter` hooks — one place covers all four tools),
+  `mcp.meeting.booked`/`mcp.meeting.rejected` (`ScheduleMeetingTool`, the only tool needing its
+  own, because a rejected booking is `isError: true` at HTTP 200 and reaches no `rescue_from`),
+  `api.error`/`api.rate_limited` (`Api::BaseController`, the latter extended per-endpoint via
+  `rate_limited_event_payload` rather than a second overlapping event),
+  `hire.request.received`/`hire.request.rejected`, and `contact.message.sent`/`.rejected`/
+  `contact.rate_limited`/`contact.csrf_rejected`/`contact.error`.
+
+  PII never goes in a payload raw: `LogRedaction.contact` turns an address into
+  `contact_domain` + a 12-char SHA256 prefix. The keys are deliberately not named `email_*` —
+  Rails 8.1 runs every event payload through an `ActiveSupport::ParameterFilter` built from
+  `config.filter_parameters`, which matches keys by *substring*, so `email_domain` would arrive
+  as `[FILTERED]` (there's a spec pinning this in `spec/services/log_redaction_spec.rb`). Avoid
+  payload keys containing any of `filter_parameter_logging.rb`'s entries.
 - **`@/` alias**: none — this is a standard Rails app, autoloaded via Zeitwerk from `app/*`.
   `app/services/use_cases/*.rb` autoloads as `UseCases::*` (the `use_cases` subdirectory becomes an
   implicit namespace under the `app/services` root).
@@ -240,6 +313,11 @@ RSpec, with specs co-located by type under `spec/` (`spec/models`, `spec/service
 - `Rails.cache.clear` runs before every example (`spec/rails_helper.rb`) — Rails' `rate_limit`
   macro shares the process-wide cache for its counters, so state must be reset between examples or
   one spec's requests would count toward another spec's rate limit.
+- `spec/support/` is auto-required by `spec/rails_helper.rb`. `spec/support/event_reporter.rb`
+  provides `captured_events { ... }` and `find_event(events, name)` for asserting on
+  `Rails.event.notify` payloads — it subscribes an
+  `ActiveSupport::EventReporter::TestHelper::EventSubscriber` for the duration of the block, so
+  it sees the app's events regardless of which subscriber ships them in production.
 - Use `travel_to`/`around { |example| travel_to(...) { example.run } }`
   (`ActiveSupport::Testing::TimeHelpers`, included globally) for anything touching
   `CheckAvailabilityUseCase` or `GetXpYearsUseCase` — both are date-sensitive.

@@ -12,7 +12,7 @@ Rails.application.routes.draw do
   # Machine-facing / locale-independent endpoints — deliberately not locale-scoped.
   get "sitemap.xml" => "static#sitemap"
   get "AGENTS.md" => "static#agents_md"
-  get "llms.txt" => "static#agents_md"
+  get "llms.txt" => "static#llms_txt"
   post "contact" => "contacts#create"
 
   namespace :api do

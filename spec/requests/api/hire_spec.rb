@@ -53,6 +53,35 @@ RSpec.describe "Api::Hire", type: :request do
     }.to change(AgentConnection, :count).by(1)
   end
 
+  describe "structured events" do
+    it "reports hire.request.received with the contact redacted" do
+      events = captured_events { perform_enqueued_jobs { post_hire(valid_params.merge(agent: "claude")) } }
+
+      payload = find_event(events, "hire.request.received")[:payload]
+      expect(payload).to include(agent: "claude", brief_length: valid_params[:brief].length, contact_domain: "example.com")
+      expect(payload.to_json).not_to include("jane@example.com")
+    end
+
+    it "reports hire.request.rejected naming the invalid fields" do
+      events = captured_events { post_hire(valid_params.merge(name: "", brief: "")) }
+
+      expect(find_event(events, "hire.request.rejected")[:payload]).to include(severity: "warn")
+      expect(find_event(events, "hire.request.rejected")[:payload][:fields]).to contain_exactly("name", "brief")
+    end
+
+    it "reports api.rate_limited once the window is exhausted" do
+      headers = json_headers.merge("X-Forwarded-For" => "6.6.6.6")
+      2.times { post_hire(valid_params, headers: headers) }
+
+      events = captured_events { post_hire(valid_params, headers: headers) }
+
+      expect(response).to have_http_status(:too_many_requests)
+      expect(find_event(events, "api.rate_limited")[:payload]).to include(
+        severity: "warn", controller: "hire", action: "create"
+      )
+    end
+  end
+
   it "rate limits after 2 requests from the same IP within the window" do
     headers = json_headers.merge("X-Forwarded-For" => "9.9.9.9")
 

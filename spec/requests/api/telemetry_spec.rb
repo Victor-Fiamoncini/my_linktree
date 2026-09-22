@@ -36,6 +36,28 @@ RSpec.describe "Api::Telemetry", type: :request do
     expect(response).to have_http_status(:too_many_requests)
   end
 
+  it "reports an api.error event with the class and backtrace when the action blows up" do
+    allow(UseCases::ListRecentConnectionsUseCase).to receive(:new).and_raise(ArgumentError, "boom")
+
+    events = captured_events { get "/api/telemetry" }
+
+    expect(response).to have_http_status(:internal_server_error)
+    payload = find_event(events, "api.error")[:payload]
+    expect(payload).to include(severity: "error", error_class: "ArgumentError", error_message: "boom")
+    expect(payload[:backtrace]).to be_an(Array)
+  end
+
+  it "reports an api.rate_limited event naming the throttled endpoint" do
+    60.times { get "/api/telemetry" }
+
+    events = captured_events { get "/api/telemetry" }
+
+    expect(response).to have_http_status(:too_many_requests)
+    expect(find_event(events, "api.rate_limited")[:payload]).to include(
+      severity: "warn", controller: "telemetry", action: "index"
+    )
+  end
+
   it "falls back to rate limiting by X-Forwarded-For (past a trusted Cloudflare hop) when CF-Connecting-IP is absent" do
     # kamal-proxy appends its previous hop (Cloudflare's edge) to X-Forwarded-For, so Rails sees
     # "<visitor ip>, <cloudflare ip>" — trusted_proxies (config/initializers/trusted_proxies.rb)
