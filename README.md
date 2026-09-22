@@ -10,7 +10,8 @@ AI agents can read the resume, check availability, and book a meeting directly.
 - **Tailwind CSS** — hand-rolled Catppuccin Frappé theme, via the `tailwindcss-rails` gem
 - **`mcp`** — official Ruby MCP SDK, driving the MCP server (`/api/mcp`)
 - **Resend** — transactional email for the contact form and meeting bookings (`:test` delivery in development)
-- **Sentry** (`sentry-ruby`/`sentry-rails`) — error monitoring and log forwarding, DSN pulled from encrypted credentials
+- **Sentry** (`sentry-ruby`/`sentry-rails`) — exception monitoring, DSN pulled from encrypted credentials
+- **Better Stack** (`logtail-rails`) — production log drain plus structured events on the API/MCP endpoints, emitted with Rails 8.1's `Rails.event`
 - **RSpec** — model, service, and request specs
 
 ## Architecture
@@ -23,15 +24,17 @@ app/
 ├── controllers/
 │   ├── api/                   # telemetry#index, mcp#create, hire#create
 │   ├── pages_controller.rb    # home page
-│   ├── contacts_controller.rb # POST /contact — redirect + flash
+│   ├── contacts_controller.rb # POST /contact — JSON response
 │   └── telemetry_page_controller.rb
 ├── services/
 │   ├── use_cases/             # framework-agnostic business logic (constructor-injected deps)
-│   └── agents_content.rb      # renders config/agents.yml into AGENTS.md / llms.txt
+│   ├── event_subscribers/     # Rails.event subscriber used outside production
+│   ├── log_redaction.rb       # redacts contacts before they reach a log payload
+│   └── agents_content.rb      # renders the two config/agents.yml bodies (AGENTS.md, llms.txt)
 ├── mcp_tools/                 # get_resume, list_services, check_availability, schedule_meeting
 ├── mailers/                   # ContactMailer, MeetingMailer
 ├── models/                    # Booking (unique slot_start), AgentConnection
-└── javascript/controllers/    # 4 Stimulus controllers (telemetry polling, mobile nav, etc.)
+└── javascript/controllers/    # 7 Stimulus controllers (telemetry polling, mobile nav, etc.)
 
 lib/
 └── seo_config.rb              # SeoConfig — plain constants (site URL, MCP endpoint, etc.),
@@ -47,10 +50,18 @@ lib/
   prevention is a DB-level unique index on `slot_start` instead of a Redis `SETNX` reservation key.
 - **Controllers** are composition roots — they wire models/services to use cases and translate
   HTTP (or JSON-RPC, for `/api/mcp`) concerns. Rate limiting uses Rails 8's `rate_limit` macro,
-  keyed by `request.remote_ip` (Rails' trusted-proxy-aware IP resolution — a client can't spoof
-  or omit headers to dodge the limit). Use cases raise plain `ArgumentError` for validation/
-  business-rule failures instead of a custom error hierarchy; controllers and MCP tools catch it
-  via `rescue_from`/`rescue` and turn it into a user-facing message.
+  keyed by `ApplicationController#rate_limit_identifier` — Cloudflare's `CF-Connecting-IP` header,
+  falling back to `request.remote_ip` only when it's absent (local dev/test). See that method's
+  comment for why `X-Forwarded-For` isn't trusted here. Use cases raise plain `ArgumentError` for
+  validation/business-rule failures rather than a deep error hierarchy; controllers and MCP tools
+  catch it via `rescue_from`/`rescue` and turn it into a user-facing message. The contact and hire
+  use cases raise a `ValidationError` subclass of it that carries a per-field `errors` hash.
+- **Agent-facing surface** — `/AGENTS.md` (prose) and `/llms.txt` (a link index in the
+  [llmstxt.org](https://llmstxt.org) shape) are two bodies in `config/agents.yml`, both leading
+  with the MCP endpoint and its four tools and keeping `POST /api/hire` as the fallback for
+  clients that don't speak MCP. Specs assert neither drifts from the tools the server registers
+  or links a URL that doesn't route. `robots.txt` disallows `/api/` but explicitly allows
+  `/api/mcp`.
 - **MCP server** (`Api::McpController`) drives the `mcp` gem's `StreamableHTTPTransport` in
   stateless mode with 4 registered tools. Every tool call is recorded through
   `RecordAgentConnectionUseCase` before validation runs, so even failed calls show up on
@@ -107,6 +118,10 @@ should contain:
 | `mailer.resend_api_key`       | placeholder (unused locally — `:test` delivery never calls Resend) |
 | `sentry_dsn`                  | placeholder, or a real DSN from your own Sentry project if you want local errors reported |
 
+No `better_stack` key here: the log drain is production-only. Locally the same structured events
+are printed to the Rails log instead (lines like `[mcp.request] {...}`), so you can see exactly
+what production would ship without sending anything.
+
 `config/credentials/production.yml.enc` has the same shape, but with real production values
 (external Postgres connection, real sender/recipient addresses, and a real
 `mailer.resend_api_key` — this one *is* used, since production delivers mail through Resend). See
@@ -132,7 +147,8 @@ Secrets split across two mechanisms, depending on who needs them and when:
 - **Rails encrypted credentials** (`config/credentials/production.yml.enc`, decrypted by
   `config/credentials/production.key`) hold everything the *app* needs once it's running:
   production Postgres `host`/`port`/`username`/`password`, mailer `sender_email`/`recipient_email`,
-  the Resend `resend_api_key`, and `sentry_dsn`. These are per-environment credentials, separate
+  the Resend `resend_api_key`, `sentry_dsn`, and `better_stack.source_token` /
+  `better_stack.ingesting_host`. These are per-environment credentials, separate
   from the shared `config/master.key` used as `test`'s fallback — a leaked dev/test key can't
   decrypt production secrets. Edit with:
 
@@ -143,7 +159,10 @@ Secrets split across two mechanisms, depending on who needs them and when:
   `config/database.yml`'s production block, the mailer classes, `config/initializers/resend.rb`,
   and `config/initializers/sentry.rb` all read these via `Rails.application.credentials.dig(...)`.
   None of it is a plain env var. `test` has no `sentry_dsn` (the shared `credentials.yml.enc`
-  doesn't define one), so Sentry is a silent no-op there rather than sending events.
+  doesn't define one), so Sentry is a silent no-op there rather than sending events. Better Stack
+  behaves the same way: with no `better_stack.source_token` the app keeps its plain STDOUT logger,
+  which is also what happens during `assets:precompile` in the Docker build (it runs without the
+  credentials key).
 
 - **Kamal secrets** (`.kamal/secrets`) hold what's needed *before* the app can decrypt anything:
   `KAMAL_REGISTRY_PASSWORD` (a Docker Hub access token, exported in your shell before deploying) and
@@ -158,6 +177,38 @@ Secrets split across two mechanisms, depending on who needs them and when:
 Before the first deploy: export `KAMAL_REGISTRY_PASSWORD` and `KAMAL_SERVER_IP` locally, fill in
 the Docker Hub username placeholder in `config/deploy.yml`, and fill in the production credentials
 above with real database connection details.
+
+### Better Stack
+
+Production logs are shipped to [Better Stack](https://betterstack.com/logs). To wire up a new
+source:
+
+1. In the Better Stack dashboard, go to **Telemetry → Sources → Connect source** and pick platform
+   **Ruby**. The source's setup page then shows a **Source Token** and an **Ingesting host**
+   (`sNNNNNN.<region>.betterstackdata.com`).
+2. Put both in the production credentials:
+
+   ```bash
+   bin/rails credentials:edit --environment production
+   ```
+
+   ```yaml
+   better_stack:
+     source_token: <source token>
+     ingesting_host: <ingesting host>
+   ```
+
+3. `kamal deploy`. No new env var and no change to `config/deploy.yml` or `.kamal/secrets` —
+   `RAILS_MASTER_KEY` already decrypts the file.
+
+To verify: **Live tail** on the source should show one `http.request` entry per request, plus the
+app's own structured events (`mcp.request`, `api.rate_limited`, `contact.message.sent`, …).
+`kamal app logs -f` keeps working in parallel — the Better Stack logger broadcasts to STDOUT, so
+the container log is not sacrificed for the drain.
+
+Logs are shipped in a background thread and dropped rather than queued if the queue fills, so an
+unreachable Better Stack slows nothing down and takes nothing offline. Leaving `better_stack` out
+of the credentials entirely disables the drain and falls back to plain STDOUT logging.
 
 ### Cloudflare
 
