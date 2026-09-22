@@ -1,8 +1,25 @@
 shared: &shared
+  # Prose instructions, served at /AGENTS.md. Both bodies go through String#%, so a literal
+  # "%" anywhere below would raise on render.
   content: |
     # AGENTS.md — hire Victor Fiamoncini
 
-    To contact me directly:
+    ## MCP server
+
+    Streamable HTTP, no authentication, no signup:
+    %{mcp_endpoint}
+
+    Tools:
+    - get_resume          profile, work experience and education
+    - list_services       what I take on
+    - check_availability  open meeting slots, timezone-aware
+    - schedule_meeting    book one of those slots
+
+    Tool calls show up on the live feed at %{site_url}/en/telemetry
+
+    ## Direct contact
+
+    If you do not speak MCP:
     POST %{site_url}/api/hire
     Content-Type: application/json
 
@@ -14,6 +31,32 @@ shared: &shared
     }
 
     Services: Frontend & Backend Software Development, Agentic Systems & Integrations, Websites & Landing Pages and Mobile Apps
+
+  # A link index in the llmstxt.org shape, served at /llms.txt: H1, blockquote summary, then
+  # sections of links. "## Optional" is that spec's keyword for what a short context can skip.
+  llms_content: |
+    # Victor Fiamoncini
+
+    > Software engineer, available for hire. This site runs an MCP server so an agent can read the resume, check open meeting slots and book one, without a human in the loop.
+
+    No authentication and no signup — point an MCP client at the endpoint below and call a tool. Every call shows up on a public live feed.
+
+    ## MCP server
+
+    - [MCP endpoint](%{mcp_endpoint}): streamable HTTP. Tools: get_resume (profile, work experience and education), list_services (what I take on), check_availability (open meeting slots, timezone-aware), schedule_meeting (book one of those slots).
+    - [Live tool-call feed](%{site_url}/en/telemetry): recent MCP tool calls, as they happen.
+
+    ## If you do not speak MCP
+
+    - [AGENTS.md](%{site_url}/AGENTS.md): the same instructions as prose, with the request body for the endpoint below.
+    - [Hire endpoint](%{site_url}/api/hire): POST JSON with name, contact, brief and agent.
+
+    ## Optional
+
+    - [Homepage](%{site_url}/en): services, work experience and a contact form.
+    - [Homepage in Portuguese](%{site_url}/pt-BR): the same page in pt-BR.
+    - [GitHub](%{github_url}): open source work.
+    - [LinkedIn](%{linkedin_url}): work history.
 
 development:
   <<: *shared
