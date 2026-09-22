@@ -16,6 +16,45 @@ RSpec.describe "Contacts", type: :request do
     expect(ActionMailer::Base.deliveries.size).to eq(1)
   end
 
+  describe "structured events" do
+    it "reports contact.message.sent with the address redacted" do
+      events = captured_events { perform_enqueued_jobs { post_contact(valid_params) } }
+
+      payload = find_event(events, "contact.message.sent")[:payload]
+      expect(payload).to include(locale: "en", message_length: valid_params[:message].length, contact_domain: "example.com")
+      expect(payload[:contact_digest]).to match(/\A[0-9a-f]{12}\z/)
+      expect(payload.to_json).not_to include("jane@example.com")
+    end
+
+    it "reports contact.message.rejected naming the invalid fields" do
+      events = captured_events { post_contact(valid_params.merge(email: "not-an-email")) }
+
+      expect(find_event(events, "contact.message.rejected")[:payload]).to eq(severity: "warn", fields: [ "email" ])
+    end
+
+    it "reports contact.csrf_rejected when the token is missing" do
+      original = ActionController::Base.allow_forgery_protection
+      ActionController::Base.allow_forgery_protection = true
+
+      events = captured_events { post_contact(valid_params) }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(find_event(events, "contact.csrf_rejected")[:payload]).to eq(severity: "warn")
+    ensure
+      ActionController::Base.allow_forgery_protection = original
+    end
+
+    it "reports contact.rate_limited once the window is exhausted" do
+      headers = json_headers.merge("X-Forwarded-For" => "5.5.5.5")
+      2.times { post_contact(valid_params, headers: headers) }
+
+      events = captured_events { post_contact(valid_params, headers: headers) }
+
+      expect(response).to have_http_status(:too_many_requests)
+      expect(find_event(events, "contact.rate_limited")[:payload]).to eq(severity: "warn")
+    end
+  end
+
   it "returns a field error when name is blank" do
     post_contact(valid_params.merge(name: ""))
 

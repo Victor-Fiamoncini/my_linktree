@@ -63,14 +63,36 @@ module Api
     end
 
     def schedule_meeting_call?
-      return false unless request.post?
+      jsonrpc_method == "tools/call" && jsonrpc_tool == "schedule_meeting"
+    end
+
+    def jsonrpc_method
+      jsonrpc_payload["method"]
+    end
+
+    def jsonrpc_tool
+      jsonrpc_payload.dig("params", "name")
+    end
+
+    # Memoized: both rate limiters and the 429 handler need the method and tool name, and the
+    # body can only be read once. The rewind is what lets the transport read it afterwards.
+    def jsonrpc_payload
+      @jsonrpc_payload ||= parse_jsonrpc_body
+    end
+
+    def parse_jsonrpc_body
+      return {} unless request.post?
 
       parsed = JSON.parse(request.body.read)
-      parsed["method"] == "tools/call" && parsed.dig("params", "name") == "schedule_meeting"
+      parsed.is_a?(Hash) ? parsed : {}
     rescue JSON::ParserError, TypeError
-      false
+      {}
     ensure
       request.body&.rewind
+    end
+
+    def rate_limited_event_payload
+      super.merge(jsonrpc_method: jsonrpc_method, tool: jsonrpc_tool)
     end
   end
 end

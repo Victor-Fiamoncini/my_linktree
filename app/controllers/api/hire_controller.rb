@@ -9,6 +9,13 @@ module Api
 
       UseCases::SendHireRequestUseCase.new.execute(**hire_params)
 
+      Rails.event.notify(
+        "hire.request.received",
+        agent: hire_params[:agent],
+        brief_length: hire_params[:brief].to_s.length,
+        **LogRedaction.contact(hire_params[:contact])
+      )
+
       render json: { message: "Thanks! I'll get back to you soon." }, status: :ok
     end
 
@@ -19,6 +26,8 @@ module Api
     end
 
     def render_validation_error(e)
+      Rails.event.notify("hire.request.rejected", severity: "warn", fields: e.errors.keys.map(&:to_s))
+
       render json: { message: "Check the highlighted fields and try again.", errors: e.errors }, status: :unprocessable_content
     end
   end
