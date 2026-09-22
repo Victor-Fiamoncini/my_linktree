@@ -40,6 +40,25 @@ Rails.application.configure do
   # Change to "debug" to log everything (including potentially personally-identifiable information!).
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
 
+  # Ship logs to Better Stack when a source token is configured, still broadcasting to STDOUT so
+  # `kamal app logs` keeps working. `create_default_logger` also registers the Rails.event
+  # subscriber that carries this app's structured events (see config/initializers/event_reporter.rb).
+  #
+  # The level needs assigning by hand: this logger reports itself as a BroadcastLogger, and
+  # `initialize_logger` only applies `config.log_level` to loggers that aren't one — so it would
+  # otherwise sit at Logtail's own DEBUG default. The token is absent during the Docker build's
+  # `assets:precompile`, where the plain STDOUT logger above stays in place.
+  better_stack = Rails.application.credentials.better_stack
+
+  if better_stack&.dig(:source_token).present?
+    config.logger = Logtail::Logger
+      .create_default_logger(better_stack[:source_token], ingesting_host: better_stack[:ingesting_host])
+      .tap do |logger|
+        logger.broadcast_to(ActiveSupport::Logger.new(STDOUT))
+        logger.level = config.log_level
+      end
+  end
+
   # Prevent health checks from clogging up the logs.
   config.silence_healthcheck_path = "/up"
 
