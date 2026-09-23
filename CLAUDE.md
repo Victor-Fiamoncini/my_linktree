@@ -25,6 +25,17 @@ Postgres 16 is required for local development — run `docker compose up -d` (se
 There is no Redis anywhere in this app: rate limiting, background jobs, and (in production)
 ActionCable all ride on Rails 8's Postgres-backed Solid Cache / Solid Queue / Solid Cable.
 
+## Validating changes
+
+After any change under `app/`, `lib/`, `config/` or `spec/`, invoke the **`validate`** skill
+(`.claude/skills/validate/SKILL.md`) before reporting the work as done — it runs the specs,
+RuboCop and Brakeman as a set, and knows this repo's two recurring false alarms (the Postgres
+container being down, and leftover rows in the test database). Escalate to `bin/ci` before a
+commit or push.
+
+`config/ci.rb` is the source of truth for what "green" means. Anything added there belongs in the
+skill's fast path too, so the local loop and CI can't drift apart.
+
 Always scaffold new Rails components (migrations, models, controllers, mailers, jobs, etc.) with
 the Rails CLI generators — `bin/rails generate migration ...`, `bin/rails generate model ...`,
 `bin/rails generate controller ...`, and so on — instead of hand-writing the file from scratch.
@@ -104,24 +115,20 @@ app/
   models/
     booking.rb                  # unique index on slot_start prevents double-booking
     agent_connection.rb         # MCP tool-call telemetry
-  services/
-    use_cases/                  # framework-agnostic business logic, constructor-injected deps
-      get_profile_use_case.rb
-      list_services_use_case.rb
-      get_xp_years_use_case.rb
-      check_availability_use_case.rb   # timezone-aware slot generation (ActiveSupport::TimeZone)
-      schedule_meeting_use_case.rb     # composes CheckAvailabilityUseCase, books + emails
-      send_contact_email_use_case.rb
-      send_hire_request_use_case.rb
-      record_agent_connection_use_case.rb
-      list_recent_connections_use_case.rb
-    event_subscribers/          # Rails.event subscribers
-      log_event_subscriber.rb   # dev/test only — production uses the logtail-rails one
+  use_cases/                    # framework-agnostic business logic, constructor-injected deps
+    get_profile_use_case.rb
+    list_services_use_case.rb
+    get_xp_years_use_case.rb
+    check_availability_use_case.rb   # timezone-aware slot generation (ActiveSupport::TimeZone)
+    schedule_meeting_use_case.rb     # composes CheckAvailabilityUseCase, books + emails
+    send_contact_email_use_case.rb
+    send_hire_request_use_case.rb
+    record_agent_connection_use_case.rb
+    list_recent_connections_use_case.rb
+    validation_error.rb         # ValidationError — shared by the two form-facing use cases
+  events/                       # everything that exists to serve Rails.event
+    log_event_subscriber.rb     # dev/test only — production uses the logtail-rails one
     log_redaction.rb            # LogRedaction — contact -> domain + digest, for event payloads
-    agents_content.rb           # .markdown -> /AGENTS.md, .llms_txt -> /llms.txt; renders the two
-                                 # config/agents.yml bodies. Response bodies only — the "Hire me
-                                 # from your agent" UI snippet on the homepage has its own inline
-                                 # copy, deliberately decoupled so each can evolve independently
   mcp_tools/                    # MCP::Tool subclasses: get_resume, list_services,
                                  # check_availability, schedule_meeting
   javascript/controllers/       # Stimulus: telemetry_feed, mobile_nav, experiences_tabs,
@@ -132,13 +139,17 @@ app/
     telemetry_page/show.html.erb
     shared/                     # header, footer, get_in_touch_button, external_link,
                                  # person_json_ld partials
-lib/
+lib/                            # static, request-independent site facts and the text built
+                                 # from them. Autoloaded via `config.autoload_lib` in
+                                 # config/application.rb — no `Lib::` namespace, since these are
+                                 # top-level files directly under `lib/`.
   seo_config.rb                 # SeoConfig — plain constants module (site URL, author, MCP
-                                 # endpoint, sitemap lastmod), no request-scoped behavior, so it
-                                 # lives in `lib/` rather than `app/services/` (which this app
-                                 # reserves for UseCases-style behavior objects). Autoloaded via
-                                 # `config.autoload_lib` in config/application.rb — no `Lib::`
-                                 # namespace since it's a top-level file directly under `lib/`.
+                                 # endpoint, sitemap lastmod)
+  agents_content.rb             # .markdown -> /AGENTS.md, .llms_txt -> /llms.txt; renders the two
+                                 # config/agents.yml bodies, interpolating SeoConfig URLs. Response
+                                 # bodies only — the "Hire me from your agent" UI snippet on the
+                                 # homepage has its own inline copy, deliberately decoupled so each
+                                 # can evolve independently
 config/
   profile.yml                  # static resume/services data (was memory-database.js)
   availability.yml             # timezone, weekly windows, slot duration, booking horizon
@@ -155,15 +166,16 @@ config/
 
 ### Key design decisions
 
-- **Use cases** (`app/services/use_cases/`) contain all business logic and have no controller/view
+- **Use cases** (`app/use_cases/`) contain all business logic and have no controller/view
   dependency. They're unit-tested in isolation using RSpec with doubles/instance_doubles for
   collaborators. `GetProfileUseCase` and `ListServicesUseCase` load `config/profile.yml` directly
   via `Rails.application.config_for(:profile)` — there's no `ConfigDatabase` wrapper class.
 - **Errors**: no error hierarchy to speak of — use cases raise plain `ArgumentError` (with a
   message like `"Missing required fields"` or `"Slot unavailable"`) for validation/business-rule
-  failures. The two exceptions are `UseCases::SendContactEmailUseCase::ValidationError` and
-  `UseCases::SendHireRequestUseCase::ValidationError`, which subclass `ArgumentError` and carry a
-  per-field `errors` hash so the contact and hire forms can highlight the offending inputs.
+  failures. The one exception is `ValidationError` (`app/use_cases/validation_error.rb`), which
+  subclasses `ArgumentError` and carries a per-field `errors` hash so the contact and hire forms
+  can highlight the offending inputs; `SendContactEmailUseCase` and `SendHireRequestUseCase` both
+  raise it.
   Controllers catch it via `rescue_from ArgumentError` (`ContactsController`); `ScheduleMeetingTool`
   catches it directly (`rescue ArgumentError => e`) and turns it into an MCP `isError: true`
   response using `e.message`. `ContactsController` also has a dedicated
@@ -299,16 +311,31 @@ config/
   `contact_domain` + a 12-char SHA256 prefix. The keys are deliberately not named `email_*` —
   Rails 8.1 runs every event payload through an `ActiveSupport::ParameterFilter` built from
   `config.filter_parameters`, which matches keys by *substring*, so `email_domain` would arrive
-  as `[FILTERED]` (there's a spec pinning this in `spec/services/log_redaction_spec.rb`). Avoid
+  as `[FILTERED]` (there's a spec pinning this in `spec/events/log_redaction_spec.rb`). Avoid
   payload keys containing any of `filter_parameter_logging.rb`'s entries.
 - **`@/` alias**: none — this is a standard Rails app, autoloaded via Zeitwerk from `app/*`.
-  `app/services/use_cases/*.rb` autoloads as `UseCases::*` (the `use_cases` subdirectory becomes an
-  implicit namespace under the `app/services` root).
+  Rails registers every directory under `app/` (bar `assets`, `javascript`, `views`) as its own
+  autoload root, so `app/use_cases/*.rb` and `app/events/*.rb` define *top-level* constants —
+  `ScheduleMeetingUseCase`, `LogRedaction` — with no namespace of their own. Adding a directory
+  under `app/` needs no config change; nesting a file one level deeper does introduce a
+  namespace.
 
 ## Testing
 
-RSpec, with specs co-located by type under `spec/` (`spec/models`, `spec/services/use_cases`,
-`spec/requests`, `spec/requests/api`).
+RSpec, with specs co-located by type under `spec/`, mirroring `app/` and `lib/` (`spec/models`,
+`spec/use_cases`, `spec/events`, `spec/mcp_tools`, `spec/mailers`, `spec/helpers`, `spec/lib`,
+`spec/requests`, `spec/requests/api`, `spec/system`).
+
+Every production file has a spec, with three deliberate exceptions: `ApplicationRecord`,
+`ApplicationJob` and `ApplicationHelper` are empty Rails base classes with no behavior of their
+own. Controllers are covered by `spec/requests/*` rather than controller specs —
+`ApplicationController#rate_limit_identifier` and `Api::BaseController`'s shared `rescue_from`
+handlers are pinned in `spec/requests/api/telemetry_spec.rb` and `spec/requests/api/mcp_spec.rb`.
+
+Nothing truncates the test database between runs, so a stray `RAILS_ENV=test bin/rails runner`
+that writes a row will break the specs asserting absolute `AgentConnection` counts
+(`spec/models/agent_connection_spec.rb`, `spec/requests/api/telemetry_spec.rb`). Clean up after
+ad-hoc runner use.
 
 - `Rails.cache.clear` runs before every example (`spec/rails_helper.rb`) — Rails' `rate_limit`
   macro shares the process-wide cache for its counters, so state must be reset between examples or

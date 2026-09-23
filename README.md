@@ -26,26 +26,26 @@ app/
 │   ├── pages_controller.rb    # home page
 │   ├── contacts_controller.rb # POST /contact — JSON response
 │   └── telemetry_page_controller.rb
-├── services/
-│   ├── use_cases/             # framework-agnostic business logic (constructor-injected deps)
-│   ├── event_subscribers/     # Rails.event subscriber used outside production
-│   ├── log_redaction.rb       # redacts contacts before they reach a log payload
-│   └── agents_content.rb      # renders the two config/agents.yml bodies (AGENTS.md, llms.txt)
+├── use_cases/                 # framework-agnostic business logic (constructor-injected deps)
+├── events/                    # everything serving Rails.event: the non-production subscriber,
+│                              # and LogRedaction (redacts contacts before they reach a payload)
 ├── mcp_tools/                 # get_resume, list_services, check_availability, schedule_meeting
 ├── mailers/                   # ContactMailer, MeetingMailer
 ├── models/                    # Booking (unique slot_start), AgentConnection
 └── javascript/controllers/    # 7 Stimulus controllers (telemetry polling, mobile nav, etc.)
 
-lib/
-└── seo_config.rb              # SeoConfig — plain constants (site URL, MCP endpoint, etc.),
-                                # autoloaded via config.autoload_lib; not a use case, so it lives
-                                # outside app/services/
+lib/                           # static, request-independent site facts and the text built from
+                                # them, autoloaded via config.autoload_lib
+├── seo_config.rb              # SeoConfig — plain constants (site URL, MCP endpoint, etc.)
+└── agents_content.rb          # renders the two config/agents.yml bodies (AGENTS.md, llms.txt)
 ```
 
 **Layers:**
 
-- **Use cases** (`app/services/use_cases/`) hold all business rules as plain Ruby classes with
-  constructor-injected collaborators, unit-tested in isolation.
+- **Use cases** (`app/use_cases/`) hold all business rules as plain Ruby classes with
+  constructor-injected collaborators, unit-tested in isolation. Every directory under `app/` is
+  its own Zeitwerk root, so these are top-level constants (`ScheduleMeetingUseCase`), not
+  namespaced.
 - **Models** (`Booking`, `AgentConnection`) replace the old Redis-backed stores; double-booking
   prevention is a DB-level unique index on `slot_start` instead of a Redis `SETNX` reservation key.
 - **Controllers** are composition roots — they wire models/services to use cases and translate
@@ -55,7 +55,8 @@ lib/
   comment for why `X-Forwarded-For` isn't trusted here. Use cases raise plain `ArgumentError` for
   validation/business-rule failures rather than a deep error hierarchy; controllers and MCP tools
   catch it via `rescue_from`/`rescue` and turn it into a user-facing message. The contact and hire
-  use cases raise a `ValidationError` subclass of it that carries a per-field `errors` hash.
+  use cases both raise the shared `ValidationError` subclass of it, which carries a per-field
+  `errors` hash.
 - **Agent-facing surface** — `/AGENTS.md` (prose) and `/llms.txt` (a link index in the
   [llmstxt.org](https://llmstxt.org) shape) are two bodies in `config/agents.yml`, both leading
   with the MCP endpoint and its four tools and keeping `POST /api/hire` as the fallback for
