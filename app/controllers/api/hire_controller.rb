@@ -2,7 +2,7 @@ module Api
   class HireController < BaseController
     rate_limit to: 2, within: 10.minutes, by: -> { rate_limit_identifier }, only: :create
 
-    rescue_from SendHireRequestUseCase::ValidationError, with: :render_validation_error
+    rescue_from ValidationError, with: :render_validation_error
 
     def create
       RecordAgentConnectionUseCase.new.execute(tool: "hire")

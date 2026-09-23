@@ -1,13 +1,4 @@
 class SendHireRequestUseCase
-  class ValidationError < ArgumentError
-    attr_reader :errors
-
-    def initialize(errors)
-      @errors = errors
-      super(errors.values.join(", "))
-    end
-  end
-
   def execute(name:, contact:, brief:, agent: nil)
     errors = {}
     errors[:name] = "can't be blank" if name.blank?

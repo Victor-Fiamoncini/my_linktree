@@ -2,7 +2,7 @@ class ContactsController < ApplicationController
   rate_limit to: 2, within: 10.minutes, by: -> { rate_limit_identifier }, only: :create
 
   rescue_from StandardError, with: :render_internal_error
-  rescue_from SendContactEmailUseCase::ValidationError, with: :render_validation_error
+  rescue_from ValidationError, with: :render_validation_error
   rescue_from ActionController::TooManyRequests, with: :render_too_many_requests
   rescue_from ActionController::InvalidAuthenticityToken, with: :render_invalid_authenticity_token
 

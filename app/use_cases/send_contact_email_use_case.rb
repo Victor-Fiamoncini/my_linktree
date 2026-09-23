@@ -1,13 +1,4 @@
 class SendContactEmailUseCase
-  class ValidationError < ArgumentError
-    attr_reader :errors
-
-    def initialize(errors)
-      @errors = errors
-      super(errors.values.join(", "))
-    end
-  end
-
   EMAIL_FORMAT = URI::MailTo::EMAIL_REGEXP
 
   def execute(name:, email:, message:)
