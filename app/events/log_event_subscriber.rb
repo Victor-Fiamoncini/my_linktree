@@ -1,5 +1,4 @@
-# The local counterpart to the subscriber logtail-rails registers in production, so the same
-# events are readable in the development log and assertable in specs.
+# Local counterpart to the subscriber logtail-rails registers in production.
 class LogEventSubscriber
   def emit(event)
     payload = event[:payload].presence || {}

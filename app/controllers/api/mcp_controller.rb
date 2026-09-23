@@ -74,8 +74,7 @@ module Api
       jsonrpc_payload.dig("params", "name")
     end
 
-    # Memoized: both rate limiters and the 429 handler need the method and tool name, and the
-    # body can only be read once. The rewind is what lets the transport read it afterwards.
+    # Memoized: the body can only be read once, and the rewind is what lets the transport read it.
     def jsonrpc_payload
       @jsonrpc_payload ||= parse_jsonrpc_body
     end

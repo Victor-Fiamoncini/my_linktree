@@ -43,8 +43,7 @@ class ContactsController < ApplicationController
     render json: { message: t("contacts.invalid_authenticity_token") }, status: :unprocessable_content
   end
 
-  # See Api::BaseController#render_internal_server_error on logging the class rather than the
-  # exception object.
+  # See Api::BaseController#render_internal_server_error.
   def render_internal_error(e)
     Rails.logger.error("#{e.class}: #{e.message}")
 

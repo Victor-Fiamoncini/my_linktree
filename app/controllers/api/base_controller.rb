@@ -7,8 +7,7 @@ module Api
 
     private
 
-    # Log the class and message, not the exception object — the default formatter just calls #to_s,
-    # which drops both the class and the backtrace.
+    # Log class + message, not the exception — the default formatter drops both.
     def render_internal_server_error(e)
       Rails.logger.error("#{e.class}: #{e.message}")
 
