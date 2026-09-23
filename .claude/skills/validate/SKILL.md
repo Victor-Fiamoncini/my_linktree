@@ -47,6 +47,14 @@ the right trade before a push and the wrong one after every edit.
 Keep `config/ci.rb` as the single source of truth. If a check is added there, add it to the fast
 path here too, so the two tiers can't drift apart.
 
+## System specs need the Tailwind build
+
+`app/assets/builds/` is gitignored, so a fresh clone or a `git worktree` has no CSS. The five
+Cuprite system specs then drive a headless browser against an unstyled page and fail on things
+like `expect(page).not_to have_button("Reach Out")` — which reads like a broken feature but isn't.
+`bin/dev` keeps the build current while you work, so this only bites in a fresh checkout. Fix it
+with `bin/rails tailwindcss:build`; `bin/ci` runs that step for you.
+
 ## Before you start: Postgres must be running
 
 Every spec run needs the Postgres 16 container from `compose.yml`. It does not survive a reboot,
