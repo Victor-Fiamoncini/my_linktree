@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe UseCases::GetProfileUseCase do
+RSpec.describe GetProfileUseCase do
   let(:config) do
     {
       name: "Jane",

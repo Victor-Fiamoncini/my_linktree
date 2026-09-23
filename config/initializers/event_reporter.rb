@@ -17,7 +17,7 @@ Rails.application.config.after_initialize do
 
   app_root = Rails.root.to_s
 
-  Rails.event.subscribe(EventSubscribers::LogEventSubscriber.new) do |event|
+  Rails.event.subscribe(LogEventSubscriber.new) do |event|
     event.dig(:source_location, :filepath)&.start_with?(app_root)
   end
 end

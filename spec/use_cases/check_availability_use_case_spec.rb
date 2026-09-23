@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe UseCases::CheckAvailabilityUseCase do
+RSpec.describe CheckAvailabilityUseCase do
   # 2027-03-03 08:00 UTC is a Wednesday (wday 3), both in UTC and in America/Sao_Paulo (UTC-3).
   let(:frozen_time) { Time.utc(2027, 3, 3, 8, 0, 0) }
   let(:availability_config) do

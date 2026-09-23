@@ -4,9 +4,9 @@ class ListServicesTool < MCP::Tool
   input_schema(properties: {})
 
   def self.call(**)
-    UseCases::RecordAgentConnectionUseCase.new.execute(tool: "list_services")
+    RecordAgentConnectionUseCase.new.execute(tool: "list_services")
 
-    services = UseCases::ListServicesUseCase.new.execute(locale: :en)
+    services = ListServicesUseCase.new.execute(locale: :en)
     MCP::Tool::Response.new([ { type: "text", text: services.to_json } ])
   end
 end

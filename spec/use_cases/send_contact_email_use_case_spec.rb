@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe UseCases::SendContactEmailUseCase do
+RSpec.describe SendContactEmailUseCase do
   it "sends a contact email" do
     expect {
       perform_enqueued_jobs do

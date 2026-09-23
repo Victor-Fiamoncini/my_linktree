@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe UseCases::RecordAgentConnectionUseCase do
+RSpec.describe RecordAgentConnectionUseCase do
   it "creates an agent connection record for the given tool" do
     expect {
       described_class.new.execute(tool: "get_resume")

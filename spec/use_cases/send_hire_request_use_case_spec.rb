@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe UseCases::SendHireRequestUseCase do
+RSpec.describe SendHireRequestUseCase do
   let(:valid_params) { { name: "Jane", contact: "jane@example.com", brief: "Build me a thing" } }
 
   it "sends a hire request email" do

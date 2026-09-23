@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe UseCases::GetXpYearsUseCase do
+RSpec.describe GetXpYearsUseCase do
   it "returns the number of years since the start year of work" do
     travel_to Time.utc(2027, 3, 1) do
       expect(described_class.new.execute).to eq(8)

@@ -4,9 +4,9 @@ class CheckAvailabilityTool < MCP::Tool
   input_schema(properties: {})
 
   def self.call(**)
-    UseCases::RecordAgentConnectionUseCase.new.execute(tool: "check_availability")
+    RecordAgentConnectionUseCase.new.execute(tool: "check_availability")
 
-    result = UseCases::CheckAvailabilityUseCase.new.execute
+    result = CheckAvailabilityUseCase.new.execute
     MCP::Tool::Response.new([ { type: "text", text: result.to_json } ])
   end
 end

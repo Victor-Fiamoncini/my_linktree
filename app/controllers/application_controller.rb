@@ -24,7 +24,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_default_description
-    xp_years = UseCases::GetXpYearsUseCase.new.execute
+    xp_years = GetXpYearsUseCase.new.execute
 
     @default_description = t("seo.default_description", xp_years: xp_years)
   end

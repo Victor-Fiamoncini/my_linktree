@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe UseCases::ListRecentConnectionsUseCase do
+RSpec.describe ListRecentConnectionsUseCase do
   it "returns recent connections as tool/timestamp hashes, newest first" do
     AgentConnection.create!(tool: "get_resume", created_at: 2.minutes.ago)
     AgentConnection.create!(tool: "schedule_meeting", created_at: 1.minute.ago)

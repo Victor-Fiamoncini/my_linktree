@@ -37,7 +37,7 @@ RSpec.describe "Api::Telemetry", type: :request do
   end
 
   it "reports an api.error event with the class and backtrace when the action blows up" do
-    allow(UseCases::ListRecentConnectionsUseCase).to receive(:new).and_raise(ArgumentError, "boom")
+    allow(ListRecentConnectionsUseCase).to receive(:new).and_raise(ArgumentError, "boom")
 
     events = captured_events { get "/api/telemetry" }
 

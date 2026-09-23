@@ -1,8 +1,8 @@
 require "rails_helper"
 
-RSpec.describe UseCases::ScheduleMeetingUseCase do
+RSpec.describe ScheduleMeetingUseCase do
   let(:slot_start) { "2027-03-03T12:00:00.000Z" }
-  let(:check_availability_use_case) { instance_double(UseCases::CheckAvailabilityUseCase, execute: { timezone: "UTC", slots: [ slot_start ] }) }
+  let(:check_availability_use_case) { instance_double(CheckAvailabilityUseCase, execute: { timezone: "UTC", slots: [ slot_start ] }) }
   let(:use_case) { described_class.new(check_availability_use_case: check_availability_use_case) }
 
   it "books the slot and sends confirmation + notification emails" do

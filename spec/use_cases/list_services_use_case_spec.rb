@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe UseCases::ListServicesUseCase do
+RSpec.describe ListServicesUseCase do
   let(:config) do
     {
       services: [
