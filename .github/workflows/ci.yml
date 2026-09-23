@@ -39,6 +39,63 @@ jobs:
       - name: Scan for security vulnerabilities in JavaScript dependencies
         run: bin/importmap audit
 
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: my_linktree
+          POSTGRES_PASSWORD: my_linktree
+          POSTGRES_DB: my_linktree_test
+        ports:
+          - 5432:5432
+        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=5
+
+    env:
+      RAILS_ENV: test
+      DATABASE_HOST: localhost
+      DATABASE_USERNAME: my_linktree
+      DATABASE_PASSWORD: my_linktree
+      # config/master.key is gitignored; the test environment falls back to the shared
+      # config/credentials.yml.enc for secret_key_base and the mailer block.
+      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            google-chrome-stable libvips postgresql-client
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Prepare the test database
+        run: bin/rails db:test:prepare
+
+      # app/assets/builds/ is gitignored, so a fresh checkout has no CSS and the
+      # Cuprite system specs would fail against an unstyled page.
+      - name: Build Tailwind CSS
+        run: bin/rails tailwindcss:build
+
+      - name: Run the RSpec suite
+        run: bundle exec rspec
+
+      - name: Upload failure screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: rspec-failure-screenshots
+          path: ${{ github.workspace }}/tmp/screenshots
+          if-no-files-found: ignore
+
   lint:
     runs-on: ubuntu-latest
     env:

@@ -2,12 +2,12 @@ class ContactsController < ApplicationController
   rate_limit to: 2, within: 10.minutes, by: -> { rate_limit_identifier }, only: :create
 
   rescue_from StandardError, with: :render_internal_error
-  rescue_from UseCases::SendContactEmailUseCase::ValidationError, with: :render_validation_error
+  rescue_from ValidationError, with: :render_validation_error
   rescue_from ActionController::TooManyRequests, with: :render_too_many_requests
   rescue_from ActionController::InvalidAuthenticityToken, with: :render_invalid_authenticity_token
 
   def create
-    UseCases::SendContactEmailUseCase.new.execute(**contact_params)
+    SendContactEmailUseCase.new.execute(**contact_params)
 
     Rails.event.notify(
       "contact.message.sent",
@@ -43,8 +43,7 @@ class ContactsController < ApplicationController
     render json: { message: t("contacts.invalid_authenticity_token") }, status: :unprocessable_content
   end
 
-  # See Api::BaseController#render_internal_server_error on logging the class rather than the
-  # exception object.
+  # See Api::BaseController#render_internal_server_error.
   def render_internal_error(e)
     Rails.logger.error("#{e.class}: #{e.message}")
 

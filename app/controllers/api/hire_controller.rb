@@ -2,12 +2,12 @@ module Api
   class HireController < BaseController
     rate_limit to: 2, within: 10.minutes, by: -> { rate_limit_identifier }, only: :create
 
-    rescue_from UseCases::SendHireRequestUseCase::ValidationError, with: :render_validation_error
+    rescue_from ValidationError, with: :render_validation_error
 
     def create
-      UseCases::RecordAgentConnectionUseCase.new.execute(tool: "hire")
+      RecordAgentConnectionUseCase.new.execute(tool: "hire")
 
-      UseCases::SendHireRequestUseCase.new.execute(**hire_params)
+      SendHireRequestUseCase.new.execute(**hire_params)
 
       Rails.event.notify(
         "hire.request.received",

@@ -11,9 +11,9 @@ class ScheduleMeetingTool < MCP::Tool
   )
 
   def self.call(name: nil, email: nil, company: nil, slot_start: nil, **)
-    UseCases::RecordAgentConnectionUseCase.new.execute(tool: "schedule_meeting")
+    RecordAgentConnectionUseCase.new.execute(tool: "schedule_meeting")
 
-    booking = UseCases::ScheduleMeetingUseCase.new.execute(name: name, email: email, company: company, slot_start: slot_start)
+    booking = ScheduleMeetingUseCase.new.execute(name: name, email: email, company: company, slot_start: slot_start)
 
     Rails.event.notify(
       "mcp.meeting.booked",
