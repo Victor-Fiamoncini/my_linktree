@@ -332,6 +332,17 @@ own. Controllers are covered by `spec/requests/*` rather than controller specs �
 `ApplicationController#rate_limit_identifier` and `Api::BaseController`'s shared `rescue_from`
 handlers are pinned in `spec/requests/api/telemetry_spec.rb` and `spec/requests/api/mcp_spec.rb`.
 
+There are **no view specs** and `config.infer_spec_type_from_file_location!` stays commented out,
+so a file under a `spec/views/` directory wouldn't even get `type: :view` without saying so.
+Templates are covered through the layer that renders them instead: the mailer views by
+`spec/mailers/*` (which assert on `mail.body.encoded`), `static/sitemap.xml.erb` by
+`spec/requests/static_spec.rb`, the contact form and telemetry feed by `spec/system/*`, and the
+`<head>` SEO block — JSON-LD graph, hreflang alternates, canonical — by
+`spec/requests/pages_spec.rb`, since those fail silently and a broken one looks fine on the page.
+The rest of `app/views/pages/` and `app/views/shared/` is smoke-covered only: it renders during
+`get /en`, so a raise fails the suite, but no assertion pins its content. That's deliberate —
+markup assertions churn on cosmetic edits.
+
 Nothing truncates the test database between runs, so a stray `RAILS_ENV=test bin/rails runner`
 that writes a row will break the specs asserting absolute `AgentConnection` counts
 (`spec/models/agent_connection_spec.rb`, `spec/requests/api/telemetry_spec.rb`). Clean up after
