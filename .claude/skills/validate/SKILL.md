@@ -69,6 +69,12 @@ RAILS_ENV=test bin/rails runner 'AgentConnection.delete_all; Booking.delete_all'
 Re-run; if they still fail, it really is the change. Clean up after any `bin/rails runner` of your
 own against the test environment.
 
+**Coverage floor, not a broken spec.** `SimpleCov failed with exit 2 due to a coverage related
+error`, printed after `0 failures`, means the whole suite passed but line coverage fell under 99%
+or branch coverage under 98% (configured at the top of `spec/spec_helper.rb`). The output lists
+the files that dropped. Add the missing spec rather than lowering the floor. A single-file run
+never trips this — the check is skipped when RSpec is given a path.
+
 **Date-sensitive specs.** `CheckAvailabilityUseCase` and `GetXpYearsUseCase` depend on the current
 date and their specs use `travel_to`. A failure that appears only today, in a spec you didn't
 touch, is worth checking against the clock first.
