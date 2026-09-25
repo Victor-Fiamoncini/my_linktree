@@ -33,6 +33,16 @@ RSpec.describe "Pages", type: :request do
       expect(response).to redirect_to("/pt-BR?utm_source=newsletter&utm_medium=email")
     end
 
+    # Header bytes aren't validated as UTF-8 anywhere upstream, and ApplicationController has no
+    # rescue_from — an unscrubbed header raised straight out of here as a 500 on the root URL.
+    it "redirects rather than 500s on headers that aren't valid UTF-8" do
+      get "/", headers: { "Accept-Language" => "pt\xFF\xFE" }
+      expect(response).to redirect_to("/pt-BR")
+
+      get "/", headers: { "CF-IPCountry" => "B\xFFR", "Accept-Language" => "pt-BR" }
+      expect(response).to redirect_to("/en")
+    end
+
     # A cached redirect would serve one visitor's language to the next.
     it "forbids caching, since the target varies per visitor" do
       get "/", headers: { "CF-IPCountry" => "BR" }

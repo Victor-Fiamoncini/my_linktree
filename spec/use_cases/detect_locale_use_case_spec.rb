@@ -12,6 +12,11 @@ RSpec.describe DetectLocaleUseCase do
       expect(use_case.execute(country_code: "US")).to eq(:en)
     end
 
+    # A garbled code is still a country that isn't Brazil, so it vetoes like "ZZ" would.
+    it "survives bytes that aren't valid UTF-8" do
+      expect(use_case.execute(country_code: "B\xFFR", accept_language: "pt-BR")).to eq(:en)
+    end
+
     # Deliberate: Brazil on an English laptop still gets Portuguese, and vice versa.
     it "ignores Accept-Language once a country is known" do
       expect(use_case.execute(country_code: "US", accept_language: "pt-BR,pt;q=0.9")).to eq(:en)
@@ -76,13 +81,40 @@ RSpec.describe DetectLocaleUseCase do
       expect(use_case.execute(accept_language: ",,,")).to eq(:en)
       expect(use_case.execute(accept_language: "pt;;;q=0.5;;")).to eq(:"pt-BR")
     end
+
+    # Header values are raw bytes. Without the scrub, downcase and the regex both raise
+    # ArgumentError here and the bare "/" 500s.
+    it "survives bytes that aren't valid UTF-8" do
+      expect(use_case.execute(accept_language: "\xFF\xFE")).to eq(:en)
+      expect(use_case.execute(accept_language: "pt\xFF,en")).to eq(:"pt-BR")
+      expect(use_case.execute(accept_language: "\xC3\x28,pt")).to eq(:"pt-BR")
+    end
+
+    it "handles a NUL byte and an absurdly long header" do
+      expect(use_case.execute(accept_language: "pt\u0000,en")).to eq(:"pt-BR")
+      expect(use_case.execute(accept_language: ([ "de" ] * 5_000).join(",") + ",pt")).to eq(:"pt-BR")
+    end
   end
 
   it "defaults to English when there is nothing to go on" do
     expect(use_case.execute).to eq(:en)
   end
 
+  # Nothing checks the return against the route constraint at runtime, and the constraint is its
+  # own hardcoded regex — a locale outside it would 302 the bare "/" straight into a 404, so every
+  # path that can produce one is exercised here rather than just the BR one.
   it "only ever returns a locale the /:locale route constraint accepts" do
-    expect(I18n.available_locales).to include(use_case.execute(country_code: "BR"))
+    [
+      { country_code: "BR" },
+      { country_code: "US" },
+      { country_code: "XX", accept_language: "pt-BR" },
+      { accept_language: "de" },
+      {}
+    ].each do |signals|
+      locale = use_case.execute(**signals)
+
+      expect(Rails.application.routes.recognize_path("/#{locale}"))
+        .to include(controller: "pages", action: "home"), "#{signals.inspect} produced #{locale.inspect}"
+    end
   end
 end

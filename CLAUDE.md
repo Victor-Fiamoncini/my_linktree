@@ -211,11 +211,14 @@ assertions churn on cosmetic edits.
 
 **Coverage**: SimpleCov is configured at the top of `spec/spec_helper.rb` (line *and* branch), so
 a plain `bundle exec rspec` prints the numbers and writes `coverage/index.html`. It uses
-`track_files "{app,lib}/**/*.rb"` because Zeitwerk doesn't eager-load in test — without it a file
-no spec touches would be missing from the report instead of counted as 0%. The floor
+`cover "{app,lib}/**/*.rb"` — not the deprecated `track_files` — because Zeitwerk doesn't
+eager-load in test: without it a file no spec touches would be missing from the report instead of
+counted as 0%, and `cover` additionally scopes the report to `app/` and `lib/`. The floor
 (`minimum_coverage line: 99, branch: 98`) is a ratchet set just under the current numbers, and it
-only applies to a whole-suite run: a single-file run covers almost nothing by definition, so the
-config skips the check when RSpec was given a path. A breach exits **2** with
+only applies to a whole-suite run: the config skips the check when an argument contains `spec/`.
+That's a literal string test, so a filtered run with *no* path — `rspec -e "..."`,
+`--only-failures`, `--next-failure` — still enforces the floor and fails on whatever the subset
+happened to cover. A breach exits **2** with
 `SimpleCov failed with exit 2 due to a coverage related error` *after* the specs have all passed —
 it reads like a suite failure but isn't.
 
