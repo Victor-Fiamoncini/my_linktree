@@ -44,6 +44,39 @@ RSpec.describe "Contacts", type: :request do
       ActionController::Base.allow_forgery_protection = original
     end
 
+    # The catch-all rescue_from StandardError — the path that decides whether an unexpected
+    # failure reaches the visitor as a handled JSON error or as a raw 500.
+    it "reports contact.error and renders a handled 500 when delivery fails unexpectedly" do
+      use_case = instance_double(SendContactEmailUseCase)
+      allow(SendContactEmailUseCase).to receive(:new).and_return(use_case)
+      allow(use_case).to receive(:execute).and_raise(Errno::ECONNREFUSED, "mail provider unreachable")
+
+      events = captured_events { post_contact(valid_params) }
+
+      expect(response).to have_http_status(:internal_server_error)
+      expect(response.parsed_body).to include("message", "action")
+
+      payload = find_event(events, "contact.error")[:payload]
+      expect(payload).to include(severity: "error", error_class: "Errno::ECONNREFUSED")
+      expect(payload[:error_message]).to include("mail provider unreachable")
+      expect(payload[:backtrace].size).to be <= 5
+    end
+
+    # An exception that never propagated has no backtrace, and &.first(5) is what keeps the
+    # handler from turning that into a second, harder-to-trace error.
+    it "still reports contact.error when the exception carries no backtrace" do
+      error = Errno::ECONNREFUSED.new("unreachable")
+      allow(error).to receive(:backtrace).and_return(nil)
+      use_case = instance_double(SendContactEmailUseCase)
+      allow(SendContactEmailUseCase).to receive(:new).and_return(use_case)
+      allow(use_case).to receive(:execute).and_raise(error)
+
+      events = captured_events { post_contact(valid_params) }
+
+      expect(response).to have_http_status(:internal_server_error)
+      expect(find_event(events, "contact.error")[:payload][:backtrace]).to be_nil
+    end
+
     it "reports contact.rate_limited once the window is exhausted" do
       headers = json_headers.merge("X-Forwarded-For" => "5.5.5.5")
       2.times { post_contact(valid_params, headers: headers) }

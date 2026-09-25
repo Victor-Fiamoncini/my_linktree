@@ -39,11 +39,29 @@ RSpec.describe ScheduleMeetingUseCase do
     }.to raise_error(ArgumentError, "Slot unavailable")
   end
 
-  it "raises ArgumentError on a double-booking race" do
+  it "raises ArgumentError when the slot was booked before this request validated" do
     Booking.create!(name: "Bob", email: "bob@example.com", slot_start: slot_start)
 
     expect {
       use_case.execute(name: "Jane", email: "jane@example.com", slot_start: slot_start)
     }.to raise_error(ArgumentError, "Slot unavailable")
+  end
+
+  # The case above is caught by the uniqueness validation, which runs a SELECT. Two requests that
+  # validate concurrently both pass it, and only the unique index on slot_start rejects the loser
+  # — so this is the one double-booking path the validation cannot see.
+  it "turns a lost insert race into the same domain error, not a 500" do
+    racing_booking = Booking.new(name: "Jane", email: "jane@example.com", slot_start: slot_start)
+    allow(racing_booking).to receive(:save).and_raise(ActiveRecord::RecordNotUnique, "PG::UniqueViolation")
+    allow(Booking).to receive(:new).and_return(racing_booking)
+
+    expect {
+      expect {
+        use_case.execute(name: "Jane", email: "jane@example.com", slot_start: slot_start)
+      }.to raise_error(ArgumentError, "Slot unavailable")
+    }.not_to change(Booking, :count)
+
+    # A booking that lost the race must not tell the person it succeeded.
+    assert_no_enqueued_emails
   end
 end

@@ -12,6 +12,16 @@ RSpec.describe "Api::Mcp", type: :request do
     response.parsed_body
   end
 
+  # The rate limiter's `unless:` proc parses the body on every POST to spot schedule_meeting
+  # calls, so a body that isn't JSON has to degrade to an empty payload and let the transport
+  # answer, rather than raising out of the limiter before the request is ever handled.
+  it "treats an unparseable body as an empty JSON-RPC payload" do
+    post "/api/mcp", params: "{ this is not json", headers: headers.merge("Content-Type" => "text/plain")
+
+    expect(response).to have_http_status(:unsupported_media_type)
+    expect(response.parsed_body.dig("error", "code")).to eq(-32600)
+  end
+
   it "handles the initialize handshake" do
     post "/api/mcp",
       params: rpc(id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "rspec", version: "1.0" } }),

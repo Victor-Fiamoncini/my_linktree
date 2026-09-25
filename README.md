@@ -259,6 +259,17 @@ of the credentials entirely disables the drain and falls back to plain STDOUT lo
   *because* the MCP exemption rule already checks "All Super Bot Fight Mode Rules" — confirm that
   checkbox is still checked before turning this on, or it will 403 AI-agent traffic to `/api/mcp`
   the same way "Block AI bots" would.
+- **IP Geolocation** (Rules → Settings) must stay **on**, or `CF-IPCountry` never reaches Rails and
+  `PagesController#root_redirect` silently falls back to `Accept-Language` — nothing looks broken.
+  Safe to trust unconditionally for the same reason as `CF-Connecting-IP`: the origin firewall
+  below restricts inbound 80/443 to Cloudflare's ranges, so no outside client can forge it.
+
+  ```bash
+  curl -s -o /dev/null -w "%{redirect_url}\n" https://www.victorfiamon.com.br/
+  ```
+
+  Expect `.../en` from a non-Brazilian network and `.../pt-BR` from a Brazilian IP or VPN exit;
+  `/en` from Brazil means IP Geolocation is off.
 - **Origin firewall**: none of the above matters if the origin VPS accepts direct connections —
   Cloudflare's proxy, DDoS protection, and every rule above are bypassed by anyone who requests the
   IP directly instead of the domain (Kamal auto-provisions a real Let's Encrypt cert on the VPS

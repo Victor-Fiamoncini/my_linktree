@@ -17,10 +17,8 @@ Rails.application.routes.draw do
     match "mcp" => "mcp#create", via: [ :post, :get, :options, :delete ]
   end
 
-  # Bare "/" has no canonical locale of its own — English is the default language
-  # for every visitor; switching to pt-BR is an explicit choice via the header
-  # language switcher, never auto-detected from the browser.
-  get "/", to: redirect("/en", status: 302)
+  # 302, never 301 — a cached permanent redirect would pin a browser to one language forever.
+  get "/", to: "pages#root_redirect"
 
   scope "/:locale", constraints: { locale: /en|pt-BR/ } do
     root "pages#home"
