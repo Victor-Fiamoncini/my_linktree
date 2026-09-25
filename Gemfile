@@ -79,6 +79,9 @@ group :test do
 
   # Headless Chrome driver for Capybara via CDP, no chromedriver version management needed [https://github.com/rubycdp/cuprite]
   gem "cuprite"
+
+  # Line and branch coverage, configured at the top of spec/spec_helper.rb [https://github.com/simplecov-ruby/simplecov]
+  gem "simplecov", require: false
 end
 
 group :development do

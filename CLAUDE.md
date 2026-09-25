@@ -141,6 +141,18 @@ config/
   short-circuit before calling the tool, but this app records the agent connection *before*
   validating, even for calls that go on to fail. Validation happens inside the use cases, with
   domain errors caught in the tool's `call` and turned into `error: true` responses, not raised.
+- **Locale routing**: every user-facing page sits under `scope "/:locale"` (`en|pt-BR`), and
+  `ApplicationController#switch_locale` reads `params[:locale]` generically, serving both the route
+  segment and the `locale` field in the contact form's JSON body. The bare `/` has no locale, so
+  `PagesController#root_redirect` 302s it to whatever `DetectLocaleUseCase` picks: `CF-IPCountry`
+  first, then `Accept-Language` when there's no country (`XX`/`T1` count as none), then `:en`.
+  Country *vetoes* `Accept-Language` rather than outranking it, and only `BR` maps to Portuguese —
+  Portugal and the rest get English on purpose, since the one translation is Brazilian. Nothing is
+  persisted, so a visitor who switches to `/en` is sent back to `/pt-BR` on their next bare-`/`
+  entry; locale-scoped links (`root_path`) keep the locale they're already on. The redirect is
+  `:found` with `Cache-Control: private, no-store` — a cached 301 would pin a browser to one
+  language forever. Only `/` is detected, so canonical, `hreflang`, `x-default` and the sitemap
+  need no geo awareness.
 - **Agent-facing surface**: `/AGENTS.md` (prose, `text/markdown`) and `/llms.txt` (a link index in
   the [llmstxt.org](https://llmstxt.org) shape, `text/plain`) are two *different* bodies for two
   conventions, both in `config/agents.yml` and rendered by `AgentsContent`. Both lead with the MCP
@@ -196,6 +208,19 @@ by `spec/requests/static_spec.rb`, the contact form and telemetry feed by `spec/
 — a broken one looks fine on the page). The rest of `app/views/` is smoke-covered only: it renders
 during `get /en`, so a raise fails the suite, but nothing pins its content, since markup
 assertions churn on cosmetic edits.
+
+**Coverage**: SimpleCov is configured at the top of `spec/spec_helper.rb` (line *and* branch), so
+a plain `bundle exec rspec` prints the numbers and writes `coverage/index.html`. It uses
+`cover "{app,lib}/**/*.rb"` — not the deprecated `track_files` — because Zeitwerk doesn't
+eager-load in test: without it a file no spec touches would be missing from the report instead of
+counted as 0%, and `cover` additionally scopes the report to `app/` and `lib/`. The floor
+(`minimum_coverage line: 99, branch: 98`) is a ratchet set just under the current numbers, and it
+only applies to a whole-suite run: the config skips the check when an argument contains `spec/`.
+That's a literal string test, so a filtered run with *no* path — `rspec -e "..."`,
+`--only-failures`, `--next-failure` — still enforces the floor and fails on whatever the subset
+happened to cover. A breach exits **2** with
+`SimpleCov failed with exit 2 due to a coverage related error` *after* the specs have all passed —
+it reads like a suite failure but isn't.
 
 Nothing truncates the test database between runs, so a stray `RAILS_ENV=test bin/rails runner`
 that writes a row will break the specs asserting absolute `AgentConnection` counts. Clean up after

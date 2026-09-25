@@ -47,6 +47,19 @@ RSpec.describe "Api::Telemetry", type: :request do
     expect(payload[:backtrace]).to be_an(Array)
   end
 
+  # An exception that never propagated has no backtrace; &.first(5) is what stops the error
+  # handler from raising a second, more confusing error on top of the first.
+  it "still reports api.error when the exception carries no backtrace" do
+    error = ArgumentError.new("boom")
+    allow(error).to receive(:backtrace).and_return(nil)
+    allow(ListRecentConnectionsUseCase).to receive(:new).and_raise(error)
+
+    events = captured_events { get "/api/telemetry" }
+
+    expect(response).to have_http_status(:internal_server_error)
+    expect(find_event(events, "api.error")[:payload][:backtrace]).to be_nil
+  end
+
   it "reports an api.rate_limited event naming the throttled endpoint" do
     60.times { get "/api/telemetry" }
 
