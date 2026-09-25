@@ -1,0 +1,24 @@
+<% content_for :title, t("errors.not_found.title") %>
+<% content_for :og_title, t("errors.not_found.og_title") %>
+<% content_for :description, t("errors.not_found.description") %>
+<% content_for :canonical, @localized_path %>
+<% content_for :robots, "noindex, nofollow" %>
+
+<main class="bg-ctp-base flex flex-1 flex-col items-center px-8 py-16">
+  <section class="w-full max-w-[1080px]">
+    <p class="text-ctp-pink mb-3.5 font-mono text-[13px] tracking-[0.06em] break-all">$ cd <%= @localized_path %></p>
+
+    <h1 class="text-ctp-text mb-4 text-[28px] font-semibold tracking-[-0.025em] sm:text-[34px]"><%= t("errors.not_found.heading") %></h1>
+
+    <p class="text-ctp-subtext0 mb-6 w-full text-[17px] leading-[1.7] text-pretty"><%= t("errors.not_found.body") %></p>
+
+    <div class="border-ctp-surface0 rounded-btn mb-8 border bg-[#1e1e2e] px-4 py-3 font-mono text-xs">
+      <p class="text-ctp-red"><%= t("errors.not_found.shell_error") %></p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-4 font-mono text-[13px]">
+      <%= link_to t("errors.not_found.home_label"), root_path, title: t("errors.not_found.home_title"), class: "bg-ctp-blue text-ctp-crust rounded-btn hover:bg-ctp-lavender inline-flex items-center px-4 py-2 transition-all duration-200 hover:-translate-y-0.5" %>
+      <%= link_to t("errors.not_found.telemetry_label"), telemetry_path, title: t("errors.not_found.telemetry_title"), class: "text-ctp-subtext0 hover:text-ctp-green transition-colors" %>
+    </div>
+  </section>
+</main>

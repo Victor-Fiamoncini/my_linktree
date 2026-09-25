@@ -1,9 +1,6 @@
 class PagesController < ApplicationController
   def root_redirect
-    locale = DetectLocaleUseCase.new.execute(
-      country_code: request.headers["CF-IPCountry"],
-      accept_language: request.headers["Accept-Language"]
-    )
+    locale = detected_locale
 
     response.set_header("Cache-Control", "private, no-store")
 

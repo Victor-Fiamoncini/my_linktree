@@ -153,6 +153,13 @@ config/
   `:found` with `Cache-Control: private, no-store` — a cached 301 would pin a browser to one
   language forever. Only `/` is detected, so canonical, `hreflang`, `x-default` and the sitemap
   need no geo awareness.
+- **404 page**: `config.exceptions_app` routes *only* 404s to `ErrorsController#not_found`; every
+  other status still falls back to `public/*.html`, as does a 404 page that raises (reported via
+  `Rails.error`, source `errors_controller`). There's no `/404` route and no catch-all.
+  Locale comes from the original path's `/en|/pt-BR` prefix, else `detected_locale` (shared with
+  `root_redirect`); unknown `/api/*` paths get JSON. Only reachable when
+  `show_detailed_exceptions` is false, so dev shows the debug page — `spec/requests/errors_spec.rb`
+  flips that per-example.
 - **Agent-facing surface**: `/AGENTS.md` (prose, `text/markdown`) and `/llms.txt` (a link index in
   the [llmstxt.org](https://llmstxt.org) shape, `text/plain`) are two *different* bodies for two
   conventions, both in `config/agents.yml` and rendered by `AgentsContent`. Both lead with the MCP

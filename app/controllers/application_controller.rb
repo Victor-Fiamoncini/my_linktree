@@ -19,6 +19,13 @@ class ApplicationController < ActionController::Base
     I18n.with_locale(locale, &action)
   end
 
+  def detected_locale
+    DetectLocaleUseCase.new.execute(
+      country_code: request.headers["CF-IPCountry"],
+      accept_language: request.headers["Accept-Language"]
+    )
+  end
+
   def set_default_description
     xp_years = GetXpYearsUseCase.new.execute
 

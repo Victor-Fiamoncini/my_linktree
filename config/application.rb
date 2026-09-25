@@ -42,5 +42,16 @@ module MyLinktree
     config.i18n.available_locales = [ :en, :"pt-BR" ]
     config.i18n.default_locale = :en
     config.i18n.fallbacks = true
+
+    # Only 404 gets the localized ERB page; every other status, or a failing 404 page, keeps public/*.html.
+    config.exceptions_app = ->(env) do
+      public_exceptions = ActionDispatch::PublicExceptions.new(Rails.public_path)
+      return public_exceptions.call(env) unless env["PATH_INFO"] == "/404"
+
+      ErrorsController.action(:not_found).call(env)
+    rescue StandardError => e
+      Rails.error.report(e, handled: true, source: "errors_controller")
+      public_exceptions.call(env)
+    end
   end
 end

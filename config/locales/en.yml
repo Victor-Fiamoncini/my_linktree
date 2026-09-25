@@ -83,6 +83,19 @@ en:
     error: "# error: something went wrong while loading live telemetry."
     empty: "# no agent connections yet."
 
+  errors:
+    not_found:
+      title: "Page Not Found"
+      og_title: "Page Not Found — Victor Fiamoncini"
+      description: "The page you're looking for doesn't exist or has moved."
+      heading: "404 — Page not found"
+      body: "The page you're looking for doesn't exist, has moved, or never did. Head back home or take a look at what the agents are up to."
+      shell_error: "cd: no such file or directory"
+      home_label: "cd ~"
+      home_title: "Go to the home page"
+      telemetry_label: "/telemetry ↗"
+      telemetry_title: "View live telemetry"
+
   experiences_helper:
     present: "Present"
     tech_categories:

@@ -83,6 +83,19 @@ pt-BR:
     error: "# erro: algo deu errado ao carregar a telemetria ao vivo."
     empty: "# nenhuma conexão de agente ainda."
 
+  errors:
+    not_found:
+      title: "Página Não Encontrada"
+      og_title: "Página Não Encontrada — Victor Fiamoncini"
+      description: "A página que você procura não existe ou foi movida."
+      heading: "404 — Página não encontrada"
+      body: "A página que você procura não existe, foi movida ou nunca existiu. Volte para o início ou veja o que os agentes andam fazendo."
+      shell_error: "cd: arquivo ou diretório inexistente"
+      home_label: "cd ~"
+      home_title: "Ir para a página inicial"
+      telemetry_label: "/telemetry ↗"
+      telemetry_title: "Ver telemetria ao vivo"
+
   experiences_helper:
     present: "Atual"
     tech_categories:

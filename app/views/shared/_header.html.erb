@@ -8,7 +8,7 @@
   other_locale = I18n.locale == :en ? "pt-BR" : "en"
   other_language_name = t("shared.header.other_language_name")
   switch_label = I18n.locale == :en ? "PT-BR" : "EN"
-  switch_path = request.path.sub(%r{\A/(en|pt-BR)}, "/#{other_locale}")
+  switch_path = (content_for(:canonical) || request.path).sub(%r{\A/(en|pt-BR)}, "/#{other_locale}")
   nav_link_classes = {
     "blue" => "text-ctp-subtext0 hover:text-ctp-blue relative pb-0.5 transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-ctp-blue after:transition-all after:duration-300 hover:after:w-full",
     "mauve" => "text-ctp-subtext0 hover:text-ctp-mauve relative pb-0.5 transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-ctp-mauve after:transition-all after:duration-300 hover:after:w-full",
