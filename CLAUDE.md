@@ -69,7 +69,7 @@ and book a meeting.
 ```
 app/
   controllers/
-    application_controller.rb   # @default_description, allow_browser, rate_limit_identifier
+    application_controller.rb   # allow_browser, switch_locale, rate_limit_identifier
     contacts_controller.rb      # POST /contact — JSON response
     static_controller.rb        # AGENTS.md, llms.txt, sitemap.xml
     pages_controller.rb, telemetry_page_controller.rb
