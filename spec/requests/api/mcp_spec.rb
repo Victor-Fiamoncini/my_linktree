@@ -40,8 +40,8 @@ RSpec.describe "Api::Mcp", type: :request do
     expect(server_info["title"]).to eq(SeoConfig::SITE_NAME)
     expect(server_info["websiteUrl"]).to eq(SeoConfig::SITE_URL)
     expect(server_info["icons"]).to contain_exactly(
-      { "mimeType" => "image/png", "sizes" => "192x192", "src" => SeoConfig::MCP_ICON_192 },
-      { "mimeType" => "image/png", "sizes" => "512x512", "src" => SeoConfig::MCP_ICON_512 }
+      { "mimeType" => "image/png", "sizes" => [ "192x192" ], "src" => SeoConfig::MCP_ICON_192 },
+      { "mimeType" => "image/png", "sizes" => [ "512x512" ], "src" => SeoConfig::MCP_ICON_512 }
     )
   end
 
