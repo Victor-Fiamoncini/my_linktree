@@ -44,19 +44,20 @@ credentials, not env vars. Edit with `bin/rails credentials:edit --environment <
   No `better_stack`: the log drain is production-only.
 - `config/credentials/production.yml.enc` (key: `config/credentials/production.key`) — same shape,
   plus `mailer.resend_api_key` and `better_stack.source_token`/`ingesting_host`.
-- `config/credentials.yml.enc` (the shared file, key: `config/master.key`) — fallback for
-  environments without their own, i.e. `test`. Holds `secret_key_base` plus a `mailer` block (test
-  needs non-nil values so `mail()` doesn't raise) and deliberately no `sentry_dsn`, so
-  `Sentry.init` no-ops there instead of raising.
-
-**Gotcha**: the bare `bin/rails credentials:edit` targets the shared file only if `Rails.env`
-(default: `development`) has no per-environment file. Since `development.yml.enc` exists, running
-it from a normal shell silently edits *that* file. Use `RAILS_ENV=test bin/rails credentials:edit`
-to reach the shared one.
+- `config/credentials/test.yml.enc` (key: `config/credentials/test.key`, **committed**) — only a
+  dummy `mailer` block (test needs non-nil values so `mail()` doesn't raise) and deliberately no
+  `sentry_dsn`, so `Sentry.init` no-ops. The key is committed so CI needs no secret; never put a
+  real value here. `config.require_master_key = true` in `test.rb` makes a missing key fail at boot
+  rather than silently yield empty credentials. Don't set `RAILS_MASTER_KEY` when running specs:
+  the env var wins over `test.key` and fails to decrypt.
+There is no shared `config/credentials.yml.enc`/`config/master.key`: every environment has its own
+file. **Gotcha**: the bare `bin/rails credentials:edit` edits the current `Rails.env`'s file
+(default: `development`), and in an environment without one it silently creates a new shared pair.
+Always pass `--environment`.
 
 `config/database.yml`, the three mailers, and the `resend`/`sentry` initializers read these via
 `Rails.application.credentials.dig(...)`. `test` keeps the ENV-based `default` anchor, whose
-fallbacks already equal `compose.yml`'s, so it needs no credentials file or env var at all.
+fallbacks already equal `compose.yml`'s, so its database config needs no credentials or env var.
 Deploy-side secrets (`RAILS_MASTER_KEY`, `KAMAL_*`) are in [README](README.md#deployment).
 
 ## Architecture
@@ -68,7 +69,7 @@ and book a meeting.
 ```
 app/
   controllers/
-    application_controller.rb   # @default_description, allow_browser, rate_limit_identifier
+    application_controller.rb   # allow_browser, switch_locale, rate_limit_identifier
     contacts_controller.rb      # POST /contact — JSON response
     static_controller.rb        # AGENTS.md, llms.txt, sitemap.xml
     pages_controller.rb, telemetry_page_controller.rb
@@ -153,6 +154,13 @@ config/
   `:found` with `Cache-Control: private, no-store` — a cached 301 would pin a browser to one
   language forever. Only `/` is detected, so canonical, `hreflang`, `x-default` and the sitemap
   need no geo awareness.
+- **404 page**: `config.exceptions_app` routes *only* 404s to `ErrorsController#not_found`; every
+  other status still falls back to `public/*.html`, as does a 404 page that raises (reported via
+  `Rails.error`, source `errors_controller`). There's no `/404` route and no catch-all.
+  Locale comes from the original path's `/en|/pt-BR` prefix, else `detected_locale` (shared with
+  `root_redirect`); unknown `/api/*` paths get JSON. Only reachable when
+  `show_detailed_exceptions` is false, so dev shows the debug page — `spec/requests/errors_spec.rb`
+  flips that per-example.
 - **Agent-facing surface**: `/AGENTS.md` (prose, `text/markdown`) and `/llms.txt` (a link index in
   the [llmstxt.org](https://llmstxt.org) shape, `text/plain`) are two *different* bodies for two
   conventions, both in `config/agents.yml` and rendered by `AgentsContent`. Both lead with the MCP

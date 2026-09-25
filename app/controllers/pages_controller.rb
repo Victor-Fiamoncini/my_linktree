@@ -1,9 +1,6 @@
 class PagesController < ApplicationController
   def root_redirect
-    locale = DetectLocaleUseCase.new.execute(
-      country_code: request.headers["CF-IPCountry"],
-      accept_language: request.headers["Accept-Language"]
-    )
+    locale = detected_locale
 
     response.set_header("Cache-Control", "private, no-store")
 
@@ -12,11 +9,7 @@ class PagesController < ApplicationController
 
   def home
     @profile = GetProfileUseCase.new.execute
-    @services = ListServicesUseCase.new.execute
-
-    xp_years_use_case = GetXpYearsUseCase.new
-    @xp_years = xp_years_use_case.execute
-    @start_year_of_work = xp_years_use_case.start_year_of_work
+    @start_year_of_work = GetXpYearsUseCase.new.start_year_of_work
   end
 
   private

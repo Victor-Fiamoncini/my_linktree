@@ -33,8 +33,8 @@ registry:
 
 # Database host/port/username/password, mailer sender/recipient, and the Resend API key
 # all live in config/credentials/production.yml.enc instead of plain env vars.
-# RAILS_MASTER_KEY below is what decrypts that file at boot (it's the production.key,
-# not the shared master.key) — the only env var the app needs from Kamal.
+# RAILS_MASTER_KEY below is what decrypts that file at boot (it's config/credentials/production.key)
+# — the only env var the app needs from Kamal.
 env:
   secret:
     - RAILS_MASTER_KEY

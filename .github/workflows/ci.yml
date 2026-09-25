@@ -58,9 +58,7 @@ jobs:
       DATABASE_HOST: localhost
       DATABASE_USERNAME: my_linktree
       DATABASE_PASSWORD: my_linktree
-      # config/master.key is gitignored; the test environment falls back to the shared
-      # config/credentials.yml.enc for secret_key_base and the mailer block.
-      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+      # No RAILS_MASTER_KEY: it would override the committed config/credentials/test.key.
 
     steps:
       - name: Checkout code

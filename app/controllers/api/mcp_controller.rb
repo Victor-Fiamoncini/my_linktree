@@ -10,7 +10,7 @@ module Api
     before_action :set_cors_headers
 
     rate_limit to: 30, within: 1.minute, by: -> { rate_limit_identifier }, only: :create, unless: -> { request.options? }
-    rate_limit to: 3, within: 10.minutes, name: "schedule_meeting", by: -> { rate_limit_identifier }, unless: -> { !schedule_meeting_call? }, only: :create
+    rate_limit to: 3, within: 10.minutes, name: "schedule_meeting", by: -> { rate_limit_identifier }, if: -> { schedule_meeting_call? }, only: :create
 
     def create
       return head :ok if request.options?
