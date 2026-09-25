@@ -93,14 +93,14 @@ credentials (see below).
 
 `config/credentials/development.yml.enc` is committed (encrypted, safe for git), but the key that
 decrypts it — `config/credentials/development.key` — is gitignored like every `*.key` file, so a
-fresh clone can't read it yet. Same for `config/master.key`, which backs the shared
-`config/credentials.yml.enc` (`secret_key_base`, plus `test`'s mailer fallback — see `CLAUDE.md`).
-Get both key files from whoever holds them (e.g. a password manager) and drop them in `config/` and
-`config/credentials/` respectively before running `bin/rails credentials:edit` or booting the app.
+fresh clone can't read it yet. Get it from whoever holds it (e.g. a password manager) and drop it in
+`config/credentials/` before running `bin/rails credentials:edit` or booting the app. The one
+exception is `config/credentials/test.key`: it's committed, since `test.yml.enc` holds only dummy
+values, so the specs run on a fresh clone (and in CI) with no key setup.
 
-If you're setting the app up standalone with no access to the original keys, delete the two `.enc`
-files and regenerate them with real content — none of the development values are actual secrets,
-they just need to exist:
+If you're setting the app up standalone with no access to the original keys, delete
+`config/credentials/development.yml.enc` and regenerate it with real content — none of the
+development values are actual secrets, they just need to exist:
 
 ```bash
 bin/rails credentials:edit --environment development
@@ -150,7 +150,7 @@ Secrets split across two mechanisms, depending on who needs them and when:
   production Postgres `host`/`port`/`username`/`password`, mailer `sender_email`/`recipient_email`,
   the Resend `resend_api_key`, `sentry_dsn`, and `better_stack.source_token` /
   `better_stack.ingesting_host`. These are per-environment credentials, separate
-  from the shared `config/master.key` used as `test`'s fallback — a leaked dev/test key can't
+  from the dev/test keys — a leaked dev/test key can't
   decrypt production secrets. Edit with:
 
   ```bash
@@ -159,7 +159,7 @@ Secrets split across two mechanisms, depending on who needs them and when:
 
   `config/database.yml`'s production block, the mailer classes, `config/initializers/resend.rb`,
   and `config/initializers/sentry.rb` all read these via `Rails.application.credentials.dig(...)`.
-  None of it is a plain env var. `test` has no `sentry_dsn` (the shared `credentials.yml.enc`
+  None of it is a plain env var. `test` has no `sentry_dsn` (`config/credentials/test.yml.enc`
   doesn't define one), so Sentry is a silent no-op there rather than sending events. Better Stack
   behaves the same way: with no `better_stack.source_token` the app keeps its plain STDOUT logger,
   which is also what happens during `assets:precompile` in the Docker build (it runs without the
@@ -168,7 +168,7 @@ Secrets split across two mechanisms, depending on who needs them and when:
 - **Kamal secrets** (`.kamal/secrets`) hold what's needed *before* the app can decrypt anything:
   `KAMAL_REGISTRY_PASSWORD` (a Docker Hub access token, exported in your shell before deploying) and
   `RAILS_MASTER_KEY` (read straight from `config/credentials/production.key` on disk — note this is
-  the production-scoped key, not `config/master.key`). This is what lets the container decrypt the
+  the production-scoped key). This is what lets the container decrypt the
   credentials file above at boot — it's the only env var `config/deploy.yml` injects into the app
   container. `KAMAL_SERVER_IP` is also exported here — not a credential, but kept out of
   `config/deploy.yml` (`servers: web: - <%= ENV.fetch("KAMAL_SERVER_IP") %>`) since that file is

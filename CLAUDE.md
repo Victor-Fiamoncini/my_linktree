@@ -44,19 +44,20 @@ credentials, not env vars. Edit with `bin/rails credentials:edit --environment <
   No `better_stack`: the log drain is production-only.
 - `config/credentials/production.yml.enc` (key: `config/credentials/production.key`) — same shape,
   plus `mailer.resend_api_key` and `better_stack.source_token`/`ingesting_host`.
-- `config/credentials.yml.enc` (the shared file, key: `config/master.key`) — fallback for
-  environments without their own, i.e. `test`. Holds `secret_key_base` plus a `mailer` block (test
-  needs non-nil values so `mail()` doesn't raise) and deliberately no `sentry_dsn`, so
-  `Sentry.init` no-ops there instead of raising.
-
-**Gotcha**: the bare `bin/rails credentials:edit` targets the shared file only if `Rails.env`
-(default: `development`) has no per-environment file. Since `development.yml.enc` exists, running
-it from a normal shell silently edits *that* file. Use `RAILS_ENV=test bin/rails credentials:edit`
-to reach the shared one.
+- `config/credentials/test.yml.enc` (key: `config/credentials/test.key`, **committed**) — only a
+  dummy `mailer` block (test needs non-nil values so `mail()` doesn't raise) and deliberately no
+  `sentry_dsn`, so `Sentry.init` no-ops. The key is committed so CI needs no secret; never put a
+  real value here. `config.require_master_key = true` in `test.rb` makes a missing key fail at boot
+  rather than silently yield empty credentials. Don't set `RAILS_MASTER_KEY` when running specs:
+  the env var wins over `test.key` and fails to decrypt.
+There is no shared `config/credentials.yml.enc`/`config/master.key`: every environment has its own
+file. **Gotcha**: the bare `bin/rails credentials:edit` edits the current `Rails.env`'s file
+(default: `development`), and in an environment without one it silently creates a new shared pair.
+Always pass `--environment`.
 
 `config/database.yml`, the three mailers, and the `resend`/`sentry` initializers read these via
 `Rails.application.credentials.dig(...)`. `test` keeps the ENV-based `default` anchor, whose
-fallbacks already equal `compose.yml`'s, so it needs no credentials file or env var at all.
+fallbacks already equal `compose.yml`'s, so its database config needs no credentials or env var.
 Deploy-side secrets (`RAILS_MASTER_KEY`, `KAMAL_*`) are in [README](README.md#deployment).
 
 ## Architecture
