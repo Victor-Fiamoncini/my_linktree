@@ -4,8 +4,8 @@ shared: &shared
   experiences:
     - id: 1
       company: Breaker19
-      backend: [PHP, Laravel, Next.js, Postgres, MongoDB, Pusher, Auth0, Postmark, PHPUnit, Auth0, Twilio, MailMason, Highway, FrontApp]
-      frontend: [React, Vue, Tailwind CSS, SCSS, TypeScript, Cypress, Jest, Mapbox]
+      backend: [PHP, Laravel, Postgres, MongoDB, Pusher, Auth0, Postmark, PHPUnit, Twilio, MailMason, Highway, FrontApp]
+      frontend: [React, Next.js, Vue, Tailwind CSS, SCSS, TypeScript, Cypress, Jest, Mapbox]
       infra: [AWS, Render Cloud, Docker, Docker Compose, Nginx, Sentry, LogRocket, Jenkins]
       other_tools: [Git, GitHub, Claude Code, Open Code, GitHub Copilot, CodeRabbit, Postman, Figma, Linear, Lambdatest, Mailosaur]
       country_flag: "🇺🇸"
