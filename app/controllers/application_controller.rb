@@ -12,8 +12,11 @@ class ApplicationController < ActionController::Base
   private
 
   def switch_locale(&action)
-    locale = params[:locale].presence_in(I18n.available_locales.map(&:to_s)) || I18n.default_locale
-    I18n.with_locale(locale, &action)
+    I18n.with_locale(request_locale, &action)
+  end
+
+  def request_locale
+    params[:locale].presence_in(I18n.available_locales.map(&:to_s)) || I18n.default_locale
   end
 
   def detected_locale
