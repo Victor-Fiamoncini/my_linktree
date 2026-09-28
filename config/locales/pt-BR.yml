@@ -13,6 +13,8 @@ pt-BR:
       nav_experience_title: "Ir para a seção Experiência"
       nav_hire_label: "#contrate-me"
       nav_hire_title: "Ir para a seção Contrate-me"
+      nav_job_match_label: "#fit-vaga"
+      nav_job_match_title: "Ir para a seção Fit com a vaga"
       nav_contact_label: "#contato"
       nav_contact_title: "Ir para a seção Contato"
       telemetry_button_label: "/telemetria"
@@ -57,7 +59,7 @@ pt-BR:
     hire_from_agent:
       prompt: "$ ./hire-me --no-human-required"
       heading: "Contrate-me pelo seu agente"
-      intro_html: "Este portfólio fala %{mcp_link}! Ele expõe um %{mcp_server} junto com o próprio site, com quatro ferramentas. Você pode adicionar este portfólio como um conector no seu agente favorito (Claude, ChatGPT, Deepseek, Kimi, etc). Seu agente poderá verificar meu trabalho, checar minha disponibilidade e agendar uma reunião."
+      intro_html: "Este portfólio fala %{mcp_link}! Ele expõe um %{mcp_server} junto com o próprio site, com cinco ferramentas. Você pode adicionar este portfólio como um conector no seu agente favorito (Claude, ChatGPT, Deepseek, Kimi, etc). Seu agente poderá verificar meu trabalho, avaliar meu fit com uma vaga, checar minha disponibilidade e agendar uma reunião."
       mcp_link_title: "Model Context Protocol"
       mcp_server: "servidor MCP"
       copy_endpoint_title: "Copiar endpoint do MCP"
@@ -70,6 +72,16 @@ pt-BR:
       agents_md_services_line: "Serviços: Desenvolvimento de Software Frontend & Backend, Sistemas Agênticos & Integrações, Sites & Landing Pages e Aplicativos Mobile"
       copy: "Copiar"
       copied: "Copiado!"
+    job_match:
+      prompt: "$ ./match --job-description"
+      heading: "Tenho fit com a sua vaga?"
+      intro: "Cole a descrição de uma vaga. Esta seção busca os trechos mais próximos do meu currículo e dos meus projetos no GitHub, e o Claude escreve uma avaliação honesta, citando as fontes e apontando as lacunas. A avaliação é gerada em inglês."
+      label: "descrição da vaga"
+      placeholder: "Cole a descrição da vaga aqui..."
+      submit: "Avaliar o fit"
+      submitting: "Lendo a vaga e buscando no meu trabalho..."
+      sources_heading: "Fontes"
+      generic_error: "Algo deu errado. Verifique sua conexão e tente novamente."
 
   telemetry_page:
     title: "Telemetria de Agentes ao Vivo"
@@ -122,6 +134,17 @@ pt-BR:
     errors:
       blank: "não pode ficar em branco"
       invalid_email: "é inválido"
+
+  job_matches:
+    validation_failed: "Verifique a descrição da vaga e tente novamente."
+    declined: "Não foi possível processar esse pedido. Tente outra descrição de vaga."
+    too_many_requests: "Você atingiu o limite de avaliações por enquanto. Tente novamente mais tarde."
+    budget_exhausted: "O avaliador de vagas atingiu o limite diário. Tente novamente amanhã ou use o formulário de contato abaixo."
+    invalid_authenticity_token: "Sua sessão expirou. Atualize a página e tente novamente."
+    internal_error: "Algo deu errado do nosso lado. Tente novamente em instantes."
+    errors:
+      blank: "não pode ficar em branco"
+      too_long: "deve ter no máximo %{count} caracteres"
 
   seo:
     job_title: "Engenheiro de Software"
