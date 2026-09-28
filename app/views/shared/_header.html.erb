@@ -3,6 +3,7 @@
     { label: t("shared.header.nav_about_label"), href: "#{root_path}#about", accent: "blue", title: t("shared.header.nav_about_title") },
     { label: t("shared.header.nav_experience_label"), href: "#{root_path}#experience", accent: "mauve", title: t("shared.header.nav_experience_title") },
     { label: t("shared.header.nav_hire_label"), href: "#{root_path}#agents", accent: "peach", title: t("shared.header.nav_hire_title") },
+    { label: t("shared.header.nav_job_match_label"), href: "#{root_path}#job-match", accent: "lavender", title: t("shared.header.nav_job_match_title") },
     { label: t("shared.header.nav_contact_label"), href: "#{root_path}#contact", accent: "pink", title: t("shared.header.nav_contact_title") },
   ]
   other_locale = I18n.locale == :en ? "pt-BR" : "en"
@@ -13,6 +14,7 @@
     "blue" => "text-ctp-subtext0 hover:text-ctp-blue relative pb-0.5 transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-ctp-blue after:transition-all after:duration-300 hover:after:w-full",
     "mauve" => "text-ctp-subtext0 hover:text-ctp-mauve relative pb-0.5 transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-ctp-mauve after:transition-all after:duration-300 hover:after:w-full",
     "peach" => "text-ctp-subtext0 hover:text-ctp-peach relative pb-0.5 transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-ctp-peach after:transition-all after:duration-300 hover:after:w-full",
+    "lavender" => "text-ctp-subtext0 hover:text-ctp-lavender relative pb-0.5 transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-ctp-lavender after:transition-all after:duration-300 hover:after:w-full",
     "pink" => "text-ctp-subtext0 hover:text-ctp-pink relative pb-0.5 transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-ctp-pink after:transition-all after:duration-300 hover:after:w-full",
   }
   telemetry_button_class = "bg-ctp-green text-ctp-crust rounded-btn hover:bg-ctp-teal inline-flex items-center gap-1 px-4 py-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_20px_-4px_var(--color-ctp-green)]"
@@ -31,15 +33,18 @@
         height="26"
         class="rounded-chip block h-[26px] w-[26px]"
       >
-      <span class="text-ctp-text max-[424px]:hidden text-base font-semibold">Victor Fiamoncini</span>
+
+      <span class="text-ctp-text max-[424px]:hidden text-base font-semibold whitespace-nowrap">Victor Fiamoncini</span>
     <% end %>
 
-    <ul class="hidden items-center gap-x-7 font-mono text-[13px] min-[900px]:flex">
+    <ul class="hidden items-center gap-x-5 font-mono text-[13px] whitespace-nowrap min-[900px]:flex min-[1000px]:gap-x-7">
       <% section_links.each do |link| %>
         <li><%= link_to link[:label], link[:href], title: link[:title], class: nav_link_classes.fetch(link[:accent]) %></li>
       <% end %>
-      <li><%= link_to telemetry_path, title: t("shared.header.telemetry_title"), class: telemetry_button_class do %><%= t("shared.header.telemetry_button_label") %> <span class="text-ctp-crust/70">↗</span><% end %></li>
-      <li><%= link_to switch_label, switch_path, title: t("shared.header.switch_language", language: other_language_name), rel: "alternate", hreflang: other_locale, class: "text-ctp-subtext0 hover:text-ctp-text font-mono text-[13px] transition-colors" %></li>
+
+			<li><%= link_to telemetry_path, title: t("shared.header.telemetry_title"), class: telemetry_button_class do %><%= t("shared.header.telemetry_button_label") %> <span class="text-ctp-crust/70">↗</span><% end %></li>
+
+			<li><%= link_to switch_label, switch_path, title: t("shared.header.switch_language", language: other_language_name), rel: "alternate", hreflang: other_locale, class: "text-ctp-subtext0 hover:text-ctp-text font-mono text-[13px] transition-colors" %></li>
     </ul>
 
     <div class="flex items-center gap-3 min-[900px]:hidden">
@@ -55,6 +60,7 @@
         class="border-ctp-surface1 text-ctp-text rounded-btn hover:border-ctp-blue flex h-9 w-9 cursor-pointer items-center justify-center border transition-all duration-200 hover:scale-105"
       >
         <span data-mobile-nav-target="openIcon" class="h-4 w-4"><%= svg_icon(:bars) %></span>
+
         <span data-mobile-nav-target="closeIcon" class="hidden h-4 w-4"><%= svg_icon(:times) %></span>
       </button>
     </div>
@@ -65,7 +71,8 @@
       <% section_links.each do |link| %>
         <li><%= link_to link[:label], link[:href], title: link[:title], class: nav_link_classes.fetch(link[:accent]), data: { action: "mobile-nav#close" } %></li>
       <% end %>
-      <li><%= link_to telemetry_path, title: t("shared.header.telemetry_title"), class: telemetry_button_class, data: { action: "mobile-nav#close" } do %><%= t("shared.header.telemetry_button_label") %> <span class="text-ctp-crust/70">↗</span><% end %></li>
+
+			<li><%= link_to telemetry_path, title: t("shared.header.telemetry_title"), class: telemetry_button_class, data: { action: "mobile-nav#close" } do %><%= t("shared.header.telemetry_button_label") %> <span class="text-ctp-crust/70">↗</span><% end %></li>
     </ul>
   </div>
 </header>
