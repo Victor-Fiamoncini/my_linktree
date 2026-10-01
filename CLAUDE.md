@@ -12,11 +12,13 @@ bundle exec rspec spec/requests/api/mcp_spec.rb  # Run one file
 bin/rubocop                     # Lint (rubocop-rails-omakase)
 bin/rails db:migrate            # Run pending migrations
 bin/rails db:create db:migrate  # First-time setup, after `docker compose up -d`
+bin/rails knowledge:ingest      # (Re)embed the RAG corpus — needs real `rag.*` credentials
 ```
 
-Rails 8.1; Ruby version in `.ruby-version`. Postgres 16 is required locally (`docker compose up
--d`, see `compose.yml`). There is no Redis: rate limiting, jobs, and ActionCable all ride on
-Rails 8's Postgres-backed Solid Cache / Solid Queue / Solid Cable.
+Rails 8.1; Ruby version in `.ruby-version`. Postgres 16 with the pgvector extension is required
+locally (`docker compose up -d` runs the `pgvector/pgvector:pg16` image, see `compose.yml`). There
+is no Redis: rate limiting, jobs, and ActionCable all ride on Rails 8's Postgres-backed Solid Cache
+/ Solid Queue / Solid Cable.
 
 ## Validating changes
 
@@ -40,14 +42,15 @@ There is no `.env`/`dotenv-rails` — all per-environment config lives in Rails'
 credentials, not env vars. Edit with `bin/rails credentials:edit --environment <env>`.
 
 - `config/credentials/development.yml.enc` (key: `config/credentials/development.key`) —
-  `database.*` (matching `compose.yml`), `mailer.sender_email`/`recipient_email`, `sentry_dsn`.
-  No `better_stack`: the log drain is production-only.
+  `database.*` (matching `compose.yml`), `mailer.sender_email`/`recipient_email`, `sentry_dsn`,
+  `rag.openai_api_key` and optional `rag.github_token`. No `better_stack`: the
+  log drain is production-only.
 - `config/credentials/production.yml.enc` (key: `config/credentials/production.key`) — same shape,
   plus `mailer.resend_api_key` and `better_stack.source_token`/`ingesting_host`.
 - `config/credentials/test.yml.enc` (key: `config/credentials/test.key`, **committed**) — only a
-  dummy `mailer` block (test needs non-nil values so `mail()` doesn't raise) and deliberately no
-  `sentry_dsn`, so `Sentry.init` no-ops. The key is committed so CI needs no secret; never put a
-  real value here. `config.require_master_key = true` in `test.rb` makes a missing key fail at boot
+  dummy `mailer` block (test needs non-nil values so `mail()` doesn't raise), a dummy `rag` block,
+  and deliberately no `sentry_dsn`, so `Sentry.init` no-ops. The key is committed so CI needs no
+  secret; never put a real value here. `config.require_master_key = true` in `test.rb` makes a missing key fail at boot
   rather than silently yield empty credentials. Don't set `RAILS_MASTER_KEY` when running specs:
   the env var wins over `test.key` and fails to decrypt.
 There is no shared `config/credentials.yml.enc`/`config/master.key`: every environment has its own
@@ -64,13 +67,14 @@ Deploy-side secrets (`RAILS_MASTER_KEY`, `KAMAL_*`) are in [README](README.md#de
 
 This is a Rails 8 personal landing page using Hotwire (Turbo + Stimulus via importmap — no Node,
 no JS bundler). It also serves an MCP server so AI agents can read the resume, check availability,
-and book a meeting.
+book a meeting, and get a cited summary of how Victor fits a job description (RAG).
 
 ```
 app/
   controllers/
     application_controller.rb   # allow_browser, switch_locale, rate_limit_identifier
     contacts_controller.rb      # POST /contact — JSON response
+    job_matches_controller.rb   # POST /job_match — RAG job-fit summary, JSON response
     static_controller.rb        # AGENTS.md, llms.txt, sitemap.xml
     pages_controller.rb, telemetry_page_controller.rb
     api/
@@ -82,10 +86,12 @@ app/
   models/
     booking.rb                  # unique index on slot_start prevents double-booking
     agent_connection.rb         # MCP tool-call telemetry
+    knowledge_chunk.rb          # RAG corpus: text + 1024-dim pgvector embedding (HNSW, cosine)
+  clients/                      # outbound HTTP: OpenaiEmbedder, OpenaiClient, GithubReadmeClient
   use_cases/                    # framework-agnostic business logic, constructor-injected deps
   events/                       # everything that exists to serve Rails.event
   mcp_tools/                    # MCP::Tool subclasses: get_resume, list_services,
-                                # check_availability, schedule_meeting
+                                # check_availability, schedule_meeting, match_job
   javascript/controllers/       # Stimulus
   views/                        # layouts/, pages/ (home + partials), telemetry_page/, shared/
 lib/                            # static, request-independent site facts and the text built from
@@ -97,6 +103,7 @@ lib/                            # static, request-independent site facts and the
 config/
   profile.yml                   # static resume/services data
   availability.yml              # timezone, weekly windows, slot duration, booking horizon
+  knowledge.yml                 # GitHub repos whose READMEs join profile.yml in the RAG corpus
   agents.yml                    # two bodies: `content` (/AGENTS.md) and `llms_content` (/llms.txt)
   initializers/
     logtail.rb                  # scopes the logtail-rails railtie (prod: logrageify!, else off)
@@ -118,16 +125,27 @@ config/
   `rescue`; `ContactsController` adds a `rescue_from ActionController::InvalidAuthenticityToken` so
   an expired session redirects with a flash instead of a raw 422, and anything else falls through
   to a generic `rescue_from StandardError`.
-- **Rate limiting**: Rails 8's declarative `rate_limit` macro in `ContactsController` and
-  `Api::McpController`, backed by `Rails.cache` (Solid Cache in dev/production, `MemoryStore` in
+- **Rate limiting**: Rails 8's declarative `rate_limit` macro in `ContactsController`,
+  `JobMatchesController` and `Api::McpController`, backed by `Rails.cache` (Solid Cache in dev/production, `MemoryStore` in
   test). `ApplicationController#rate_limit_identifier` prefers the `CF-Connecting-IP` header,
   falling back to `request.remote_ip` only when absent (local dev/test) — `X-Forwarded-For` arrives
   corrupted in production, collapsing every visitor into one bucket. Trusting `CF-Connecting-IP`
   unconditionally is safe only because the origin firewall restricts inbound 80/443 to Cloudflare's
   ranges, so nobody can reach the app to forge it. `Api::McpController` declares two named limiters
   on the same action — a general one and a `schedule_meeting`-specific one whose `unless:` proc
-  parses and rewinds the JSON-RPC body so it only counts calls by that name. Both controllers catch
-  `ActionController::TooManyRequests` via `rescue_from` rather than the macro's `with:`.
+  parses and rewinds the JSON-RPC body so it only counts calls by that name (`match_job` has its
+  own too). The controllers catch `ActionController::TooManyRequests` via `rescue_from` rather
+  than the macro's `with:`. The one exception is the job matcher's global limiter. Each call
+  is billed by OpenAI, so both surfaces stack per-IP limits (web: 3/10 min and
+  10/day; MCP `match_job`: 5/10 min and 10/day) and then one shared cap of
+  `GLOBAL_DAILY_LIMIT` (100/day, a constant in each controller that must stay equal, `by: -> { "all" }`). Both controllers
+  declare it with `scope: :job_match`, so they increment the same `rate-limit:job_match:global:all`
+  key rather than the default per-controller one. Its `with:` renders a "try again tomorrow"
+  message and a `job_match.budget_exhausted` error event tagged with `surface`. **Order is
+  load-bearing**: `rate_limit` is a `before_action` that increments and then raises, so a per-IP
+  rejection halts the chain before the global counter is touched. Declare the global limiter
+  first and one abusive IP could drain everyone's budget. The global limiter also skips input
+  `MatchJobUseCase.acceptable?` rejects, since that never reaches OpenAI; per-IP limits still count it.
 - **MCP server** (`Api::McpController`): builds a fresh `MCP::Server` + stateless
   `MCP::Server::Transports::StreamableHTTPTransport` per request (official `mcp` gem) and proxies
   its Rack `[status, headers, body]` triple straight through the Rails response (`self.status=`,
@@ -137,7 +155,7 @@ config/
   it's a public, unauthenticated, cookie-free endpoint called by arbitrary external MCP clients
   whose `Origin` values can't be enumerated, and `Host` is already validated by Rails'
   `config.hosts`. `set_cors_headers` reflects whatever `Origin` is present for the same reason —
-  safe because the endpoint never sets `Access-Control-Allow-Credentials`. The 4 `MCP::Tool`
+  safe because the endpoint never sets `Access-Control-Allow-Credentials`. The 5 `MCP::Tool`
   subclasses deliberately don't declare `required:` in their `input_schema`: the gem would
   short-circuit before calling the tool, but this app records the agent connection *before*
   validating, even for calls that go on to fail. Validation happens inside the use cases, with
@@ -164,12 +182,27 @@ config/
 - **Agent-facing surface**: `/AGENTS.md` (prose, `text/markdown`) and `/llms.txt` (a link index in
   the [llmstxt.org](https://llmstxt.org) shape, `text/plain`) are two *different* bodies for two
   conventions, both in `config/agents.yml` and rendered by `AgentsContent`. Both lead with the MCP
-  endpoint and its four tools and keep `POST /api/hire` as the fallback for clients that don't
+  endpoint and its five tools and keep `POST /api/hire` as the fallback for clients that don't
   speak MCP. URLs are never typed by hand — they interpolate `%{site_url}`/`%{mcp_endpoint}`/
   `%{github_url}`/`%{linkedin_url}` from `SeoConfig`, so **a literal `%` in either body raises on
   render**. Two hand-written bodies means two chances to drift, so `spec/requests/static_spec.rb`
   guards both: every `Api::McpController::TOOLS` name must appear, and every `SeoConfig::SITE_URL`
   link must recognize under some HTTP verb.
+- **RAG job-fit matcher** (study guide: [docs/RAG.md](docs/RAG.md)): a job description goes to
+  `MatchJobUseCase`. It embeds the text with OpenAI (`text-embedding-3-small` at 1024 dimensions), takes the 8 nearest `KnowledgeChunk`s by cosine distance
+  (`neighbor` gem), at most 2 per source title so one README can't fill the prompt,, and sends them to `gpt-6-luna` (`OpenaiClient`, Responses API, plain REST) as numbered
+  documents. There are no native citations for passed-in text, so a strict `RESPONSE_SCHEMA` forces a JSON reply of paragraphs
+  with the document numbers behind each. Out-of-range numbers are dropped, and the rest map to a
+  deduped source list. Only MCP gets the citations and sources: `POST /job_match` returns just the
+  joined `summary` string, which is all the page shows. Refusals and content-filter stops raise
+  `ArgumentError` (a 422); any other non-`completed` status raises `OpenaiClient::Error` (a 500). The corpus is built
+  offline, by hand (`bin/rails knowledge:ingest`; there's no scheduled job), by `IngestKnowledgeUseCase` from `profile.yml` (en) and the READMEs in
+  `config/knowledge.yml`. It's idempotent: a chunk is keyed by the SHA-256 of its source type, title, url and
+  content (not `source_ref`, which shifts with position), so only changed chunks are re-embedded and chunks nothing produces any more are deleted. A README 404
+  counts as "gone", but any other GitHub failure raises, so an outage can't wipe a repo's chunks.
+  The Stimulus controller writes model output with `textContent` only, never `innerHTML`.
+  `rescue_from` handlers run outside `switch_locale`, so `JobMatchesController` translates them
+  via `request_locale`.
 - **Edge WAF (Cloudflare)**: production sits behind Cloudflare with **Block AI bots** on site-wide,
   which would 403 agent traffic before it reaches this app. `/api/mcp` is exempted by a
   dashboard-only Custom Rule (Skip) that must have **both** "All managed rules" and "All Super Bot
@@ -189,11 +222,15 @@ config/
   event in a request. PII never goes in a payload raw — `LogRedaction.contact` redacts it, and its
   key names are load-bearing (see the comment in `app/events/log_redaction.rb`).
 
-  The events: `mcp.request`/`mcp.exception` (`config/initializers/mcp.rb`, covering all four
+  The events: `mcp.request`/`mcp.exception` (`config/initializers/mcp.rb`, covering all five
   tools), `mcp.meeting.booked`/`mcp.meeting.rejected` (`ScheduleMeetingTool`), `api.error`/
   `api.rate_limited` (`Api::BaseController`, the latter extended per-endpoint via
   `rate_limited_event_payload`), `hire.request.received`/`hire.request.rejected`, and
-  `contact.message.sent`/`.rejected`/`contact.rate_limited`/`contact.csrf_rejected`/`contact.error`.
+  `contact.message.sent`/`.rejected`/`contact.rate_limited`/`contact.csrf_rejected`/`contact.error`,
+  `job_match.completed`/`.rejected` (`JobMatchesController` and `MatchJobTool`, told apart by
+  `surface`) plus `job_match.rate_limited`/`.budget_exhausted`/`.csrf_rejected`/`.error`.
+  Filter-parameter gotcha: any payload key containing `token` is `[FILTERED]`, hence
+  `llm_input`/`llm_output` rather than `input_tokens`.
 - **`@/` alias**: none — this is a standard Rails app, autoloaded via Zeitwerk from `app/*`. Every
   directory under `app/` (bar `assets`, `javascript`, `views`) is its own autoload root, so
   `app/use_cases/*.rb` and `app/events/*.rb` define *top-level* constants — `ScheduleMeetingUseCase`,
