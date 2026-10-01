@@ -25,6 +25,9 @@ gem "resend"
 # Official Ruby SDK for the Model Context Protocol [https://github.com/modelcontextprotocol/ruby-sdk]
 gem "mcp"
 
+# Nearest-neighbor search over pgvector columns for the RAG matcher [https://github.com/ankane/neighbor]
+gem "neighbor"
+
 # Locale data (pluralization rules, date/month names) for I18n beyond English [https://github.com/svenfuchs/rails-i18n]
 gem "rails-i18n"
 
@@ -51,9 +54,11 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
 
+# Exception monitoring with Sentry, configured in config/initializers/sentry.rb [https://github.com/getsentry/sentry-ruby]
 gem "sentry-ruby"
 gem "sentry-rails"
 
+# Production log drain to Better Stack, scoped in config/initializers/logtail.rb [https://github.com/logtail/logtail-ruby-rails]
 gem "logtail-rails"
 
 group :development, :test do
@@ -82,6 +87,9 @@ group :test do
 
   # Line and branch coverage, configured at the top of spec/spec_helper.rb [https://github.com/simplecov-ruby/simplecov]
   gem "simplecov", require: false
+
+  # Stubs outbound HTTP for the OpenAI and GitHub clients [https://github.com/bblimke/webmock]
+  gem "webmock"
 end
 
 group :development do
