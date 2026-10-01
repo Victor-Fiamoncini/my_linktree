@@ -73,14 +73,14 @@ en:
       copy: "Copy"
       copied: "Copied!"
     job_match:
-      prompt: "$ ./match --job-description"
+      prompt: "$ cat job.txt | ./match --rag"
       heading: "Do I fit your role?"
-      intro: "Paste a job description. This section retrieves the closest excerpts from my resume and GitHub projects, then has Claude write an honest assessment, citing its sources and naming the gaps."
+      intro_html: "Paste a job description. This section uses %{rag_link} (retrieval-augmented generation): it retrieves the closest excerpts from my resume and GitHub projects, then has OpenAI write up how my experience fits the role, grounded in them."
+      rag_link_title: "Retrieval-augmented generation"
       label: "job description"
       placeholder: "Paste the job description here..."
       submit: "Check the fit"
       submitting: "Reading the job and searching my work..."
-      sources_heading: "Sources"
       generic_error: "Something went wrong. Please check your connection and try again."
 
   telemetry_page:

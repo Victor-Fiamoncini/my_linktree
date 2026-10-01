@@ -73,14 +73,14 @@ pt-BR:
       copy: "Copiar"
       copied: "Copiado!"
     job_match:
-      prompt: "$ ./match --job-description"
+      prompt: "$ cat job.txt | ./match --rag"
       heading: "Tenho fit com a sua vaga?"
-      intro: "Cole a descrição de uma vaga. Esta seção busca os trechos mais próximos do meu currículo e dos meus projetos no GitHub, e o Claude escreve uma avaliação honesta, citando as fontes e apontando as lacunas. A avaliação é gerada em inglês."
+      intro_html: "Cole a descrição de uma vaga. Esta seção usa %{rag_link} (geração aumentada por recuperação): busca os trechos mais próximos do meu currículo e dos meus projetos no GitHub, e a OpenAI escreve, com base neles, como a minha experiência se encaixa na vaga. A avaliação é gerada em inglês."
+      rag_link_title: "Retrieval-augmented generation"
       label: "descrição da vaga"
       placeholder: "Cole a descrição da vaga aqui..."
       submit: "Avaliar o fit"
       submitting: "Lendo a vaga e buscando no meu trabalho..."
-      sources_heading: "Fontes"
       generic_error: "Algo deu errado. Verifique sua conexão e tente novamente."
 
   telemetry_page:

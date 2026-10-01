@@ -3,8 +3,10 @@
 
   <h2 class="text-ctp-text mb-4 text-[28px] font-semibold tracking-[-0.025em] min-[900px]:text-[34px]"><%= t("pages.job_match.heading") %></h2>
 
-  <p class="text-ctp-subtext0 mb-10 w-full text-[17px] leading-[1.7] text-pretty text-justify">
-    <%= t("pages.job_match.intro") %>
+  <% rag_link = link_to("RAG", "https://en.wikipedia.org/wiki/Retrieval-augmented_generation", target: "_blank", rel: "noreferrer", title: t("pages.job_match.rag_link_title"), class: "text-ctp-mauve hover:text-ctp-pink transition-colors") %>
+
+	<p class="text-ctp-subtext0 mb-10 w-full text-[17px] leading-[1.7] text-pretty text-justify">
+    <%= t("pages.job_match.intro_html", rag_link: rag_link) %>
   </p>
 
   <%= form_with url: job_match_path, method: :post, class: "grid w-full gap-4",
@@ -12,7 +14,6 @@
       controller: "job-match", action: "submit->job-match#submit",
       job_match_submitting_value: t("pages.job_match.submitting"),
       job_match_submit_label_value: t("pages.job_match.submit"),
-      job_match_sources_heading_value: t("pages.job_match.sources_heading"),
       job_match_generic_error_value: t("pages.job_match.generic_error"),
       job_match_locale_value: I18n.locale,
     } do |form| %>
@@ -38,10 +39,6 @@
 
     <div class="border-ctp-surface0 rounded-btn hidden border bg-[#1e1e2e] p-6" data-job-match-target="result" aria-live="polite">
       <div class="text-ctp-text text-[16px] leading-[1.7] whitespace-pre-line" data-job-match-target="summary"></div>
-
-      <p class="text-ctp-subtext0 mt-6 mb-2 font-mono text-xs" data-job-match-target="sourcesHeading"></p>
-
-			<ol class="text-ctp-subtext0 list-decimal space-y-1 pl-5 text-sm" data-job-match-target="sources"></ol>
     </div>
   <% end %>
 </section>

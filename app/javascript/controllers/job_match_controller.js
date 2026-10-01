@@ -2,8 +2,8 @@ import { Controller } from "@hotwired/stimulus"
 
 // Model output is untrusted, so it only ever reaches the DOM through textContent.
 export default class extends Controller {
-  static targets = ["input", "fieldError", "submit", "banner", "result", "summary", "sourcesHeading", "sources"]
-  static values = { submitting: String, submitLabel: String, sourcesHeading: String, genericError: String, locale: String }
+  static targets = ["input", "fieldError", "submit", "banner", "result", "summary"]
+  static values = { submitting: String, submitLabel: String, genericError: String, locale: String }
 
   async submit(event) {
     event.preventDefault()
@@ -37,36 +37,8 @@ export default class extends Controller {
     }
   }
 
-  #renderResult({ summary, sources }) {
-    summary.forEach(({ text, citations }) => {
-      this.summaryTarget.append(document.createTextNode(text))
-
-      citations.forEach(({ source, cited_text }) => {
-        const marker = document.createElement("a")
-        marker.href = `#job-match-source-${source + 1}`
-        marker.title = cited_text
-        marker.textContent = `[${source + 1}]`
-        marker.className = "text-ctp-mauve hover:text-ctp-pink align-super text-xs"
-        this.summaryTarget.append(marker)
-      })
-    })
-
-    this.sourcesHeadingTarget.textContent = this.sourcesHeadingValue
-    sources.forEach(({ title, url }, index) => {
-      const item = document.createElement("li")
-      item.id = `job-match-source-${index + 1}`
-
-      const link = document.createElement("a")
-      link.href = url
-      link.target = "_blank"
-      link.rel = "noreferrer"
-      link.textContent = title
-      link.className = "text-ctp-blue hover:text-ctp-lavender transition-colors"
-
-      item.append(link)
-      this.sourcesTarget.append(item)
-    })
-
+  #renderResult({ summary }) {
+    this.summaryTarget.textContent = summary
     this.resultTarget.classList.remove("hidden")
   }
 
@@ -75,7 +47,6 @@ export default class extends Controller {
     this.bannerTarget.classList.add("hidden")
     this.resultTarget.classList.add("hidden")
     this.summaryTarget.replaceChildren()
-    this.sourcesTarget.replaceChildren()
   }
 
   #showFieldError(message) {

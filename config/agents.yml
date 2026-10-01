@@ -14,7 +14,7 @@ shared: &shared
     - list_services       what I take on
     - check_availability  open meeting slots, timezone-aware
     - schedule_meeting    book one of those slots
-    - match_job           paste a job description, get a cited assessment of how I fit it
+    - match_job           paste a job description, get a cited summary of how I fit it
 
     Tool calls show up on the live feed at %{site_url}/en/telemetry
 
@@ -44,7 +44,7 @@ shared: &shared
 
     ## MCP server
 
-    - [MCP endpoint](%{mcp_endpoint}): streamable HTTP. Tools: get_resume (profile, work experience and education), list_services (what I take on), check_availability (open meeting slots, timezone-aware), schedule_meeting (book one of those slots), match_job (a cited assessment of how I fit a job description).
+    - [MCP endpoint](%{mcp_endpoint}): streamable HTTP. Tools: get_resume (profile, work experience and education), list_services (what I take on), check_availability (open meeting slots, timezone-aware), schedule_meeting (book one of those slots), match_job (a cited summary of how I fit a job description).
     - [Live tool-call feed](%{site_url}/en/telemetry): recent MCP tool calls, as they happen.
 
     ## If you do not speak MCP
