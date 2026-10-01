@@ -1,16 +1,21 @@
 module Api
   class McpController < BaseController
-    TOOLS = [ GetResumeTool, ListServicesTool, CheckAvailabilityTool, ScheduleMeetingTool ].freeze
+    TOOLS = [ GetResumeTool, ListServicesTool, CheckAvailabilityTool, ScheduleMeetingTool, MatchJobTool ].freeze
 
     CORS_METHOD_HEADERS = {
       "Access-Control-Allow-Methods" => "POST, GET, DELETE, OPTIONS",
       "Access-Control-Allow-Headers" => "Content-Type, Accept, Mcp-Session-Id, Mcp-Protocol-Version"
     }.freeze
 
+    GLOBAL_DAILY_LIMIT = 100
+
     before_action :set_cors_headers
 
     rate_limit to: 30, within: 1.minute, by: -> { rate_limit_identifier }, only: :create, unless: -> { request.options? }
     rate_limit to: 3, within: 10.minutes, name: "schedule_meeting", by: -> { rate_limit_identifier }, if: -> { schedule_meeting_call? }, only: :create
+    rate_limit to: 5, within: 10.minutes, name: "match_job", by: -> { rate_limit_identifier }, if: -> { match_job_call? }, only: :create
+    rate_limit to: 10, within: 1.day, name: "match_job_daily", by: -> { rate_limit_identifier }, if: -> { match_job_call? }, only: :create
+    rate_limit to: GLOBAL_DAILY_LIMIT, within: 1.day, name: "global", scope: :job_match, by: -> { "all" }, with: :render_budget_exhausted, if: -> { billable_match_job_call? }, only: :create
 
     def create
       return head :ok if request.options?
@@ -66,6 +71,14 @@ module Api
       jsonrpc_method == "tools/call" && jsonrpc_tool == "schedule_meeting"
     end
 
+    def match_job_call?
+      jsonrpc_method == "tools/call" && jsonrpc_tool == "match_job"
+    end
+
+    def billable_match_job_call?
+      match_job_call? && MatchJobUseCase.acceptable?(jsonrpc_payload.dig("params", "arguments", "job_description"))
+    end
+
     def jsonrpc_method
       jsonrpc_payload["method"]
     end
@@ -88,6 +101,12 @@ module Api
       {}
     ensure
       request.body&.rewind
+    end
+
+    def render_budget_exhausted
+      Rails.event.notify("job_match.budget_exhausted", severity: "error", surface: "mcp")
+
+      render json: { message: "Daily limit reached", action: "match_job has reached its daily limit. Please try again tomorrow." }, status: :too_many_requests
     end
 
     def rate_limited_event_payload

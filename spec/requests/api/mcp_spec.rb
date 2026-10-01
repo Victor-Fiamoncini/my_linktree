@@ -54,11 +54,11 @@ RSpec.describe "Api::Mcp", type: :request do
     expect(server_info).not_to have_key("icons")
   end
 
-  it "lists all 4 tools" do
+  it "lists all 5 tools" do
     post "/api/mcp", params: rpc(id: 1, method: "tools/list"), headers: headers
 
     tool_names = response.parsed_body.dig("result", "tools").map { |t| t["name"] }
-    expect(tool_names).to contain_exactly("get_resume", "list_services", "check_availability", "schedule_meeting")
+    expect(tool_names).to contain_exactly("get_resume", "list_services", "check_availability", "schedule_meeting", "match_job")
   end
 
   it "calls get_resume and records the connection" do
@@ -247,6 +247,78 @@ RSpec.describe "Api::Mcp", type: :request do
     expect(response).to have_http_status(:too_many_requests)
   end
 
+  it "rate limits match_job specifically after 5 requests from the same IP" do
+    use_case = instance_double(MatchJobUseCase, execute: { summary: [], sources: [], usage: { input_tokens: 1, output_tokens: 1 } })
+    allow(MatchJobUseCase).to receive(:new).and_return(use_case)
+    ip_headers = headers.merge("X-Forwarded-For" => "9.9.9.9")
+    params = rpc(id: 1, method: "tools/call", params: { name: "match_job", arguments: { job_description: "Rails role" } })
+
+    5.times do
+      post "/api/mcp", params: params, headers: ip_headers
+      expect(response).to have_http_status(:ok)
+    end
+
+    post "/api/mcp", params: params, headers: ip_headers
+    expect(response).to have_http_status(:too_many_requests)
+  end
+
+  describe "match_job daily limits" do
+    let(:match_job_params) { rpc(id: 1, method: "tools/call", params: { name: "match_job", arguments: { job_description: "Rails role" } }) }
+
+    before do
+      use_case = instance_double(MatchJobUseCase, execute: { summary: [], sources: [], usage: { input_tokens: 1, output_tokens: 1 } })
+      allow(MatchJobUseCase).to receive(:new).and_return(use_case)
+    end
+
+    def post_match_job(ip)
+      post "/api/mcp", params: match_job_params, headers: headers.merge("CF-Connecting-IP" => ip)
+    end
+
+    it "caps one IP at 10 match_job calls a day, even when it stays under the burst limit" do
+      travel_to Time.zone.parse("2026-09-28 09:00") do
+        10.times do |index|
+          travel 11.minutes if index.positive? && (index % 5).zero?
+          post_match_job("6.6.6.6")
+          expect(response).to have_http_status(:ok)
+        end
+
+        travel 11.minutes
+        post_match_job("6.6.6.6")
+        expect(response).to have_http_status(:too_many_requests)
+      end
+    end
+
+    it "draws from the web form's global budget, with its own message and an error event" do
+      Rails.cache.increment("rate-limit:job_match:global:all", Api::McpController::GLOBAL_DAILY_LIMIT, expires_in: 1.day)
+
+      events = captured_events { post_match_job("7.7.7.7") }
+
+      expect(response).to have_http_status(:too_many_requests)
+      expect(response.parsed_body["action"]).to include("daily limit")
+      expect(find_event(events, "job_match.budget_exhausted")[:payload]).to eq(severity: "error", surface: "mcp")
+    end
+
+    it "doesn't count calls rejected per IP against the global budget" do
+      7.times { post_match_job("8.8.8.8") }
+
+      expect(Rails.cache.read("rate-limit:job_match:global:all", raw: true).to_i).to eq(5)
+    end
+
+    it "leaves the global budget alone for match_job calls that fail validation" do
+      post "/api/mcp", params: rpc(id: 1, method: "tools/call", params: { name: "match_job", arguments: { job_description: " " } }),
+        headers: headers.merge("CF-Connecting-IP" => "8.8.4.4")
+
+      expect(response).to have_http_status(:ok)
+      expect(Rails.cache.read("rate-limit:job_match:global:all", raw: true)).to be_nil
+    end
+
+    it "leaves the global budget alone for other tools" do
+      post "/api/mcp", params: rpc(id: 1, method: "tools/list"), headers: headers
+
+      expect(Rails.cache.read("rate-limit:job_match:global:all", raw: true)).to be_nil
+    end
+  end
+
   it "rate limits by the real connection IP when no X-Forwarded-For header is present" do
     30.times do |i|
       post "/api/mcp", params: rpc(id: i, method: "tools/list"), headers: headers
@@ -307,7 +379,7 @@ RSpec.describe "Api::Mcp", type: :request do
     get "/api/mcp"
 
     expect(response).to have_http_status(:ok)
-    expect(response.parsed_body["tools"]).to contain_exactly("get_resume", "list_services", "check_availability", "schedule_meeting")
+    expect(response.parsed_body["tools"]).to contain_exactly("get_resume", "list_services", "check_availability", "schedule_meeting", "match_job")
   end
 
   it "answers a stream-opening GET (Accept: text/event-stream) with the gem's native 405, not the plain description" do
