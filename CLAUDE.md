@@ -240,8 +240,7 @@ config/
 ## Testing
 
 RSpec, with specs co-located by type under `spec/`, mirroring `app/` and `lib/`. Every production
-file has a spec, bar three empty Rails base classes (`ApplicationRecord`, `ApplicationJob`,
-`ApplicationHelper`). Controllers are covered by `spec/requests/*` rather than controller specs —
+file has a spec, bar two empty Rails base classes (`ApplicationRecord`, `ApplicationHelper`). Controllers are covered by `spec/requests/*` rather than controller specs —
 `ApplicationController#rate_limit_identifier` and `Api::BaseController`'s shared `rescue_from`
 handlers are pinned in `spec/requests/api/telemetry_spec.rb` and `spec/requests/api/mcp_spec.rb`.
 

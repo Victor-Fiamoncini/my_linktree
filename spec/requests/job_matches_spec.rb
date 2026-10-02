@@ -71,6 +71,17 @@ RSpec.describe "Job matches", type: :request do
     expect(find_event(events, "job_match.error")[:payload]).to include(severity: "error", error_class: "OpenaiEmbedder::Error")
   end
 
+  it "still reports job_match.error when the exception carries no backtrace" do
+    error = OpenaiClient::Error.new("boom")
+    allow(error).to receive(:backtrace).and_return(nil)
+    allow(use_case).to receive(:execute).and_raise(error)
+
+    events = captured_events { post_job_match("Rails role") }
+
+    expect(response).to have_http_status(:internal_server_error)
+    expect(find_event(events, "job_match.error")[:payload][:backtrace]).to be_nil
+  end
+
   it "rate limits after 3 requests from the same IP" do
     allow(use_case).to receive(:execute).and_return(result)
     3.times { post_job_match("Rails role") }

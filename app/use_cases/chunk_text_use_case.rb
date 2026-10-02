@@ -69,7 +69,7 @@ class ChunkTextUseCase
       current << piece
     end
 
-    chunks << current if current.any?
+    chunks << current
 
     chunks.map { |chunk| chunk.join("\n\n") }
   end
