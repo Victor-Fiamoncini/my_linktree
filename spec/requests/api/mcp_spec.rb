@@ -22,6 +22,24 @@ RSpec.describe "Api::Mcp", type: :request do
     expect(response.parsed_body.dig("error", "code")).to eq(-32600)
   end
 
+  # The limiters inspect params and arguments before the transport validates them, so a string
+  # where an object belongs must read as "no tool", not raise a TypeError into a 500.
+  [
+    { name: "params", params: "x" },
+    { name: "match_job arguments", params: { name: "match_job", arguments: "x" } },
+    { name: "schedule_meeting arguments", params: { name: "schedule_meeting", arguments: 42 } }
+  ].each do |malformed|
+    it "lets the transport answer a tools/call whose #{malformed[:name]} isn't an object" do
+      events = captured_events do
+        post "/api/mcp", params: { jsonrpc: "2.0", id: 1, method: "tools/call", params: malformed[:params] }.to_json, headers: headers
+      end
+
+      expect(response).not_to have_http_status(:internal_server_error)
+      expect(response.parsed_body).to include("jsonrpc" => "2.0")
+      expect(find_event(events, "api.error")).to be_nil
+    end
+  end
+
   it "handles the initialize handshake" do
     post "/api/mcp",
       params: rpc(id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "rspec", version: "1.0" } }),
@@ -264,6 +282,20 @@ RSpec.describe "Api::Mcp", type: :request do
       expect(response).to have_http_status(:too_many_requests)
       expect(response.parsed_body["action"]).to include("schedule_meeting has reached its daily limit")
       expect(find_event(events, "mcp.meeting.budget_exhausted")[:payload]).to eq(severity: "error")
+    end
+
+    it "caps one IP at 3 calls a day, even when it stays under the burst limit" do
+      travel_to Time.zone.parse("2026-09-28 09:00") do
+        3.times do
+          post_schedule_meeting("10.3.0.1")
+          expect(response).to have_http_status(:ok)
+          travel 11.minutes
+        end
+
+        post_schedule_meeting("10.3.0.1")
+        expect(response).to have_http_status(:too_many_requests)
+        expect(Rails.cache.read(booking_key, raw: true).to_i).to eq(3)
+      end
     end
 
     # Declaration order is the guarantee: a per-IP rejection never reaches the global limiter.

@@ -151,7 +151,8 @@ config/
   first and one abusive IP could drain everyone's budget. The global limiter also skips input
   `MatchJobUseCase.acceptable?` rejects, since that never reaches OpenAI; per-IP limits still count it.
   `schedule_meeting` gets the same treatment against spam, since each booking takes a real slot and
-  mails whatever address it was given: after its per-IP limiter (same ordering rule), a shared
+  mails whatever address it was given: after its per-IP limits (3/10 min and 3/day, same ordering
+  rule, so draining the budget takes at least 4 IPs), a shared
   `BOOKING_DAILY_LIMIT` (10/day, `name: "schedule_meeting_global"`) whose `with:` emits
   `mcp.meeting.budget_exhausted`. Draining it blocks genuine bookings until tomorrow, which is
   why that event is error-level.

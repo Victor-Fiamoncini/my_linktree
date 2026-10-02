@@ -14,7 +14,8 @@ module Api
 
     rate_limit to: 30, within: 1.minute, by: -> { rate_limit_identifier }, only: :create, unless: -> { request.options? }
     rate_limit to: 3, within: 10.minutes, name: "schedule_meeting", by: -> { rate_limit_identifier }, if: -> { schedule_meeting_call? }, only: :create
-    # After the per-IP limiter, so one IP can't drain everyone's bookings.
+    rate_limit to: 3, within: 1.day, name: "schedule_meeting_daily", by: -> { rate_limit_identifier }, if: -> { schedule_meeting_call? }, only: :create
+    # After the per-IP limiters, so one IP can't drain everyone's bookings.
     rate_limit to: BOOKING_DAILY_LIMIT, within: 1.day, name: "schedule_meeting_global", by: -> { "all" }, with: :render_booking_budget_exhausted, if: -> { schedule_meeting_call? }, only: :create
     rate_limit to: 5, within: 10.minutes, name: "match_job", by: -> { rate_limit_identifier }, if: -> { match_job_call? }, only: :create
     rate_limit to: 10, within: 1.day, name: "match_job_daily", by: -> { rate_limit_identifier }, if: -> { match_job_call? }, only: :create
@@ -79,7 +80,7 @@ module Api
     end
 
     def billable_match_job_call?
-      match_job_call? && MatchJobUseCase.acceptable?(jsonrpc_payload.dig("params", "arguments", "job_description"))
+      match_job_call? && MatchJobUseCase.acceptable?(hash_or_empty(jsonrpc_params["arguments"])["job_description"])
     end
 
     def jsonrpc_method
@@ -87,7 +88,16 @@ module Api
     end
 
     def jsonrpc_tool
-      jsonrpc_payload.dig("params", "name")
+      jsonrpc_params["name"]
+    end
+
+    def jsonrpc_params
+      hash_or_empty(jsonrpc_payload["params"])
+    end
+
+    # Client-supplied JSON may put a string where an object belongs; dig would raise a 500.
+    def hash_or_empty(value)
+      value.is_a?(Hash) ? value : {}
     end
 
     # Memoized: the body can only be read once, and the rewind is what lets the transport read it.
@@ -98,8 +108,7 @@ module Api
     def parse_jsonrpc_body
       return {} unless request.post?
 
-      parsed = JSON.parse(request.body.read)
-      parsed.is_a?(Hash) ? parsed : {}
+      hash_or_empty(JSON.parse(request.body.read))
     rescue JSON::ParserError, TypeError
       {}
     ensure
