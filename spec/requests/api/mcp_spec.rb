@@ -181,17 +181,14 @@ RSpec.describe "Api::Mcp", type: :request do
       )
     end
 
-    # Pre-existing behaviour, pinned here because the event now makes it visible: a body that
-    # isn't valid JSON blows up in Rails' params parsing (ApplicationController#switch_locale
-    # reads params[:locale]) long before the transport sees it, so it lands on rescue_from
-    # StandardError as a 500 rather than a 400.
-    it "reports api.error for a body that isn't valid JSON" do
+    # switch_locale reads params[:locale], which parses the body; request_locale swallows the
+    # ParseError so the transport answers with a JSON-RPC error instead of a 500 and api.error.
+    it "lets the transport reject a body that isn't valid JSON, without an api.error" do
       events = captured_events { post "/api/mcp", params: "not json at all", headers: headers }
 
-      expect(response).to have_http_status(:internal_server_error)
-      expect(find_event(events, "api.error")[:payload]).to include(
-        error_class: "ActionDispatch::Http::Parameters::ParseError"
-      )
+      expect(response).to have_http_status(:bad_request)
+      expect(response.parsed_body.dig("error", "code")).to eq(-32700)
+      expect(find_event(events, "api.error")).to be_nil
       expect(find_event(events, "api.rate_limited")).to be_nil
     end
 

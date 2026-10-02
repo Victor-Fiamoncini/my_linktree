@@ -6,6 +6,7 @@ class JobMatchesController < ApplicationController
   rate_limit to: GLOBAL_DAILY_LIMIT, within: 1.day, name: "global", scope: :job_match, by: -> { "all" }, with: :render_budget_exhausted, if: -> { MatchJobUseCase.acceptable?(params[:job_description]) }, only: :create
 
   rescue_from StandardError, with: :render_internal_error
+  rescue_from ActionDispatch::Http::Parameters::ParseError, with: :render_bad_request
   rescue_from ArgumentError, with: :render_declined
   rescue_from ValidationError, with: :render_validation_error
   rescue_from ActionController::TooManyRequests, with: :render_too_many_requests

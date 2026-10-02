@@ -17,6 +17,13 @@ class ApplicationController < ActionController::Base
 
   def request_locale
     params[:locale].presence_in(I18n.available_locales.map(&:to_s)) || I18n.default_locale
+  rescue ActionDispatch::Http::Parameters::ParseError
+    I18n.default_locale
+  end
+
+  # A malformed body is the client's mistake, not a 500 worth an error-level event.
+  def render_bad_request
+    render json: { message: "Malformed request body" }, status: :bad_request
   end
 
   def detected_locale
