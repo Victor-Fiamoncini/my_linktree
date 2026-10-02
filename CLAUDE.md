@@ -124,7 +124,11 @@ config/
   inputs. Controllers catch it via `rescue_from ArgumentError`, `ScheduleMeetingTool` via a direct
   `rescue`; `ContactsController` adds a `rescue_from ActionController::InvalidAuthenticityToken` so
   an expired session redirects with a flash instead of a raw 422, and anything else falls through
-  to a generic `rescue_from StandardError`.
+  to a generic `rescue_from StandardError`. A malformed JSON body is a 400 (`render_bad_request`), not a 500:
+  `rescue_from StandardError` would otherwise catch the `ParseError` and report an error-level event,
+  so `ContactsController`, `JobMatchesController` and `Api::BaseController` each rescue it *after*
+  their `StandardError` handler, and `request_locale` falls back to the default locale instead of
+  re-raising.
 - **Rate limiting**: Rails 8's declarative `rate_limit` macro in `ContactsController`,
   `JobMatchesController` and `Api::McpController`, backed by `Rails.cache` (Solid Cache in dev/production, `MemoryStore` in
   test). `ApplicationController#rate_limit_identifier` prefers the `CF-Connecting-IP` header,
@@ -265,6 +269,13 @@ That's a literal string test, so a filtered run with *no* path — `rspec -e "..
 happened to cover. A breach exits **2** with
 `SimpleCov failed with exit 2 due to a coverage related error` *after* the specs have all passed —
 it reads like a suite failure but isn't.
+
+**Attack suite**: `spec/security/` is the one directory that doesn't mirror `app/`. It throws
+hostile input at every public surface: prompt injection (through the real clients, with only
+OpenAI's HTTP faked by `stub_openai` in `spec/support/openai_stubs.rb`), XSS, email injection, SQL
+injection, CSRF and DoS. Each file sets its `type:` explicitly. Per-endpoint rate-limit counts and
+missing-token CSRF stay in `spec/requests/*`; the suite covers what an attacker can make the app
+*do or spend*. Add a case there when adding an endpoint or a new place input is echoed.
 
 Nothing truncates the test database between runs, so a stray `RAILS_ENV=test bin/rails runner`
 that writes a row will break the specs asserting absolute `AgentConnection` counts. Clean up after
