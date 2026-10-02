@@ -97,7 +97,7 @@ RSpec.describe MatchJobUseCase do
 
   it "rejects a job description over the length limit" do
     expect { use_case.execute(job_description: "x" * (described_class::MAX_LENGTH + 1)) }.to raise_error(ValidationError) { |error|
-      expect(error.errors[:job_description]).to include("10000")
+      expect(error.errors[:job_description]).to include("6000")
     }
   end
 

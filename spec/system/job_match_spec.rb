@@ -30,12 +30,12 @@ RSpec.describe "Job match", type: :system do
   end
 
   it "shows the field error and banner when the server rejects the description" do
-    allow(use_case).to receive(:execute).and_raise(ValidationError.new(job_description: "must be at most 10000 characters"))
+    allow(use_case).to receive(:execute).and_raise(ValidationError.new(job_description: "must be at most 6000 characters"))
 
     fill_in "job_description", with: "Too long, pretend"
     click_button "Check the fit"
 
-    expect(page).to have_content("must be at most 10000 characters")
+    expect(page).to have_content("must be at most 6000 characters")
     expect(page).to have_content("Check the job description and try again.")
   end
 end

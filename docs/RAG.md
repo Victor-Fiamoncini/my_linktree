@@ -224,7 +224,7 @@ this behaviour.
 | Concern | Guardrail |
 |---|---|
 | Abuse / cost | Web: 3 per 10 min **and** 10 per day per IP. MCP: 5 `match_job` calls per 10 min **and** 10 per day per IP, on top of the general 30/min. Then one **global 100 per day** shared by both surfaces (`rate_limit ... scope: :job_match`), which bounds the daily OpenAI spend. Input that fails validation skips the global counter |
-| Huge inputs | Job descriptions are capped at 10,000 characters (validated server-side; `maxlength` in the form is only a convenience) |
+| Huge inputs | Job descriptions are capped at 6,000 characters, which keeps even CJK text under the embedding model's 8,191-token limit (validated server-side; `maxlength` in the form is only a convenience) |
 | XSS from model output | The Stimulus controller writes the answer with `textContent`, never `innerHTML` (a system spec checks this) |
 | PII in logs | Events log sizes, token counts and latency, never the job description |
 | Log redaction gotcha | `filter_parameters` redacts any key containing `token`, so the events use `llm_input`/`llm_output` |

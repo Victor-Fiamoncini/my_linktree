@@ -1,6 +1,7 @@
 class MatchJobUseCase
   MODEL = "gpt-6-luna"
-  MAX_LENGTH = 10_000
+  # The embedding model takes at most 8,191 tokens, and CJK text runs about one token per character.
+  MAX_LENGTH = 6_000
   CITED_TEXT_LENGTH = 200
   # Room for low-effort reasoning plus a sub-250-word reply; caps what an injected "write more" costs.
   MAX_OUTPUT_TOKENS = 3000
