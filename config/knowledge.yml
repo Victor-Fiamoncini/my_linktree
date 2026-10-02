@@ -1,0 +1,31 @@
+# Corpus for the job-fit matcher (RAG). Re-run `bin/rails knowledge:ingest` after editing.
+shared: &shared
+  github_owner: Victor-Fiamoncini
+  repos:
+    - Victor-Fiamoncini
+    - my_linktree
+    - my_blog
+    - my_bar_decoder
+    - my_qr_coder
+    - rinha_de_backend_2025_rust
+    - rinha_de_backend_2024_q1_rust
+    - capuchin_audio_classification
+    - urban_audio_classification
+    - polls_for_devs_server
+    - gymanager_server
+    - up_storage
+    - ecoleta
+    - my_faiss_rag
+    - my_hnsw_rag
+    - rinha_de_backend_2023_q3_rust
+    - rinha_de_backend_2024_q1_python
+    - clean_login
+
+development:
+  <<: *shared
+
+test:
+  <<: *shared
+
+production:
+  <<: *shared

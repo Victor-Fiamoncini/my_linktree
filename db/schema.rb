@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_31_133749) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_28_184120) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "vector"
 
   create_table "agent_connections", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -29,5 +30,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_31_133749) do
     t.datetime "slot_start", null: false
     t.datetime "updated_at", null: false
     t.index ["slot_start"], name: "index_bookings_on_slot_start", unique: true
+  end
+
+  create_table "knowledge_chunks", force: :cascade do |t|
+    t.text "content", null: false
+    t.string "content_hash", null: false
+    t.datetime "created_at", null: false
+    t.vector "embedding", limit: 1024, null: false
+    t.string "source_ref", null: false
+    t.string "source_type", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.string "url"
+    t.index ["content_hash"], name: "index_knowledge_chunks_on_content_hash", unique: true
+    t.index ["embedding"], name: "index_knowledge_chunks_on_embedding", opclass: :vector_cosine_ops, using: :hnsw
   end
 end
