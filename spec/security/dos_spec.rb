@@ -70,6 +70,28 @@ RSpec.describe "Denial of service", type: :request do
     expect(sent_to_model.size).to eq(3)
   end
 
+  # Each booking takes a real slot and mails whatever address it was given.
+  it "stops booking slots and sending mail at the daily cap, however many IPs the spammer uses" do
+    travel_to Time.zone.parse("2026-09-28 09:00")
+
+    call = ->(name, arguments, ip) do
+      rpc = { jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: name, arguments: arguments } }
+      perform_enqueued_jobs { post "/api/mcp", params: rpc.to_json, headers: mcp_headers.merge("CF-Connecting-IP" => ip) }
+    end
+
+    call.call("check_availability", {}, "9.9.9.9")
+    slots = JSON.parse(response.parsed_body.dig("result", "content", 0, "text"))["slots"]
+    expect(slots.size).to be > Api::McpController::BOOKING_DAILY_LIMIT
+
+    (Api::McpController::BOOKING_DAILY_LIMIT + 1).times do |index|
+      call.call("schedule_meeting", { name: "Spam", email: "victim#{index}@example.com", slot_start: slots[index] }, "10.9.0.#{index}")
+    end
+
+    expect(response).to have_http_status(:too_many_requests)
+    expect(Booking.count).to eq(Api::McpController::BOOKING_DAILY_LIMIT)
+    expect(ActionMailer::Base.deliveries.size).to eq(Api::McpController::BOOKING_DAILY_LIMIT * 2)
+  end
+
   it "bills OpenAI for at most 5 MCP matches in a burst from one IP" do
     10.times { post "/api/mcp", params: match_job_rpc("Rails role").to_json, headers: mcp_headers.merge("CF-Connecting-IP" => "8.8.8.8") }
 

@@ -139,7 +139,7 @@ config/
   on the same action — a general one and a `schedule_meeting`-specific one whose `unless:` proc
   parses and rewinds the JSON-RPC body so it only counts calls by that name (`match_job` has its
   own too). The controllers catch `ActionController::TooManyRequests` via `rescue_from` rather
-  than the macro's `with:`. The one exception is the job matcher's global limiter. Each call
+  than the macro's `with:`. The exceptions are the two global limiters below. Each job match
   is billed by OpenAI, so both surfaces stack per-IP limits (web: 3/10 min and
   10/day; MCP `match_job`: 5/10 min and 10/day) and then one shared cap of
   `GLOBAL_DAILY_LIMIT` (100/day, a constant in each controller that must stay equal, `by: -> { "all" }`). Both controllers
@@ -150,6 +150,11 @@ config/
   rejection halts the chain before the global counter is touched. Declare the global limiter
   first and one abusive IP could drain everyone's budget. The global limiter also skips input
   `MatchJobUseCase.acceptable?` rejects, since that never reaches OpenAI; per-IP limits still count it.
+  `schedule_meeting` gets the same treatment against spam, since each booking takes a real slot and
+  mails whatever address it was given: after its per-IP limiter (same ordering rule), a shared
+  `BOOKING_DAILY_LIMIT` (10/day, `name: "schedule_meeting_global"`) whose `with:` emits
+  `mcp.meeting.budget_exhausted`. Draining it blocks genuine bookings until tomorrow, which is
+  why that event is error-level.
 - **MCP server** (`Api::McpController`): builds a fresh `MCP::Server` + stateless
   `MCP::Server::Transports::StreamableHTTPTransport` per request (official `mcp` gem) and proxies
   its Rack `[status, headers, body]` triple straight through the Rails response (`self.status=`,
@@ -227,7 +232,8 @@ config/
   key names are load-bearing (see the comment in `app/events/log_redaction.rb`).
 
   The events: `mcp.request`/`mcp.exception` (`config/initializers/mcp.rb`, covering all five
-  tools), `mcp.meeting.booked`/`mcp.meeting.rejected` (`ScheduleMeetingTool`), `api.error`/
+  tools), `mcp.meeting.booked`/`mcp.meeting.rejected` (`ScheduleMeetingTool`),
+  `mcp.meeting.budget_exhausted` (`Api::McpController`), `api.error`/
   `api.rate_limited` (`Api::BaseController`, the latter extended per-endpoint via
   `rate_limited_event_payload`), `hire.request.received`/`hire.request.rejected`, and
   `contact.message.sent`/`.rejected`/`contact.rate_limited`/`contact.csrf_rejected`/`contact.error`,

@@ -244,6 +244,42 @@ RSpec.describe "Api::Mcp", type: :request do
     expect(response).to have_http_status(:too_many_requests)
   end
 
+  describe "schedule_meeting global daily limit" do
+    let(:booking_key) { "rate-limit:api/mcp:schedule_meeting_global:all" }
+
+    def post_schedule_meeting(ip)
+      post "/api/mcp",
+        params: rpc(id: 1, method: "tools/call", params: { name: "schedule_meeting", arguments: { name: "X", email: "x@x.com", slot_start: "2099-01-01T00:00:00.000Z" } }),
+        headers: headers.merge("CF-Connecting-IP" => ip)
+    end
+
+    it "caps everyone at 10 calls a day, with its own message and an error event" do
+      10.times do |index|
+        post_schedule_meeting("10.1.0.#{index}")
+        expect(response).to have_http_status(:ok)
+      end
+
+      events = captured_events { post_schedule_meeting("10.1.1.1") }
+
+      expect(response).to have_http_status(:too_many_requests)
+      expect(response.parsed_body["action"]).to include("schedule_meeting has reached its daily limit")
+      expect(find_event(events, "mcp.meeting.budget_exhausted")[:payload]).to eq(severity: "error")
+    end
+
+    # Declaration order is the guarantee: a per-IP rejection never reaches the global limiter.
+    it "doesn't count calls rejected per IP against the global budget" do
+      5.times { post_schedule_meeting("10.2.0.1") }
+
+      expect(Rails.cache.read(booking_key, raw: true).to_i).to eq(3)
+    end
+
+    it "leaves the other tools alone once the budget is spent" do
+      Rails.cache.increment(booking_key, Api::McpController::BOOKING_DAILY_LIMIT, expires_in: 1.day)
+
+      expect(JSON.parse(call_tool("check_availability").dig("result", "content", 0, "text"))["slots"]).to be_an(Array)
+    end
+  end
+
   it "rate limits match_job specifically after 5 requests from the same IP" do
     use_case = instance_double(MatchJobUseCase, execute: { summary: [], sources: [], usage: { input_tokens: 1, output_tokens: 1 } })
     allow(MatchJobUseCase).to receive(:new).and_return(use_case)
