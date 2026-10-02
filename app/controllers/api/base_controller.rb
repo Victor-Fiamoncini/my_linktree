@@ -3,6 +3,7 @@ module Api
     skip_before_action :verify_authenticity_token
 
     rescue_from StandardError, with: :render_internal_server_error
+    rescue_from ActionDispatch::Http::Parameters::ParseError, with: :render_bad_request
     rescue_from ActionController::TooManyRequests, with: :render_too_many_requests
 
     private

@@ -1,14 +1,18 @@
 # My Linktree
 
-Personal landing page with social links, experience history, a contact form, and an MCP server so
-AI agents can read the resume, check availability, and book a meeting directly.
+Personal landing page with social links, experience history, a contact form, a RAG-powered
+"Do I fit your role?" job matcher, and an MCP server so AI agents can read the resume, assess a job
+fit, check availability, and book a meeting directly.
 
 ## Tech Stack
 
 - **Ruby on Rails 8** — Hotwire (Turbo + Stimulus) via importmap, no Node/JS build step
-- **Postgres 16** — primary database, plus Solid Cache (rate limiting), Solid Queue, and Solid Cable
+- **Postgres 16 + pgvector** — primary database and vector store (via the `neighbor` gem), plus
+  Solid Cache (rate limiting), Solid Queue, and Solid Cable
 - **Tailwind CSS** — hand-rolled Catppuccin Frappé theme, via the `tailwindcss-rails` gem
 - **`mcp`** — official Ruby MCP SDK, driving the MCP server (`/api/mcp`)
+- **OpenAI** (REST: `gpt-6-luna` + `text-embedding-3-small`) — generation and embeddings for the RAG job matcher
+  (see [docs/RAG.md](docs/RAG.md))
 - **Resend** — transactional email for the contact form and meeting bookings (`:test` delivery in development)
 - **Sentry** (`sentry-ruby`/`sentry-rails`) — exception monitoring, DSN pulled from encrypted credentials
 - **Better Stack** (`logtail-rails`) — production log drain plus structured events on the API/MCP endpoints, emitted with Rails 8.1's `Rails.event`
@@ -25,13 +29,16 @@ app/
 │   ├── api/                   # telemetry#index, mcp#create, hire#create
 │   ├── pages_controller.rb    # home page
 │   ├── contacts_controller.rb # POST /contact — JSON response
+│   ├── job_matches_controller.rb # POST /job_match — RAG job-fit summary, JSON response
 │   └── telemetry_page_controller.rb
 ├── use_cases/                 # framework-agnostic business logic (constructor-injected deps)
 ├── events/                    # everything serving Rails.event: the non-production subscriber,
 │                              # and LogRedaction (redacts contacts before they reach a payload)
-├── mcp_tools/                 # get_resume, list_services, check_availability, schedule_meeting
+├── mcp_tools/                 # get_resume, list_services, check_availability, schedule_meeting,
+│                              # match_job
+├── clients/                   # outbound HTTP: OpenaiEmbedder, OpenaiClient, GithubReadmeClient
 ├── mailers/                   # ContactMailer, MeetingMailer
-├── models/                    # Booking (unique slot_start), AgentConnection
+├── models/                    # Booking (unique slot_start), AgentConnection, KnowledgeChunk
 └── javascript/controllers/    # 7 Stimulus controllers (telemetry polling, mobile nav, etc.)
 
 lib/                           # static, request-independent site facts and the text built from
@@ -59,21 +66,31 @@ lib/                           # static, request-independent site facts and the 
   `errors` hash.
 - **Agent-facing surface** — `/AGENTS.md` (prose) and `/llms.txt` (a link index in the
   [llmstxt.org](https://llmstxt.org) shape) are two bodies in `config/agents.yml`, both leading
-  with the MCP endpoint and its four tools and keeping `POST /api/hire` as the fallback for
+  with the MCP endpoint and its five tools and keeping `POST /api/hire` as the fallback for
   clients that don't speak MCP. Specs assert neither drifts from the tools the server registers
   or links a URL that doesn't route. `robots.txt` disallows `/api/` but explicitly allows
   `/api/mcp`.
 - **MCP server** (`Api::McpController`) drives the `mcp` gem's `StreamableHTTPTransport` in
-  stateless mode with 4 registered tools. Every tool call is recorded through
+  stateless mode with 5 registered tools. Every tool call is recorded through
   `RecordAgentConnectionUseCase` before validation runs, so even failed calls show up on
-  `/telemetry`. `schedule_meeting` has its own, stricter rate limit on top of the general one.
+  `/telemetry`. `schedule_meeting` and `match_job` each have their own, stricter rate limit on top of the
+  general one.
+- **RAG job matcher** — `bin/rails knowledge:ingest`, run by hand, chunks
+  `config/profile.yml` and the GitHub READMEs listed in `config/knowledge.yml`, embeds them with
+  OpenAI and stores them in pgvector. `MatchJobUseCase` retrieves the closest chunks for a job
+  description and has OpenAI's `gpt-6-luna` write a cited summary of how he fits the role. It's served on the homepage
+  (`POST /job_match`) and as the `match_job` MCP tool. The web endpoint allows 3 requests per 10
+  minutes and MCP 5, both capped at 10 per day per IP. Both surfaces share one budget of 100
+  calls per day across all visitors and agents; blank or over-long submissions don't count against it. The full walkthrough is in
+  [docs/RAG.md](docs/RAG.md).
 
 ## Getting Started
 
 ```bash
 bundle install
-docker compose up -d          # local Postgres 16
+docker compose up -d          # local Postgres 16 with pgvector
 bin/rails db:create db:migrate
+bin/rails knowledge:ingest    # embed the RAG corpus (needs the rag.* credentials below)
 bin/dev                       # Rails server + Tailwind watcher
 ```
 
@@ -118,13 +135,19 @@ should contain:
 | `mailer.recipient_email`      | any address you want test emails addressed to |
 | `mailer.resend_api_key`       | placeholder (unused locally — `:test` delivery never calls Resend) |
 | `sentry_dsn`                  | placeholder, or a real DSN from your own Sentry project if you want local errors reported |
+| `rag.openai_api_key`          | a real OpenAI API key; see [RAG job matcher](#rag-job-matcher-openai) |
+| `rag.github_token`            | optional, a GitHub token with public read access; without one, README fetches use GitHub's unauthenticated limit of 60 requests/hour |
+
+Unlike the rest of the table, the `rag.*` keys have to be real to use the feature locally, since
+neither API has a test mode. Both have free allowances that easily cover local use. Without them the app still boots and every other page works, but
+`bin/rails knowledge:ingest` fails and the "Do I fit your role?" form answers with a generic error.
 
 No `better_stack` key here: the log drain is production-only. Locally the same structured events
 are printed to the Rails log instead (lines like `[mcp.request] {...}`), so you can see exactly
 what production would ship without sending anything.
 
 `config/credentials/production.yml.enc` has the same shape, but with real production values
-(external Postgres connection, real sender/recipient addresses, and a real
+(external Postgres connection, real sender/recipient addresses, the `rag.*` keys, and a real
 `mailer.resend_api_key` — this one *is* used, since production delivers mail through Resend). See
 [Deployment](#deployment) below.
 
@@ -136,6 +159,7 @@ bin/rails server          # Rails server only
 bundle exec rspec         # Run the test suite
 bin/rubocop               # Lint (rubocop-rails-omakase)
 bin/rails db:migrate       # Run pending migrations
+bin/rails knowledge:ingest # (Re)embed the RAG corpus; only changed chunks are re-embedded
 ```
 
 ## Deployment
@@ -148,8 +172,9 @@ Secrets split across two mechanisms, depending on who needs them and when:
 - **Rails encrypted credentials** (`config/credentials/production.yml.enc`, decrypted by
   `config/credentials/production.key`) hold everything the *app* needs once it's running:
   production Postgres `host`/`port`/`username`/`password`, mailer `sender_email`/`recipient_email`,
-  the Resend `resend_api_key`, `sentry_dsn`, and `better_stack.source_token` /
-  `better_stack.ingesting_host`. These are per-environment credentials, separate
+  the Resend `resend_api_key`, `sentry_dsn`, `better_stack.source_token` /
+  `better_stack.ingesting_host`, and the RAG job matcher's `rag.openai_api_key` /
+  `rag.github_token`. These are per-environment credentials, separate
   from the dev/test keys — a leaked dev/test key can't
   decrypt production secrets. Edit with:
 
@@ -210,6 +235,53 @@ the container log is not sacrificed for the drain.
 Logs are shipped in a background thread and dropped rather than queued if the queue fills, so an
 unreachable Better Stack slows nothing down and takes nothing offline. Leaving `better_stack` out
 of the credentials entirely disables the drain and falls back to plain STDOUT logging.
+
+### RAG job matcher (OpenAI)
+
+The "Do I fit your role?" section and the `match_job` MCP tool call OpenAI for both embeddings
+(`text-embedding-3-small`) and generation (`gpt-6-luna`). Every call is billed, but cheaply: a
+match costs about $0.0005, and a full re-embed of the corpus a fraction of a cent. Walkthrough and
+design notes: [docs/RAG.md](docs/RAG.md).
+
+1. Get the keys:
+   - **OpenAI**: at [platform.openai.com](https://platform.openai.com/api-keys), create a project
+     key. Add a payment method and set a monthly **budget limit** on the project, so a runaway
+     can't bill more than you allow. The app's own 100 calls/day cap already bounds normal use.
+   - **GitHub** (optional): a fine-grained token with **Public repositories (read-only)** access
+     and no other permissions. It only raises the rate limit for README fetches.
+2. Add them to each environment's credentials. `development` and `production` each need their own
+   copy, since every environment has its own file:
+
+   ```bash
+   bin/rails credentials:edit --environment production
+   ```
+
+   ```yaml
+   rag:
+     openai_api_key: sk-...
+     github_token: github_pat_...   # optional
+   ```
+
+   Don't add real values to `config/credentials/test.yml.enc`. Its key is committed, and its `rag`
+   block holds dummy strings on purpose, since the specs stub every API.
+3. Make sure the production Postgres has the **pgvector** extension available. The
+   `EnableVector` migration runs `CREATE EXTENSION vector`, and `kamal deploy` fails on
+   `db:prepare` if the server doesn't ship it. Locally, `compose.yml` and CI use the
+   `pgvector/pgvector:pg16` image, which does.
+4. `kamal deploy`, then build the corpus:
+
+   ```bash
+   kamal app exec --reuse "bin/rails knowledge:ingest"
+   ```
+
+   Nothing re-indexes on a schedule. Run the task again whenever `config/profile.yml`, a README
+   or the repo list in `config/knowledge.yml` changes. It's idempotent, so only changed chunks
+   are re-embedded.
+
+As with Better Stack, no env var or `config/deploy.yml` change is needed: `RAILS_MASTER_KEY`
+already decrypts the file. In Better Stack, watch for `job_match.budget_exhausted`: it means the
+shared web + MCP cap of 100 calls/day was reached (`surface` says which one hit it). A `job_match.error` with `OpenaiClient::Error` and
+`HTTP 429` means OpenAI's rate limit or the project's budget limit was hit.
 
 ### Cloudflare
 

@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   get "AGENTS.md" => "static#agents_md"
   get "llms.txt" => "static#llms_txt"
   post "contact" => "contacts#create"
+  post "job_match" => "job_matches#create"
 
   namespace :api do
     get "telemetry" => "telemetry#index"

@@ -22,6 +22,24 @@ RSpec.describe "Api::Mcp", type: :request do
     expect(response.parsed_body.dig("error", "code")).to eq(-32600)
   end
 
+  # The limiters inspect params and arguments before the transport validates them, so a string
+  # where an object belongs must read as "no tool", not raise a TypeError into a 500.
+  [
+    { name: "params", params: "x" },
+    { name: "match_job arguments", params: { name: "match_job", arguments: "x" } },
+    { name: "schedule_meeting arguments", params: { name: "schedule_meeting", arguments: 42 } }
+  ].each do |malformed|
+    it "lets the transport answer a tools/call whose #{malformed[:name]} isn't an object" do
+      events = captured_events do
+        post "/api/mcp", params: { jsonrpc: "2.0", id: 1, method: "tools/call", params: malformed[:params] }.to_json, headers: headers
+      end
+
+      expect(response).not_to have_http_status(:internal_server_error)
+      expect(response.parsed_body).to include("jsonrpc" => "2.0")
+      expect(find_event(events, "api.error")).to be_nil
+    end
+  end
+
   it "handles the initialize handshake" do
     post "/api/mcp",
       params: rpc(id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "rspec", version: "1.0" } }),
@@ -54,11 +72,11 @@ RSpec.describe "Api::Mcp", type: :request do
     expect(server_info).not_to have_key("icons")
   end
 
-  it "lists all 4 tools" do
+  it "lists all 5 tools" do
     post "/api/mcp", params: rpc(id: 1, method: "tools/list"), headers: headers
 
     tool_names = response.parsed_body.dig("result", "tools").map { |t| t["name"] }
-    expect(tool_names).to contain_exactly("get_resume", "list_services", "check_availability", "schedule_meeting")
+    expect(tool_names).to contain_exactly("get_resume", "list_services", "check_availability", "schedule_meeting", "match_job")
   end
 
   it "calls get_resume and records the connection" do
@@ -181,17 +199,14 @@ RSpec.describe "Api::Mcp", type: :request do
       )
     end
 
-    # Pre-existing behaviour, pinned here because the event now makes it visible: a body that
-    # isn't valid JSON blows up in Rails' params parsing (ApplicationController#switch_locale
-    # reads params[:locale]) long before the transport sees it, so it lands on rescue_from
-    # StandardError as a 500 rather than a 400.
-    it "reports api.error for a body that isn't valid JSON" do
+    # switch_locale reads params[:locale], which parses the body; request_locale swallows the
+    # ParseError so the transport answers with a JSON-RPC error instead of a 500 and api.error.
+    it "lets the transport reject a body that isn't valid JSON, without an api.error" do
       events = captured_events { post "/api/mcp", params: "not json at all", headers: headers }
 
-      expect(response).to have_http_status(:internal_server_error)
-      expect(find_event(events, "api.error")[:payload]).to include(
-        error_class: "ActionDispatch::Http::Parameters::ParseError"
-      )
+      expect(response).to have_http_status(:bad_request)
+      expect(response.parsed_body.dig("error", "code")).to eq(-32700)
+      expect(find_event(events, "api.error")).to be_nil
       expect(find_event(events, "api.rate_limited")).to be_nil
     end
 
@@ -245,6 +260,128 @@ RSpec.describe "Api::Mcp", type: :request do
       params: rpc(id: 1, method: "tools/call", params: { name: "schedule_meeting", arguments: { name: "X", email: "x@x.com", slot_start: "2099-01-01T00:00:00.000Z" } }),
       headers: ip_headers
     expect(response).to have_http_status(:too_many_requests)
+  end
+
+  describe "schedule_meeting global daily limit" do
+    let(:booking_key) { "rate-limit:api/mcp:schedule_meeting_global:all" }
+
+    def post_schedule_meeting(ip)
+      post "/api/mcp",
+        params: rpc(id: 1, method: "tools/call", params: { name: "schedule_meeting", arguments: { name: "X", email: "x@x.com", slot_start: "2099-01-01T00:00:00.000Z" } }),
+        headers: headers.merge("CF-Connecting-IP" => ip)
+    end
+
+    it "caps everyone at 10 calls a day, with its own message and an error event" do
+      10.times do |index|
+        post_schedule_meeting("10.1.0.#{index}")
+        expect(response).to have_http_status(:ok)
+      end
+
+      events = captured_events { post_schedule_meeting("10.1.1.1") }
+
+      expect(response).to have_http_status(:too_many_requests)
+      expect(response.parsed_body["action"]).to include("schedule_meeting has reached its daily limit")
+      expect(find_event(events, "mcp.meeting.budget_exhausted")[:payload]).to eq(severity: "error")
+    end
+
+    it "caps one IP at 3 calls a day, even when it stays under the burst limit" do
+      travel_to Time.zone.parse("2026-09-28 09:00") do
+        3.times do
+          post_schedule_meeting("10.3.0.1")
+          expect(response).to have_http_status(:ok)
+          travel 11.minutes
+        end
+
+        post_schedule_meeting("10.3.0.1")
+        expect(response).to have_http_status(:too_many_requests)
+        expect(Rails.cache.read(booking_key, raw: true).to_i).to eq(3)
+      end
+    end
+
+    # Declaration order is the guarantee: a per-IP rejection never reaches the global limiter.
+    it "doesn't count calls rejected per IP against the global budget" do
+      5.times { post_schedule_meeting("10.2.0.1") }
+
+      expect(Rails.cache.read(booking_key, raw: true).to_i).to eq(3)
+    end
+
+    it "leaves the other tools alone once the budget is spent" do
+      Rails.cache.increment(booking_key, Api::McpController::BOOKING_DAILY_LIMIT, expires_in: 1.day)
+
+      expect(JSON.parse(call_tool("check_availability").dig("result", "content", 0, "text"))["slots"]).to be_an(Array)
+    end
+  end
+
+  it "rate limits match_job specifically after 5 requests from the same IP" do
+    use_case = instance_double(MatchJobUseCase, execute: { summary: [], sources: [], usage: { input_tokens: 1, output_tokens: 1 } })
+    allow(MatchJobUseCase).to receive(:new).and_return(use_case)
+    ip_headers = headers.merge("X-Forwarded-For" => "9.9.9.9")
+    params = rpc(id: 1, method: "tools/call", params: { name: "match_job", arguments: { job_description: "Rails role" } })
+
+    5.times do
+      post "/api/mcp", params: params, headers: ip_headers
+      expect(response).to have_http_status(:ok)
+    end
+
+    post "/api/mcp", params: params, headers: ip_headers
+    expect(response).to have_http_status(:too_many_requests)
+  end
+
+  describe "match_job daily limits" do
+    let(:match_job_params) { rpc(id: 1, method: "tools/call", params: { name: "match_job", arguments: { job_description: "Rails role" } }) }
+
+    before do
+      use_case = instance_double(MatchJobUseCase, execute: { summary: [], sources: [], usage: { input_tokens: 1, output_tokens: 1 } })
+      allow(MatchJobUseCase).to receive(:new).and_return(use_case)
+    end
+
+    def post_match_job(ip)
+      post "/api/mcp", params: match_job_params, headers: headers.merge("CF-Connecting-IP" => ip)
+    end
+
+    it "caps one IP at 10 match_job calls a day, even when it stays under the burst limit" do
+      travel_to Time.zone.parse("2026-09-28 09:00") do
+        10.times do |index|
+          travel 11.minutes if index.positive? && (index % 5).zero?
+          post_match_job("6.6.6.6")
+          expect(response).to have_http_status(:ok)
+        end
+
+        travel 11.minutes
+        post_match_job("6.6.6.6")
+        expect(response).to have_http_status(:too_many_requests)
+      end
+    end
+
+    it "draws from the web form's global budget, with its own message and an error event" do
+      Rails.cache.increment("rate-limit:job_match:global:all", Api::McpController::GLOBAL_DAILY_LIMIT, expires_in: 1.day)
+
+      events = captured_events { post_match_job("7.7.7.7") }
+
+      expect(response).to have_http_status(:too_many_requests)
+      expect(response.parsed_body["action"]).to include("daily limit")
+      expect(find_event(events, "job_match.budget_exhausted")[:payload]).to eq(severity: "error", surface: "mcp")
+    end
+
+    it "doesn't count calls rejected per IP against the global budget" do
+      7.times { post_match_job("8.8.8.8") }
+
+      expect(Rails.cache.read("rate-limit:job_match:global:all", raw: true).to_i).to eq(5)
+    end
+
+    it "leaves the global budget alone for match_job calls that fail validation" do
+      post "/api/mcp", params: rpc(id: 1, method: "tools/call", params: { name: "match_job", arguments: { job_description: " " } }),
+        headers: headers.merge("CF-Connecting-IP" => "8.8.4.4")
+
+      expect(response).to have_http_status(:ok)
+      expect(Rails.cache.read("rate-limit:job_match:global:all", raw: true)).to be_nil
+    end
+
+    it "leaves the global budget alone for other tools" do
+      post "/api/mcp", params: rpc(id: 1, method: "tools/list"), headers: headers
+
+      expect(Rails.cache.read("rate-limit:job_match:global:all", raw: true)).to be_nil
+    end
   end
 
   it "rate limits by the real connection IP when no X-Forwarded-For header is present" do
@@ -307,7 +444,7 @@ RSpec.describe "Api::Mcp", type: :request do
     get "/api/mcp"
 
     expect(response).to have_http_status(:ok)
-    expect(response.parsed_body["tools"]).to contain_exactly("get_resume", "list_services", "check_availability", "schedule_meeting")
+    expect(response.parsed_body["tools"]).to contain_exactly("get_resume", "list_services", "check_availability", "schedule_meeting", "match_job")
   end
 
   it "answers a stream-opening GET (Accept: text/event-stream) with the gem's native 405, not the plain description" do

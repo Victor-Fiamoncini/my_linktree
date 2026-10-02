@@ -13,6 +13,8 @@ en:
       nav_experience_title: "Go to Experience section"
       nav_hire_label: "#hire-me"
       nav_hire_title: "Go to Hire Me section"
+      nav_job_match_label: "#job-fit"
+      nav_job_match_title: "Go to Job Fit section"
       nav_contact_label: "#contact"
       nav_contact_title: "Go to Contact section"
       telemetry_button_label: "/telemetry"
@@ -57,7 +59,7 @@ en:
     hire_from_agent:
       prompt: "$ ./hire-me --no-human-required"
       heading: "Hire me from your agent"
-      intro_html: "This portfolio speaks %{mcp_link}! It exposes an %{mcp_server} alongside the site itself, with four tools. You can add this portfolio as a connector on your favorite Harness (Claude, ChatGPT, Deepseek, Kimi, etc). Your agent will be able to verify my work, check my availability and book a meeting."
+      intro_html: "This portfolio speaks %{mcp_link}! It exposes an %{mcp_server} alongside the site itself, with five tools. You can add this portfolio as a connector on your favorite Harness (Claude, ChatGPT, Deepseek, Kimi, etc). Your agent will be able to verify my work, check how I fit a job, check my availability and book a meeting."
       mcp_link_title: "Model Context Protocol"
       mcp_server: "MCP server"
       copy_endpoint_title: "Copy MCP endpoint"
@@ -70,6 +72,16 @@ en:
       agents_md_services_line: "Services: Frontend & Backend Software Development, Agentic Systems & Integrations, Websites & Landing Pages and Mobile Apps"
       copy: "Copy"
       copied: "Copied!"
+    job_match:
+      prompt: "$ cat job.txt | ./match --rag"
+      heading: "Do I fit your role?"
+      intro_html: "Paste a job description. This section uses %{rag_link} (retrieval-augmented generation): it retrieves the closest excerpts from my resume and GitHub projects, then has OpenAI write up how my experience fits the role, grounded in them."
+      rag_link_title: "Retrieval-augmented generation"
+      label: "job description"
+      placeholder: "Paste the job description here..."
+      submit: "Check the fit"
+      submitting: "Reading the job and searching my work..."
+      generic_error: "Something went wrong. Please check your connection and try again."
 
   telemetry_page:
     title: "Live Agent Telemetry"
@@ -122,6 +134,17 @@ en:
     errors:
       blank: "can't be blank"
       invalid_email: "is invalid"
+
+  job_matches:
+    validation_failed: "Check the job description and try again."
+    declined: "That request couldn't be processed. Please try a different job description."
+    too_many_requests: "You've reached the limit of job checks for now. Please try again later."
+    budget_exhausted: "The job matcher has reached its daily limit. Please try again tomorrow, or use the contact form below."
+    invalid_authenticity_token: "Your session expired. Please refresh the page and try again."
+    internal_error: "Something went wrong on our end. Please try again in a moment."
+    errors:
+      blank: "can't be blank"
+      too_long: "must be at most %{count} characters"
 
   seo:
     job_title: "Software Engineer"
