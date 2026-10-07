@@ -35,7 +35,7 @@
         data-theme-target="switch"
         aria-checked="<%= current_theme == "latte" %>"
         aria-label="<%= t("shared.header.toggle_theme") %>"
-        title="<%= t("shared.header.toggle_theme") %>"
+        title="<%= t("shared.header.theme_title.#{current_theme}") %>"
         class="group border-ctp-surface1 bg-ctp-crust hover:border-theme-accent focus-visible:outline-theme-accent relative flex h-7 w-[52px] shrink-0 cursor-pointer items-center border p-0.5 transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2"
       >
         <span class="bg-theme-accent text-ctp-crust latte:translate-x-6 flex h-[22px] w-[22px] items-center justify-center transition-all duration-300 ease-[cubic-bezier(.5,1.6,.5,1)] group-hover:shadow-[0_0_12px_-2px_var(--color-theme-accent)]">

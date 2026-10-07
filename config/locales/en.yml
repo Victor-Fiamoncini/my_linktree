@@ -21,6 +21,9 @@ en:
       telemetry_title: "View live telemetry"
       toggle_nav: "Toggle navigation menu"
       toggle_theme: "Toggle light theme"
+      theme_title:
+        frappe: "Switch to light theme"
+        latte: "Switch to dark theme"
       switch_language: "View in %{language}"
     footer:
       copyright: "© %{year} Victor Fiamoncini"

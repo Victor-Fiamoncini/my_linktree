@@ -49,11 +49,14 @@ RSpec.describe "Theme toggle", type: :system do
     expect(page).to have_css('html[data-theme="latte"]', visible: :all)
     expect(page).to have_css("button[role='switch'][aria-checked='true']")
     expect(page).to have_css("header nav ul button[aria-pressed='true']")
+    expect(page).to have_css("button[role='switch'][title='Switch to dark theme']")
+    expect(page).to have_css("header nav ul button[title='Switch to dark theme']")
 
     find("button[role='switch']").click
 
     expect(page).to have_css('html[data-theme="frappe"]', visible: :all)
     expect(page).to have_css("button[role='switch'][aria-checked='false']")
+    expect(page).to have_css("button[role='switch'][title='Switch to light theme']")
   end
 
   it "moves the active highlight in the Theme card and the browser chrome color with the theme" do

@@ -76,6 +76,7 @@ RSpec.describe "Pages", type: :request do
       expect(response.body).to include('<meta name="theme-color" content="#8caaee">')
       expect(response.body).to include('aria-pressed="false"')
       expect(response.body).to include('aria-checked="false"')
+      expect(response.body.scan('title="Switch to light theme"').size).to eq(3)
     end
 
     it "renders Latte when the theme cookie asks for it" do
@@ -87,6 +88,7 @@ RSpec.describe "Pages", type: :request do
       expect(response.body).to include('<meta name="theme-color" content="#1e66f5">')
       expect(response.body).to include('aria-pressed="true"')
       expect(response.body).to include('aria-checked="true"')
+      expect(response.body.scan('title="Switch to dark theme"').size).to eq(3)
     end
   end
 
