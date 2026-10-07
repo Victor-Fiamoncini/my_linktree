@@ -21,6 +21,9 @@ pt-BR:
       telemetry_title: "Ver telemetria ao vivo"
       toggle_nav: "Abrir/fechar menu de navegação"
       toggle_theme: "Alternar tema claro"
+      theme_title:
+        frappe: "Mudar para o tema claro"
+        latte: "Mudar para o tema escuro"
       switch_language: "Ver em %{language}"
     footer:
       copyright: "© %{year} Victor Fiamoncini"
