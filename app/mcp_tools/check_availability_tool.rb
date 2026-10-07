@@ -1,12 +1,9 @@
-class CheckAvailabilityTool < MCP::Tool
+class CheckAvailabilityTool < ApplicationTool
   tool_name "check_availability"
   description "Check available meeting slots with Victor Fiamoncini."
   input_schema(properties: {})
 
-  def self.call(**)
-    RecordAgentConnectionUseCase.new.execute(tool: "check_availability")
-
-    result = CheckAvailabilityUseCase.new.execute
-    MCP::Tool::Response.new([ { type: "text", text: result.to_json } ])
+  def self.perform(**)
+    CheckAvailabilityUseCase.new.execute
   end
 end
