@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Job matches", type: :request do
+RSpec.describe "Api::JobMatches", type: :request do
   let(:json_headers) { { "Content-Type" => "application/json", "Accept" => "application/json" } }
   let(:use_case) { instance_double(MatchJobUseCase) }
   let(:result) do
@@ -15,7 +15,7 @@ RSpec.describe "Job matches", type: :request do
 
   def post_job_match(job_description, locale: "en", ip: nil)
     headers = ip ? json_headers.merge("CF-Connecting-IP" => ip) : json_headers
-    post "/job_match", params: { job_description: job_description, locale: locale }.to_json, headers: headers
+    post "/api/job_match", params: { job_description: job_description, locale: locale }.to_json, headers: headers
   end
 
   it "returns the summary as plain prose, without citations, sources or usage" do

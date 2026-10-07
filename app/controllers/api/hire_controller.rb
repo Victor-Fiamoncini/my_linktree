@@ -1,5 +1,5 @@
 module Api
-  class HireController < BaseController
+  class HireController < PublicController
     rate_limit to: 2, within: 10.minutes, by: -> { rate_limit_identifier }, only: :create
 
     rescue_from ValidationError, with: :render_validation_error

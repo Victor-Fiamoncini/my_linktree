@@ -4,8 +4,8 @@ RSpec.describe "Cross-site request forgery", type: :request do
   let(:json_headers) { { "Content-Type" => "application/json", "Accept" => "application/json" } }
   let(:endpoints) do
     {
-      "/contact" => { name: "Jane", email: "jane@example.com", message: "Hi" },
-      "/job_match" => { job_description: "Rails role" }
+      "/api/contact" => { name: "Jane", email: "jane@example.com", message: "Hi" },
+      "/api/job_match" => { job_description: "Rails role" }
     }
   end
   let!(:sent_to_model) { stub_openai }
