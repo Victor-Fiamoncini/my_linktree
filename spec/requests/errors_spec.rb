@@ -18,7 +18,7 @@ RSpec.describe "Errors", type: :request do
 
     expect(response).to have_http_status(:not_found)
     expect(response.media_type).to eq("text/html")
-    expect(response.body).to include('<html lang="en">')
+    expect(response.body).to include('<html lang="en"')
     expect(page.at("h1").text).to eq(I18n.t("errors.not_found.heading", locale: :en))
   end
 
@@ -26,21 +26,21 @@ RSpec.describe "Errors", type: :request do
     get "/pt-BR/nope"
 
     expect(response).to have_http_status(:not_found)
-    expect(response.body).to include('<html lang="pt-BR">')
+    expect(response.body).to include('<html lang="pt-BR"')
     expect(page.at("h1").text).to eq(I18n.t("errors.not_found.heading", locale: :"pt-BR"))
   end
 
   it "detects the locale from CF-IPCountry for a path without one" do
     get "/nope", headers: { "CF-IPCountry" => "BR" }
 
-    expect(response.body).to include('<html lang="pt-BR">')
+    expect(response.body).to include('<html lang="pt-BR"')
     expect(page.at('link[rel="canonical"]')["href"]).to eq("#{SeoConfig::SITE_URL}/pt-BR/nope")
   end
 
   it "detects the locale from Accept-Language for a path without one" do
     get "/nope", headers: { "Accept-Language" => "en-US,en;q=0.9" }
 
-    expect(response.body).to include('<html lang="en">')
+    expect(response.body).to include('<html lang="en"')
   end
 
   it "points the language switch at the same path in the other locale" do

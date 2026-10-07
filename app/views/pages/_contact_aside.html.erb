@@ -1,22 +1,78 @@
 <%
-  swatch_classes = %w[bg-ctp-blue bg-ctp-mauve bg-ctp-green bg-ctp-yellow bg-ctp-peach bg-ctp-teal]
+  # Literal class strings so Tailwind picks them up; each row shows its own flavor whatever the active theme.
+  flavors = [
+    {
+      name: "Catppuccin Frappé",
+      url: SeoConfig::CATPPUCCIN_FRAPPE_URL,
+      # Active unless Latte is on
+      row_classes: "border-theme-accent bg-ctp-surface0/50 latte:border-transparent latte:bg-transparent latte:opacity-55 latte:hover:opacity-100",
+      name_classes: "text-ctp-text font-medium latte:text-ctp-subtext0 latte:font-normal",
+      active_badge_classes: "inline-flex latte:hidden",
+      swatch_classes: %w[bg-[#8caaee] bg-[#ca9ee6] bg-[#a6d189] bg-[#e5c890] bg-[#ef9f76] bg-[#81c8be]]
+    },
+    {
+      name: "Catppuccin Latte",
+      url: SeoConfig::CATPPUCCIN_LATTE_URL,
+      row_classes: "border-transparent opacity-55 hover:opacity-100 latte:border-theme-accent latte:bg-ctp-surface0/50 latte:opacity-100",
+      name_classes: "text-ctp-subtext0 latte:text-ctp-text latte:font-medium",
+      active_badge_classes: "hidden latte:inline-flex",
+      swatch_classes: %w[bg-[#1e66f5] bg-[#8839ef] bg-[#40a02b] bg-[#df8e1d] bg-[#fe640b] bg-[#179299]]
+    }
+  ]
 %>
 <div class="grid gap-3">
   <%= render "shared/external_link", icon: :linkedin, link: SeoConfig::LINKEDIN_URL, label: "LinkedIn", handle: "/in/victor-fiamoncini", variant: "card", accent: "blue" %>
   <%= render "shared/external_link", icon: :github, link: SeoConfig::GITHUB_URL, label: "GitHub", handle: "Victor-Fiamoncini", variant: "card", accent: "mauve" %>
 
   <div class="bg-ctp-mantle border-ctp-surface0 rounded-btn border px-5 py-[18px]">
-    <p class="text-ctp-overlay0 mb-2 font-mono text-xs tracking-[0.08em] uppercase"><%= t("shared.contact_aside.theme_label") %></p>
-    <a
-      href="<%= SeoConfig::CATPPUCCIN_URL %>"
-      target="_blank"
-      rel="noopener noreferrer"
-      title="<%= t("shared.contact_aside.theme_link_title") %>"
-      class="text-ctp-subtext0 hover:text-ctp-text mb-3.5 inline-block text-sm transition-colors"
-    >Catppuccin Frappé</a>
-    <div class="flex gap-1.5">
-      <% swatch_classes.each do |klass| %>
-        <span class="rounded-chip h-5 w-5 <%= klass %>"></span>
+    <div class="mb-3 flex items-center justify-between gap-3">
+      <p class="text-ctp-overlay0 font-mono text-xs tracking-[0.08em] uppercase"><%= t("shared.contact_aside.theme_label") %></p>
+
+      <button
+        type="button"
+        role="switch"
+        data-action="theme#toggle"
+        data-theme-target="switch"
+        aria-checked="<%= current_theme == "latte" %>"
+        aria-label="<%= t("shared.header.toggle_theme") %>"
+        title="<%= t("shared.header.toggle_theme") %>"
+        class="group border-ctp-surface1 bg-ctp-crust hover:border-theme-accent focus-visible:outline-theme-accent relative flex h-7 w-[52px] shrink-0 cursor-pointer items-center border p-0.5 transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2"
+      >
+        <span class="bg-theme-accent text-ctp-crust latte:translate-x-6 flex h-[22px] w-[22px] items-center justify-center transition-all duration-300 ease-[cubic-bezier(.5,1.6,.5,1)] group-hover:shadow-[0_0_12px_-2px_var(--color-theme-accent)]">
+          <span class="h-3.5 w-3.5 latte:hidden"><%= svg_icon(:moon) %></span>
+
+          <span class="hidden h-3.5 w-3.5 latte:block"><%= svg_icon(:sun) %></span>
+        </span>
+      </button>
+    </div>
+
+    <div class="grid gap-1.5">
+      <% flavors.each do |flavor| %>
+        <div class="-mx-2 border-l-2 px-2.5 py-2 transition-all duration-300 <%= flavor[:row_classes] %>">
+          <div class="mb-2 flex items-center justify-between gap-3">
+            <a
+              href="<%= flavor[:url] %>"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="<%= t("shared.contact_aside.theme_link_title", flavor: flavor[:name]) %>"
+              class="hover:text-ctp-text inline-block text-sm transition-colors <%= flavor[:name_classes] %>"
+            ><%= flavor[:name] %></a>
+
+            <span class="text-theme-accent items-center gap-1.5 font-mono text-[11px] tracking-[0.08em] uppercase <%= flavor[:active_badge_classes] %>">
+              <span class="relative flex h-1.5 w-1.5">
+                <span class="bg-theme-accent absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
+                <span class="bg-theme-accent relative inline-flex h-1.5 w-1.5 rounded-full"></span>
+              </span>
+              <%= t("shared.contact_aside.theme_active") %>
+            </span>
+          </div>
+
+          <div class="flex gap-1.5">
+            <% flavor[:swatch_classes].each do |klass| %>
+              <span class="rounded-chip h-5 w-5 <%= klass %>"></span>
+            <% end %>
+          </div>
+        </div>
       <% end %>
     </div>
   </div>

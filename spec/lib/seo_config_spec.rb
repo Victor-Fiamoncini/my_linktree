@@ -12,7 +12,8 @@ RSpec.describe SeoConfig do
   it "serves every URL over absolute https" do
     urls = [
       described_class::SITE_URL, described_class::LINKEDIN_URL, described_class::GITHUB_URL,
-      described_class::CATPPUCCIN_URL, described_class::MCP_ENDPOINT,
+      described_class::CATPPUCCIN_FRAPPE_URL, described_class::CATPPUCCIN_LATTE_URL,
+      described_class::MCP_ENDPOINT,
       described_class::MCP_ICON_192, described_class::MCP_ICON_512
     ]
 

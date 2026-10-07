@@ -1,25 +1,9 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Catppuccin Frappé palette — kept in sync with app/assets/tailwind/application.css
-const CATPPUCCIN_PALETTE = [
-  [48, 52, 70],    // base
-  [41, 44, 60],    // mantle
-  [35, 38, 52],    // crust
-  [65, 69, 89],    // surface0
-  [81, 87, 109],   // surface1
-  [115, 121, 148], // overlay0
-  [165, 173, 206], // subtext0
-  [181, 191, 226], // subtext1
-  [198, 208, 245], // text
-  [140, 170, 238], // blue
-  [202, 158, 230], // mauve
-  [166, 209, 137], // green
-  [229, 200, 144], // yellow
-  [129, 200, 190], // teal
-  [186, 187, 241], // lavender
-  [239, 159, 118], // peach
-  [244, 184, 228], // pink
-  [231, 130, 132]  // red
+// Read from the active theme's --color-ctp-* variables in app/assets/tailwind/application.css
+const PALETTE_COLORS = [
+  "base", "mantle", "crust", "surface0", "surface1", "overlay0", "subtext0", "subtext1", "text",
+  "blue", "mauve", "green", "yellow", "teal", "lavender", "peach", "pink", "red"
 ]
 
 // 48x56 keeps cells perfectly square at the canvas's 300x350 display size
@@ -41,8 +25,14 @@ export default class extends Controller {
   }
 
   render() {
-    const displayWidth = this.canvasTarget.width
-    const displayHeight = this.canvasTarget.height
+    if (!this.sourceTarget.naturalWidth) return
+
+    // Captured once: the canvas is resized to device pixels below, so re-renders can't re-read it.
+    this.displayWidth ??= this.canvasTarget.width
+    this.displayHeight ??= this.canvasTarget.height
+    this.palette = this.readPalette()
+
+    const { displayWidth, displayHeight } = this
 
     // The source image's natural aspect ratio doesn't match the display box, and the
     // <img> uses object-cover (CSS crops it to fill the box, centered) — so the sampler
@@ -112,11 +102,21 @@ export default class extends Controller {
     return { sx: 0, sy: (sourceHeight - sHeight) / 2, sWidth, sHeight }
   }
 
+  readPalette() {
+    const styles = getComputedStyle(document.documentElement)
+
+    return PALETTE_COLORS.map((name) => {
+      const hex = styles.getPropertyValue(`--color-ctp-${name}`).trim().slice(1)
+
+      return [0, 2, 4].map((offset) => parseInt(hex.slice(offset, offset + 2), 16))
+    })
+  }
+
   nearestPaletteColor(r, g, b) {
-    let closest = CATPPUCCIN_PALETTE[0]
+    let closest = this.palette[0]
     let closestDistance = Infinity
 
-    for (const color of CATPPUCCIN_PALETTE) {
+    for (const color of this.palette) {
       const distance = (r - color[0]) ** 2 + (g - color[1]) ** 2 + (b - color[2]) ** 2
 
       if (distance < closestDistance) {

@@ -57,14 +57,37 @@ RSpec.describe "Pages", type: :request do
 
     expect(response).to have_http_status(:ok)
     expect(response.body).to include("<!DOCTYPE html>")
-    expect(response.body).to include('<html lang="en">')
+    expect(response.body).to include('<html lang="en"')
   end
 
   it "renders the home page in Portuguese" do
     get "/pt-BR"
 
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include('<html lang="pt-BR">')
+    expect(response.body).to include('<html lang="pt-BR"')
+  end
+
+  # Rendered server-side from the cookie so the first paint is already in the chosen theme.
+  describe "theme" do
+    it "renders Frappé by default" do
+      get "/en"
+
+      expect(response.body).to include('data-theme="frappe"')
+      expect(response.body).to include('<meta name="theme-color" content="#8caaee">')
+      expect(response.body).to include('aria-pressed="false"')
+      expect(response.body).to include('aria-checked="false"')
+    end
+
+    it "renders Latte when the theme cookie asks for it" do
+      cookies[:theme] = "latte"
+
+      get "/en"
+
+      expect(response.body).to include('data-theme="latte"')
+      expect(response.body).to include('<meta name="theme-color" content="#1e66f5">')
+      expect(response.body).to include('aria-pressed="true"')
+      expect(response.body).to include('aria-checked="true"')
+    end
   end
 
   # These render into <head>, so nothing on the page looks wrong when they break — a malformed

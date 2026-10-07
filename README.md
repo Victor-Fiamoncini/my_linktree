@@ -9,7 +9,7 @@ fit, check availability, and book a meeting directly.
 - **Ruby on Rails 8** — Hotwire (Turbo + Stimulus) via importmap, no Node/JS build step
 - **Postgres 16 + pgvector** — primary database and vector store (via the `neighbor` gem), plus
   Solid Cache (rate limiting), Solid Queue, and Solid Cable
-- **Tailwind CSS** — hand-rolled Catppuccin Frappé theme, via the `tailwindcss-rails` gem
+- **Tailwind CSS** — hand-rolled Catppuccin Frappé theme with a Latte light-theme toggle, via the `tailwindcss-rails` gem
 - **`mcp`** — official Ruby MCP SDK, driving the MCP server (`/api/mcp`)
 - **OpenAI** (REST: `gpt-6-luna` + `text-embedding-3-small`) — generation and embeddings for the RAG job matcher
   (see [docs/RAG.md](docs/RAG.md))
