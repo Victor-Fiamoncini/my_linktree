@@ -13,10 +13,12 @@ html {
   --radius-chip: 0px;
 }
 
-@theme {
-  /* Catppuccin Frappé — https://catppuccin.com/palette/ (hand-rolled: the official
-     @catppuccin/tailwindcss plugin pairs Latte-light/Frappé-dark via prefers-color-scheme,
-     which would flip the site to Latte for light-mode visitors instead of staying Frappé) */
+@custom-variant latte (&:where([data-theme="latte"], [data-theme="latte"] *));
+
+/* Catppuccin Frappé by default, Latte on opt-in via the header toggle — https://catppuccin.com/palette/
+   (hand-rolled: the official plugin picks the flavor by prefers-color-scheme, not by choice).
+   `static` emits every variable, since JS reads the accents at runtime. */
+@theme static {
   --color-ctp-base: #303446;
   --color-ctp-mantle: #292c3c;
   --color-ctp-crust: #232634;
@@ -38,6 +40,58 @@ html {
   --color-ctp-peach: #ef9f76;
   --color-ctp-pink: #f4b8e4;
   --color-ctp-red: #e78284;
+
+  /* The theme toggles' accent: Frappé's moon is mauve, Latte's sun is yellow */
+  --color-theme-accent: var(--color-ctp-mauve);
+
+  /* Terminal panels stay Mocha in the dark theme */
+  --color-term-bar: #181825;
+  --color-term-bg: #1e1e2e;
+  --color-term-text: #cdd6f4;
+  --color-term-blue: #89b4fa;
+  --color-term-green: #a6e3a1;
+  --color-term-yellow: #f9e2af;
+  --color-term-red: #f38ba8;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+[data-theme="latte"] {
+  color-scheme: light;
+
+  --color-ctp-base: #eff1f5;
+  --color-ctp-mantle: #e6e9ef;
+  --color-ctp-crust: #dce0e8;
+  --color-ctp-surface0: #ccd0da;
+  --color-ctp-surface1: #bcc0cc;
+  --color-ctp-surface2: #acb0be;
+  --color-ctp-overlay0: #9ca0b0;
+  --color-ctp-overlay1: #8c8fa1;
+  --color-ctp-overlay2: #7c7f93;
+  --color-ctp-subtext0: #6c6f85;
+  --color-ctp-subtext1: #5c5f77;
+  --color-ctp-text: #4c4f69;
+  --color-ctp-blue: #1e66f5;
+  --color-ctp-mauve: #8839ef;
+  --color-ctp-green: #40a02b;
+  --color-ctp-yellow: #df8e1d;
+  --color-ctp-teal: #179299;
+  --color-ctp-lavender: #7287fd;
+  --color-ctp-peach: #fe640b;
+  --color-ctp-pink: #ea76cb;
+  --color-ctp-red: #d20f39;
+
+  --color-theme-accent: var(--color-ctp-yellow);
+
+  --color-term-bar: #dce0e8;
+  --color-term-bg: #e6e9ef;
+  --color-term-text: #4c4f69;
+  --color-term-blue: #1e66f5;
+  --color-term-green: #40a02b;
+  --color-term-yellow: #df8e1d;
+  --color-term-red: #d20f39;
 }
 
 ::selection {
@@ -94,6 +148,10 @@ html {
   mix-blend-mode: screen;
   transform: translate(-50%, -50%);
   animation: cursor-trail-fade 650ms steps(6, end) forwards;
+}
+
+[data-theme="latte"] .cursor-trail-pixel {
+  mix-blend-mode: multiply;
 }
 
 @keyframes cursor-trail-fade {

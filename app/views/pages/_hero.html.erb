@@ -52,6 +52,7 @@
       title="<%= t("pages.hero.photo_link_title") %>"
       class="group rounded-card relative block"
       data-controller="photo-pixelate"
+      data-action="theme:change@window->photo-pixelate#render"
     >
       <img
         data-photo-pixelate-target="source"

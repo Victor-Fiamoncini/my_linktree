@@ -34,14 +34,14 @@
 	</p>
 
 	<div class="mt-6 w-full text-left mb-8">
-		<div class="border-ctp-surface0 rounded-t-btn flex items-center justify-between border border-b-0 bg-[#181825] px-4 py-2">
+		<div class="border-ctp-surface0 rounded-t-btn flex items-center justify-between border border-b-0 bg-term-bar px-4 py-2">
 			<div class="flex items-center gap-3">
         <span class="flex gap-1.5">
-          <span class="h-2.5 w-2.5 rounded-full bg-[#f38ba8]"></span>
-          <span class="h-2.5 w-2.5 rounded-full bg-[#f9e2af]"></span>
-          <span class="h-2.5 w-2.5 rounded-full bg-[#a6e3a1]"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-term-red"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-term-yellow"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-term-green"></span>
         </span>
-				<span class="text-xs font-bold tracking-widest text-[#cdd6f4]">MY_MCP_ENDPOINT.md</span>
+				<span class="text-xs font-bold tracking-widest text-term-text">MY_MCP_ENDPOINT.md</span>
 			</div>
 
 			<button
@@ -49,11 +49,11 @@
 				title="<%= t("pages.hire_from_agent.copy_endpoint_title") %>"
 				data-action="hire-from-agent#copy"
 				data-hire-from-agent-content-param="<%= SeoConfig::MCP_ENDPOINT %>"
-				class="cursor-pointer text-xs font-bold tracking-widest uppercase transition-colors text-[#89b4fa] hover:text-[#cdd6f4]"
+				class="cursor-pointer text-xs font-bold tracking-widest uppercase transition-colors text-term-blue hover:text-term-text"
 			><%= t("pages.hire_from_agent.copy") %></button>
 		</div>
 
-		<pre class="border-ctp-surface0 rounded-b-btn w-full overflow-x-auto border bg-[#1e1e2e] p-4 text-xs leading-relaxed font-semibold text-[#a6e3a1]"><code><%= SeoConfig::MCP_ENDPOINT %> <span class="text-ctp-overlay0 font-mono text-xs"><%= t("pages.hire_from_agent.no_auth_note") %></span>
+		<pre class="border-ctp-surface0 rounded-b-btn w-full overflow-x-auto border bg-term-bg p-4 text-xs leading-relaxed font-semibold text-term-green"><code><%= SeoConfig::MCP_ENDPOINT %> <span class="text-ctp-overlay0 font-mono text-xs"><%= t("pages.hire_from_agent.no_auth_note") %></span>
 			<span class="text-ctp-overlay0 font-mono text-xs block"><%= t("pages.hire_from_agent.watch_telemetry_note_html", url: "#{SeoConfig::SITE_URL}/#{I18n.locale}/telemetry") %></span></code></pre>
 	</div>
 
@@ -62,14 +62,14 @@
   </p>
 
   <div class="w-full text-left">
-    <div class="border-ctp-surface0 rounded-t-btn flex items-center justify-between border border-b-0 bg-[#181825] px-4 py-2">
+    <div class="border-ctp-surface0 rounded-t-btn flex items-center justify-between border border-b-0 bg-term-bar px-4 py-2">
       <div class="flex items-center gap-3">
         <span class="flex gap-1.5">
-          <span class="h-2.5 w-2.5 rounded-full bg-[#f38ba8]"></span>
-          <span class="h-2.5 w-2.5 rounded-full bg-[#f9e2af]"></span>
-          <span class="h-2.5 w-2.5 rounded-full bg-[#a6e3a1]"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-term-red"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-term-yellow"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-term-green"></span>
         </span>
-        <span class="text-xs font-bold tracking-widest text-[#cdd6f4]">AGENTS.md</span>
+        <span class="text-xs font-bold tracking-widest text-term-text">AGENTS.md</span>
       </div>
 
       <button
@@ -77,11 +77,11 @@
         title="<%= t("pages.hire_from_agent.copy_agents_md_title") %>"
         data-action="hire-from-agent#copy"
         data-hire-from-agent-content-param="<%= agents_md_preview %>"
-        class="cursor-pointer text-xs font-bold tracking-widest uppercase transition-colors text-[#89b4fa] hover:text-[#cdd6f4]"
+        class="cursor-pointer text-xs font-bold tracking-widest uppercase transition-colors text-term-blue hover:text-term-text"
       ><%= t("pages.hire_from_agent.copy") %></button>
     </div>
 
-    <pre class="border-ctp-surface0 rounded-b-btn w-full overflow-x-auto border bg-[#1e1e2e] p-4 text-xs leading-relaxed font-semibold text-[#a6e3a1]"><code><span class="text-ctp-overlay0 font-mono text-xs"><%= agents_md_preview.lines.first.chomp %></span>
+    <pre class="border-ctp-surface0 rounded-b-btn w-full overflow-x-auto border bg-term-bg p-4 text-xs leading-relaxed font-semibold text-term-green"><code><span class="text-ctp-overlay0 font-mono text-xs"><%= agents_md_preview.lines.first.chomp %></span>
 <%= agents_md_preview.lines.drop(1).join %></code></pre>
   </div>
 </section>

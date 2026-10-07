@@ -23,16 +23,16 @@
     </div>
 
     <div class="text-left">
-      <div class="border-ctp-surface0 rounded-t-btn flex items-center gap-3 border border-b-0 bg-[#181825] px-4 py-2">
+      <div class="border-ctp-surface0 rounded-t-btn flex items-center gap-3 border border-b-0 bg-term-bar px-4 py-2">
         <span class="flex gap-1.5">
-          <span class="h-2.5 w-2.5 rounded-full bg-[#f38ba8]"></span>
-          <span class="h-2.5 w-2.5 rounded-full bg-[#f9e2af]"></span>
-          <span class="h-2.5 w-2.5 rounded-full bg-[#a6e3a1]"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-term-red"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-term-yellow"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-term-green"></span>
         </span>
-        <span class="text-xs font-bold tracking-widest text-[#cdd6f4]">agents.log</span>
+        <span class="text-xs font-bold tracking-widest text-term-text">agents.log</span>
       </div>
 
-      <div class="border-ctp-surface0 rounded-b-btn border bg-[#1e1e2e] px-4 py-3" data-controller="telemetry-feed" data-telemetry-feed-url-value="<%= api_telemetry_path %>">
+      <div class="border-ctp-surface0 rounded-b-btn border bg-term-bg px-4 py-3" data-controller="telemetry-feed" data-telemetry-feed-url-value="<%= api_telemetry_path %>">
         <p data-telemetry-feed-target="loading" class="text-ctp-overlay0 py-2 font-mono text-xs"><%= t("telemetry_page.loading") %></p>
         <p data-telemetry-feed-target="error" class="text-ctp-red hidden py-2 font-mono text-xs"><%= t("telemetry_page.error") %></p>
         <p data-telemetry-feed-target="empty" class="text-ctp-overlay0 hidden py-2 font-mono text-xs"><%= t("telemetry_page.empty") %></p>
