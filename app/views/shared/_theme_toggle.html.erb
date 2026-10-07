@@ -1,0 +1,13 @@
+<button
+  type="button"
+  data-action="theme#toggle"
+  data-theme-target="toggle"
+  aria-pressed="<%= current_theme == "latte" %>"
+  aria-label="<%= t("shared.header.toggle_theme") %>"
+  title="<%= t("shared.header.toggle_theme") %>"
+  class="border-ctp-surface1 text-ctp-subtext0 rounded-btn hover:border-theme-accent hover:text-theme-accent focus-visible:outline-theme-accent flex h-9 w-9 cursor-pointer items-center justify-center border transition-all duration-200 hover:scale-105 hover:shadow-[0_0_12px_-4px_var(--color-theme-accent)] focus-visible:outline-2 focus-visible:outline-offset-2"
+>
+  <span class="h-4 w-4 latte:hidden"><%= svg_icon(:sun) %></span>
+
+  <span class="hidden h-4 w-4 latte:block"><%= svg_icon(:moon) %></span>
+</button>

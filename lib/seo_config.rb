@@ -4,7 +4,8 @@ module SeoConfig
   AUTHOR_NAME = "Victor Fiamoncini"
   LINKEDIN_URL = "https://www.linkedin.com/in/victor-fiamoncini-b74b72159"
   GITHUB_URL = "https://github.com/Victor-Fiamoncini"
-  CATPPUCCIN_URL = "https://catppuccin.com/palette/?flavor=frappe"
+  CATPPUCCIN_FRAPPE_URL = "https://catppuccin.com/palette/?flavor=frappe"
+  CATPPUCCIN_LATTE_URL = "https://catppuccin.com/palette/?flavor=latte"
   MCP_ENDPOINT = "#{SITE_URL}/api/mcp".freeze
   MCP_ICON_192 = "#{SITE_URL}/web-app-manifest-192x192.png".freeze
   MCP_ICON_512 = "#{SITE_URL}/web-app-manifest-512x512.png".freeze

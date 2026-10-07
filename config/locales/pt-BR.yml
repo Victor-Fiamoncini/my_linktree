@@ -20,6 +20,7 @@ pt-BR:
       telemetry_button_label: "/telemetria"
       telemetry_title: "Ver telemetria ao vivo"
       toggle_nav: "Abrir/fechar menu de navegação"
+      toggle_theme: "Alternar tema claro"
       switch_language: "Ver em %{language}"
     footer:
       copyright: "© %{year} Victor Fiamoncini"
@@ -29,7 +30,8 @@ pt-BR:
       title: "Ir para a seção de contato"
     contact_aside:
       theme_label: "Tema"
-      theme_link_title: "Página oficial do tema Catppuccin"
+      theme_link_title: "Página oficial da paleta Catppuccin (%{flavor})"
+      theme_active: "ativo"
 
   pages:
     hero:

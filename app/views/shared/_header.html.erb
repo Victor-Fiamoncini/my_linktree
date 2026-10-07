@@ -45,10 +45,14 @@
 			<li><%= link_to telemetry_path, title: t("shared.header.telemetry_title"), class: telemetry_button_class do %><%= t("shared.header.telemetry_button_label") %> <span class="text-ctp-crust/70">↗</span><% end %></li>
 
 			<li><%= link_to switch_label, switch_path, title: t("shared.header.switch_language", language: other_language_name), rel: "alternate", hreflang: other_locale, class: "text-ctp-subtext0 hover:text-ctp-text font-mono text-[13px] transition-colors" %></li>
+
+      <li><%= render "shared/theme_toggle" %></li>
     </ul>
 
     <div class="flex items-center gap-3 min-[900px]:hidden">
       <%= link_to switch_label, switch_path, title: t("shared.header.switch_language", language: other_language_name), rel: "alternate", hreflang: other_locale, class: "text-ctp-subtext0 hover:text-ctp-text font-mono text-[13px] transition-colors" %>
+
+      <%= render "shared/theme_toggle" %>
 
       <button
         type="button"

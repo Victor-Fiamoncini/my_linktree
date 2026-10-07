@@ -1,17 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Catppuccin Frappé accents — kept in sync with app/assets/tailwind/application.css
-const CATPPUCCIN_COLORS = [
-  "#8caaee", // blue
-  "#ca9ee6", // mauve
-  "#a6d189", // green
-  "#e5c890", // yellow
-  "#81c8be", // teal
-  "#babbf1", // lavender
-  "#ef9f76", // peach
-  "#f4b8e4", // pink
-  "#e78284", // red
-]
+// Resolved per pixel from the active theme's --color-ctp-* variables, so the trail follows the toggle
+const TRAIL_COLORS = ["blue", "mauve", "green", "yellow", "teal", "lavender", "peach", "pink", "red"]
 const SPAWN_INTERVAL_MS = 40
 const PIXEL_LIFETIME_MS = 650
 
@@ -41,14 +31,14 @@ export default class extends Controller {
 
   spawnPixel(x, y) {
     const pixel = document.createElement("span")
-    const color = CATPPUCCIN_COLORS[this.colorIndex % CATPPUCCIN_COLORS.length]
+    const color = TRAIL_COLORS[this.colorIndex % TRAIL_COLORS.length]
 
     this.colorIndex += 1
 
     pixel.className = "cursor-trail-pixel"
     pixel.style.left = `${x}px`
     pixel.style.top = `${y}px`
-    pixel.style.background = color
+    pixel.style.background = `var(--color-ctp-${color})`
 
     document.body.appendChild(pixel)
 

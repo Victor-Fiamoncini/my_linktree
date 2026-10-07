@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<%= I18n.locale %>">
+<html lang="<%= I18n.locale %>" data-theme="<%= current_theme %>">
   <head>
     <meta charset="utf-8">
     <title><%= content_for(:title) || default_title %></title>
@@ -13,10 +13,10 @@
     <link rel="alternate" hreflang="x-default" href="<%= SeoConfig::SITE_URL %><%= canonical_path.sub(%r{\A/(en|pt-BR)}, "/en") %>">
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="theme-color" content="#8caaee">
+    <meta name="theme-color" content="<%= theme_color %>">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="msapplication-navbutton-color" content="#8caaee">
-    <meta name="apple-mobile-web-app-status-bar-style" content="#8caaee">
+    <meta name="msapplication-navbutton-color" content="<%= theme_color %>">
+    <meta name="apple-mobile-web-app-status-bar-style" content="<%= theme_color %>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Victor Fiamoncini">
@@ -57,7 +57,7 @@
     <%= Sentry.get_trace_propagation_meta.html_safe %>
   </head>
 
-  <body class="bg-ctp-base flex min-h-screen flex-col font-sans antialiased" data-controller="cursor-trail">
+  <body class="bg-ctp-base flex min-h-screen flex-col font-sans antialiased" data-controller="cursor-trail theme">
     <%= render "shared/header" %>
 
     <%= yield %>
