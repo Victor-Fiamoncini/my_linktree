@@ -6,7 +6,7 @@ module Api
 
     private
 
-    # Log class + message, not the exception — the default formatter drops boths.
+    # Log class + message, not the exception — the default formatter drops both.
     def render_internal_server_error(e)
       Rails.logger.error("#{e.class}: #{e.message}")
 

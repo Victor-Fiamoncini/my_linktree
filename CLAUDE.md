@@ -216,7 +216,7 @@ config/
   link must recognize under some HTTP verb.
 - **RAG job-fit matcher** (study guide: [docs/RAG.md](docs/RAG.md)): a job description goes to
   `MatchJobUseCase`. It embeds the text with OpenAI (`text-embedding-3-small` at 1024 dimensions), takes the 8 nearest `KnowledgeChunk`s by cosine distance
-  (`neighbor` gem), at most 2 per source title so one README can't fill the prompt,, and sends them to `gpt-6-luna` (`OpenaiClient`, Responses API, plain REST) as numbered
+  (`neighbor` gem), at most 2 per source title so one README can't fill the prompt, and sends them to `gpt-6-luna` (`OpenaiClient`, Responses API, plain REST) as numbered
   documents. There are no native citations for passed-in text, so a strict `RESPONSE_SCHEMA` forces a JSON reply of paragraphs
   with the document numbers behind each. Out-of-range numbers are dropped, and the rest map to a
   deduped source list. Only MCP gets the citations and sources: `POST /api/job_match` returns just the
