@@ -26,16 +26,15 @@ the app had before this migration:
 ```
 app/
 ├── controllers/
-│   ├── api/                   # telemetry#index, mcp#create, hire#create
+│   ├── api/                   # every JSON endpoint: Public (telemetry, mcp, hire) and Form (contact, job_match)
 │   ├── pages_controller.rb    # home page
-│   ├── contacts_controller.rb # POST /contact — JSON response
-│   ├── job_matches_controller.rb # POST /job_match — RAG job-fit summary, JSON response
 │   └── telemetry_page_controller.rb
 ├── use_cases/                 # framework-agnostic business logic (constructor-injected deps)
 ├── events/                    # everything serving Rails.event: the non-production subscriber,
-│                              # and LogRedaction (redacts contacts before they reach a payload)
-├── mcp_tools/                 # get_resume, list_services, check_availability, schedule_meeting,
-│                              # match_job
+│                              # LogRedaction (redacts contacts before they reach a payload) and
+│                              # JobMatchEvents
+├── mcp_tools/                 # ApplicationTool base + get_resume, list_services, check_availability,
+│                              # schedule_meeting, match_job
 ├── clients/                   # outbound HTTP: OpenaiEmbedder, OpenaiClient, GithubReadmeClient
 ├── mailers/                   # ContactMailer, MeetingMailer
 ├── models/                    # Booking (unique slot_start), AgentConnection, KnowledgeChunk
@@ -72,14 +71,14 @@ lib/                           # static, request-independent site facts and the 
   `/api/mcp`.
 - **MCP server** (`Api::McpController`) drives the `mcp` gem's `StreamableHTTPTransport` in
   stateless mode with 5 registered tools. Every tool call is recorded through
-  `RecordAgentConnectionUseCase` before validation runs, so even failed calls show up on
+  `RecordAgentConnectionUseCase` (in the shared `ApplicationTool` base) before validation runs, so even failed calls show up on
   `/telemetry`. `schedule_meeting` and `match_job` each have their own, stricter rate limit on top of the
   general one.
 - **RAG job matcher** — `bin/rails knowledge:ingest`, run by hand, chunks
   `config/profile.yml` and the GitHub READMEs listed in `config/knowledge.yml`, embeds them with
   OpenAI and stores them in pgvector. `MatchJobUseCase` retrieves the closest chunks for a job
   description and has OpenAI's `gpt-6-luna` write a cited summary of how he fits the role. It's served on the homepage
-  (`POST /job_match`) and as the `match_job` MCP tool. The web endpoint allows 3 requests per 10
+  (`POST /api/job_match`) and as the `match_job` MCP tool. The web endpoint allows 3 requests per 10
   minutes and MCP 5, both capped at 10 per day per IP. Both surfaces share one budget of 100
   calls per day across all visitors and agents; blank or over-long submissions don't count against it. The full walkthrough is in
   [docs/RAG.md](docs/RAG.md).
@@ -324,8 +323,8 @@ shared web + MCP cap of 100 calls/day was reached (`surface` says which one hit 
   check "All rate limiting rules" (so it can't exempt `/api/mcp` from this one even if we wanted
   it to), but 60 req/10s per IP is far more than a normal agent session's handful of tool calls
   would ever hit — only an actual flood trips it. App-level rate limiting
-  (`ContactsController`/`Api::McpController`'s `rate_limit` macro, see Architecture below) still
-  layers on top for `/api/mcp` and `/contact` with tighter, tool-aware thresholds (e.g. a stricter
+  (`Api::ContactsController`/`Api::McpController`'s `rate_limit` macro, see Architecture below) still
+  layers on top for `/api/mcp` and `/api/contact` with tighter, tool-aware thresholds (e.g. a stricter
   limit specifically on `schedule_meeting` calls) that this coarse edge rule can't express.
 - **Bot Fight Mode** (Security → Settings, under "Bot traffic") is safe to enable here specifically
   *because* the MCP exemption rule already checks "All Super Bot Fight Mode Rules" — confirm that

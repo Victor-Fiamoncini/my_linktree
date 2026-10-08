@@ -9,10 +9,10 @@ Rails.application.routes.draw do
   get "sitemap.xml" => "static#sitemap"
   get "AGENTS.md" => "static#agents_md"
   get "llms.txt" => "static#llms_txt"
-  post "contact" => "contacts#create"
-  post "job_match" => "job_matches#create"
 
   namespace :api do
+    post "contact" => "contacts#create"
+    post "job_match" => "job_matches#create"
     get "telemetry" => "telemetry#index"
     post "hire" => "hire#create"
     match "mcp" => "mcp#create", via: [ :post, :get, :options, :delete ]

@@ -5,6 +5,7 @@ class MatchJobUseCase
   CITED_TEXT_LENGTH = 200
   # Room for low-effort reasoning plus a sub-250-word reply; caps what an injected "write more" costs.
   MAX_OUTPUT_TOKENS = 3000
+  GLOBAL_DAILY_LIMIT = 100
 
   SYSTEM_PROMPT = <<~PROMPT.freeze
     You explain to a recruiter why Victor Fiamoncini, a software engineer, is or could be a good fit

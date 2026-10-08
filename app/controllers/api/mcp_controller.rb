@@ -1,5 +1,5 @@
 module Api
-  class McpController < BaseController
+  class McpController < PublicController
     TOOLS = [ GetResumeTool, ListServicesTool, CheckAvailabilityTool, ScheduleMeetingTool, MatchJobTool ].freeze
 
     CORS_METHOD_HEADERS = {
@@ -7,7 +7,6 @@ module Api
       "Access-Control-Allow-Headers" => "Content-Type, Accept, Mcp-Session-Id, Mcp-Protocol-Version"
     }.freeze
 
-    GLOBAL_DAILY_LIMIT = 100
     BOOKING_DAILY_LIMIT = 10
 
     before_action :set_cors_headers
@@ -19,7 +18,7 @@ module Api
     rate_limit to: BOOKING_DAILY_LIMIT, within: 1.day, name: "schedule_meeting_global", by: -> { "all" }, with: :render_booking_budget_exhausted, if: -> { schedule_meeting_call? }, only: :create
     rate_limit to: 5, within: 10.minutes, name: "match_job", by: -> { rate_limit_identifier }, if: -> { match_job_call? }, only: :create
     rate_limit to: 10, within: 1.day, name: "match_job_daily", by: -> { rate_limit_identifier }, if: -> { match_job_call? }, only: :create
-    rate_limit to: GLOBAL_DAILY_LIMIT, within: 1.day, name: "global", scope: :job_match, by: -> { "all" }, with: :render_budget_exhausted, if: -> { billable_match_job_call? }, only: :create
+    rate_limit to: MatchJobUseCase::GLOBAL_DAILY_LIMIT, within: 1.day, name: "global", scope: :job_match, by: -> { "all" }, with: :render_budget_exhausted, if: -> { billable_match_job_call? }, only: :create
 
     def create
       return head :ok if request.options?
@@ -72,47 +71,19 @@ module Api
     end
 
     def schedule_meeting_call?
-      jsonrpc_method == "tools/call" && jsonrpc_tool == "schedule_meeting"
+      jsonrpc.tool_call?("schedule_meeting")
     end
 
     def match_job_call?
-      jsonrpc_method == "tools/call" && jsonrpc_tool == "match_job"
+      jsonrpc.tool_call?("match_job")
     end
 
     def billable_match_job_call?
-      match_job_call? && MatchJobUseCase.acceptable?(hash_or_empty(jsonrpc_params["arguments"])["job_description"])
+      match_job_call? && MatchJobUseCase.acceptable?(jsonrpc.arguments["job_description"])
     end
 
-    def jsonrpc_method
-      jsonrpc_payload["method"]
-    end
-
-    def jsonrpc_tool
-      jsonrpc_params["name"]
-    end
-
-    def jsonrpc_params
-      hash_or_empty(jsonrpc_payload["params"])
-    end
-
-    # Client-supplied JSON may put a string where an object belongs; dig would raise a 500.
-    def hash_or_empty(value)
-      value.is_a?(Hash) ? value : {}
-    end
-
-    # Memoized: the body can only be read once, and the rewind is what lets the transport read it.
-    def jsonrpc_payload
-      @jsonrpc_payload ||= parse_jsonrpc_body
-    end
-
-    def parse_jsonrpc_body
-      return {} unless request.post?
-
-      hash_or_empty(JSON.parse(request.body.read))
-    rescue JSON::ParserError, TypeError
-      {}
-    ensure
-      request.body&.rewind
+    def jsonrpc
+      @jsonrpc ||= JsonRpcRequest.new(request)
     end
 
     def render_budget_exhausted
@@ -128,7 +99,7 @@ module Api
     end
 
     def rate_limited_event_payload
-      super.merge(jsonrpc_method: jsonrpc_method, tool: jsonrpc_tool)
+      super.merge(jsonrpc_method: jsonrpc.method_name, tool: jsonrpc.tool)
     end
   end
 end

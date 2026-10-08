@@ -2,7 +2,7 @@
   input_class = "bg-ctp-mantle border-ctp-surface1 text-ctp-text rounded-btn focus:border-ctp-blue w-full border px-[14px] py-3 text-[15px] transition-colors outline-none"
   field_error_class = "text-ctp-red hidden text-xs"
 %>
-<%= form_with url: contact_path, method: :post, class: "grid w-full gap-4",
+<%= form_with url: api_contact_path, method: :post, class: "grid w-full gap-4",
   data: {
     controller: "contact-form", action: "submit->contact-form#submit",
     contact_form_sending_value: t("pages.contact_form.sending"),

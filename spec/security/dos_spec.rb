@@ -18,7 +18,7 @@ RSpec.describe "Denial of service", type: :request do
 
   before { create_knowledge_chunk(axis: 0) }
 
-  %w[/contact /job_match /api/hire].each do |path|
+  %w[/api/contact /api/job_match /api/hire].each do |path|
     it "answers malformed bodies to #{path} with a 400, not an error-level event" do
       malformed_bodies.each do |label, body|
         events = captured_events { post path, params: body, headers: json_headers }
@@ -51,7 +51,7 @@ RSpec.describe "Denial of service", type: :request do
   it "rejects an over-long job description on both surfaces before calling OpenAI" do
     oversized = "x" * (MatchJobUseCase::MAX_LENGTH + 1)
 
-    post "/job_match", params: { job_description: oversized }.to_json, headers: json_headers
+    post "/api/job_match", params: { job_description: oversized }.to_json, headers: json_headers
     expect(response).to have_http_status(:unprocessable_content)
 
     post "/api/mcp", params: match_job_rpc(oversized).to_json, headers: mcp_headers
@@ -62,7 +62,7 @@ RSpec.describe "Denial of service", type: :request do
 
   it "bills OpenAI for at most 3 matches in a burst from one IP, however it rotates X-Forwarded-For" do
     10.times do |index|
-      post "/job_match", params: { job_description: "Rails role" }.to_json,
+      post "/api/job_match", params: { job_description: "Rails role" }.to_json,
         headers: json_headers.merge("CF-Connecting-IP" => "7.7.7.7", "X-Forwarded-For" => "10.0.0.#{index}")
     end
 

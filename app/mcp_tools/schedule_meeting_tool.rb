@@ -1,4 +1,4 @@
-class ScheduleMeetingTool < MCP::Tool
+class ScheduleMeetingTool < ApplicationTool
   tool_name "schedule_meeting"
   description "Schedule a meeting with Victor Fiamoncini for an available slot returned by check_availability."
   input_schema(
@@ -10,9 +10,7 @@ class ScheduleMeetingTool < MCP::Tool
     }
   )
 
-  def self.call(name: nil, email: nil, company: nil, slot_start: nil, **)
-    RecordAgentConnectionUseCase.new.execute(tool: "schedule_meeting")
-
+  def self.perform(name: nil, email: nil, company: nil, slot_start: nil, **)
     booking = ScheduleMeetingUseCase.new.execute(name: name, email: email, company: company, slot_start: slot_start)
 
     Rails.event.notify(
@@ -22,19 +20,16 @@ class ScheduleMeetingTool < MCP::Tool
       **LogRedaction.contact(booking[:email])
     )
 
-    payload = { name: booking[:name], email: booking[:email], company: booking[:company], slot_start: booking[:slot_start] }
-    MCP::Tool::Response.new([ { type: "text", text: payload.to_json } ])
-  rescue ArgumentError => e
-    # isError: true at HTTP 200 reaches neither rescue_from nor the gem's exception reporter, so
-    # without this a double-booked slot or a missing field leaves no trace at all.
+    booking.slice(:name, :email, :company, :slot_start)
+  end
+
+  def self.rejected(error, email: nil, slot_start: nil, **)
     Rails.event.notify(
       "mcp.meeting.rejected",
       severity: "warn",
-      reason: e.message,
+      reason: error.message,
       slot_start: slot_start,
       **LogRedaction.contact(email)
     )
-
-    MCP::Tool::Response.new([ { type: "text", text: e.message } ], error: true)
   end
 end

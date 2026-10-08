@@ -407,7 +407,7 @@ collection:
           created: 1787945572764
           modified: 1787945572764
           sortKey: -1787945572751
-          description: "POST /contact — unlike the api/* controllers, ContactsController does
+          description: "POST /api/contact — unlike Api::PublicController's subclasses, Api::ContactsController does
             NOT skip Rails' default CSRF protection. Run 'Get CSRF Token'
             first (once per session) so its afterResponse script populates
             {{ csrf_token }} and the session cookie before sending a
@@ -442,7 +442,7 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: "{{base_url}}/contact"
+          - url: "{{base_url}}/api/contact"
             name: Send Contact Message
             meta:
               id: req_4532e0ee7ab26e520b3326ccdd755afa
@@ -479,7 +479,7 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: "{{base_url}}/contact"
+          - url: "{{base_url}}/api/contact"
             name: "Send Contact Message (validation error)"
             meta:
               id: req_f7ddde52aa252899adb62a452fdcb914

@@ -9,7 +9,7 @@
     <%= t("pages.job_match.intro_html", rag_link: rag_link) %>
   </p>
 
-  <%= form_with url: job_match_path, method: :post, class: "grid w-full gap-4",
+  <%= form_with url: api_job_match_path, method: :post, class: "grid w-full gap-4",
     data: {
       controller: "job-match", action: "submit->job-match#submit",
       job_match_submitting_value: t("pages.job_match.submitting"),

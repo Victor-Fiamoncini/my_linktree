@@ -39,14 +39,14 @@ RSpec.describe "SQL injection", type: :request do
         stub_openai
         chunk = create_knowledge_chunk(axis: 0)
 
-        post "/job_match", params: { job_description: payload }.to_json, headers: { "Content-Type" => "application/json" }
+        post "/api/job_match", params: { job_description: payload }.to_json, headers: { "Content-Type" => "application/json" }
 
         expect(response).to have_http_status(:ok)
         expect(KnowledgeChunk.sole).to eq(chunk)
       end
 
       it "can't pick a locale that isn't allow-listed" do
-        post "/contact", params: { name: "Jane", email: "not-an-email", message: "Hi", locale: payload }.to_json, headers: { "Content-Type" => "application/json" }
+        post "/api/contact", params: { name: "Jane", email: "not-an-email", message: "Hi", locale: payload }.to_json, headers: { "Content-Type" => "application/json" }
 
         expect(response.parsed_body["errors"]).to eq("email" => I18n.t("contacts.errors.invalid_email", locale: :en))
       end
