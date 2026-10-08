@@ -1,11 +1,11 @@
 require "rails_helper"
 
-RSpec.describe "Contacts", type: :request do
+RSpec.describe "Api::Contacts", type: :request do
   let(:valid_params) { { name: "Jane", email: "jane@example.com", message: "Hello!" } }
   let(:json_headers) { { "Content-Type" => "application/json", "Accept" => "application/json" } }
 
   def post_contact(params, headers: json_headers)
-    post "/contact", params: params.to_json, headers: headers
+    post "/api/contact", params: params.to_json, headers: headers
   end
 
   it "sends the email and returns a success message" do
@@ -138,6 +138,13 @@ RSpec.describe "Contacts", type: :request do
 
     expect(response).to have_http_status(:too_many_requests)
     expect(response.parsed_body["message"]).to include("Too many requests")
+  end
+
+  it "translates the rate-limit message, which renders outside switch_locale" do
+    3.times { post_contact(valid_params.merge(locale: "pt-BR")) }
+
+    expect(response).to have_http_status(:too_many_requests)
+    expect(response.parsed_body["message"]).to eq(I18n.t("contacts.too_many_requests", locale: :"pt-BR"))
   end
 
   it "rate limits by the real connection IP when no X-Forwarded-For header is present" do

@@ -173,7 +173,7 @@ Read in this order. It follows the data.
 | Running it | `lib/tasks/knowledge.rake` | `bin/rails knowledge:ingest`, run by hand after the sources change (no scheduled job) |
 | Retrieval | `app/use_cases/search_knowledge_use_case.rb` | Embed the job description, top-8 by cosine distance |
 | Generation | `app/use_cases/match_job_use_case.rb` | Validation, numbered documents, system prompt, JSON schema, block handling, citation mapping |
-| Web | `app/controllers/job_matches_controller.rb`, `app/views/pages/_job_match.html.erb`, `app/javascript/controllers/job_match_controller.js` | JSON endpoint (summary text only), rate limit, plain-text rendering |
+| Web | `app/controllers/api/job_matches_controller.rb`, `app/views/pages/_job_match.html.erb`, `app/javascript/controllers/job_match_controller.js` | JSON endpoint (summary text only), rate limit, plain-text rendering |
 | Agents | `app/mcp_tools/match_job_tool.rb`, `Api::McpController::TOOLS`, `config/agents.yml` | The same use case exposed as MCP tool `match_job` |
 
 ### Indexing is incremental and idempotent

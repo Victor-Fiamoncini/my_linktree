@@ -37,7 +37,7 @@ RSpec.describe "Email injection", type: :request do
   end
 
   context "through the contact form" do
-    before { deliver("/contact", name: "Jane", email: "jane@example.com", message: markup) }
+    before { deliver("/api/contact", name: "Jane", email: "jane@example.com", message: markup) }
 
     it_behaves_like "inert markup"
   end
@@ -55,7 +55,7 @@ RSpec.describe "Email injection", type: :request do
   end
 
   it "can't add headers or a body through a name in the subject" do
-    deliver("/contact", name: crlf, email: "jane@example.com", message: "Hi")
+    deliver("/api/contact", name: crlf, email: "jane@example.com", message: "Hi")
     deliver("/api/hire", name: crlf, contact: "jane@example.com", brief: "Hi")
 
     expect(ActionMailer::Base.deliveries.size).to eq(2)
@@ -77,7 +77,7 @@ RSpec.describe "Email injection", type: :request do
   end
 
   it "rejects a contact email that smuggles in another recipient" do
-    deliver("/contact", name: "Jane", email: "jane@example.com\nBcc: victim@evil.example", message: "Hi")
+    deliver("/api/contact", name: "Jane", email: "jane@example.com\nBcc: victim@evil.example", message: "Hi")
 
     expect(response).to have_http_status(:unprocessable_content)
     expect(ActionMailer::Base.deliveries).to be_empty

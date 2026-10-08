@@ -354,7 +354,7 @@ RSpec.describe "Api::Mcp", type: :request do
     end
 
     it "draws from the web form's global budget, with its own message and an error event" do
-      Rails.cache.increment("rate-limit:job_match:global:all", Api::McpController::GLOBAL_DAILY_LIMIT, expires_in: 1.day)
+      Rails.cache.increment("rate-limit:job_match:global:all", MatchJobUseCase::GLOBAL_DAILY_LIMIT, expires_in: 1.day)
 
       events = captured_events { post_match_job("7.7.7.7") }
 

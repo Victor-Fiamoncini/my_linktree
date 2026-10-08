@@ -46,7 +46,7 @@ RSpec.describe "Prompt injection", type: :request do
   end
 
   context "through the web form" do
-    before { post "/job_match", params: { job_description: breakout }.to_json, headers: { "Content-Type" => "application/json" } }
+    before { post "/api/job_match", params: { job_description: breakout }.to_json, headers: { "Content-Type" => "application/json" } }
 
     it_behaves_like "a contained breakout"
   end

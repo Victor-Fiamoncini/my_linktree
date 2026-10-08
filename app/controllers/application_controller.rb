@@ -21,11 +21,6 @@ class ApplicationController < ActionController::Base
     I18n.default_locale
   end
 
-  # A malformed body is the client's mistake, not a 500 worth an error-level event.
-  def render_bad_request
-    render json: { message: "Malformed request body" }, status: :bad_request
-  end
-
   def detected_locale
     DetectLocaleUseCase.new.execute(
       country_code: request.headers["CF-IPCountry"],

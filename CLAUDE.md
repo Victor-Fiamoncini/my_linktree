@@ -73,24 +73,27 @@ book a meeting, and get a cited summary of how Victor fits a job description (RA
 app/
   controllers/
     application_controller.rb   # allow_browser, switch_locale, rate_limit_identifier
-    contacts_controller.rb      # POST /contact — JSON response
-    job_matches_controller.rb   # POST /job_match — RAG job-fit summary, JSON response
     static_controller.rb        # AGENTS.md, llms.txt, sitemap.xml
     pages_controller.rb, telemetry_page_controller.rb
     api/
+      base_controller.rb        # abstract: shared 500/400/429 JSON handlers, template-method hooks
+      public_controller.rb      # abstract: any client — no CSRF, English replies, `api.*` events
+      form_controller.rb        # abstract: the page's own forms — CSRF kept, localized replies
+      contacts_controller.rb    # POST /api/contact — FormController
+      job_matches_controller.rb # POST /api/job_match — RAG job-fit summary, FormController
       telemetry_controller.rb   # GET /api/telemetry — last 50 {tool, timestamp}, no auth
       mcp_controller.rb         # POST/GET /api/mcp — see "MCP server" below
       hire_controller.rb        # POST /api/hire — the endpoint /AGENTS.md points agents at
-      base_controller.rb        # shared rescue_from + Rails.event error/rate-limit reporting
   mailers/                      # ContactMailer, MeetingMailer
   models/
     booking.rb                  # unique index on slot_start prevents double-booking
     agent_connection.rb         # MCP tool-call telemetry
     knowledge_chunk.rb          # RAG corpus: text + 1024-dim pgvector embedding (HNSW, cosine)
+    json_rpc_request.rb         # plain object: peeks at an MCP body (method, tool, arguments), rewinds it
   clients/                      # outbound HTTP: OpenaiEmbedder, OpenaiClient, GithubReadmeClient
   use_cases/                    # framework-agnostic business logic, constructor-injected deps
-  events/                       # everything that exists to serve Rails.event
-  mcp_tools/                    # MCP::Tool subclasses: get_resume, list_services,
+  events/                       # everything that exists to serve Rails.event (incl. JobMatchEvents)
+  mcp_tools/                    # ApplicationTool (abstract) + get_resume, list_services,
                                 # check_availability, schedule_meeting, match_job
   javascript/controllers/       # Stimulus
   views/                        # layouts/, pages/ (home + partials), telemetry_page/, shared/
@@ -121,28 +124,37 @@ config/
   `"Missing required fields"` or `"Slot unavailable"`) for validation/business-rule failures. The
   one exception is `ValidationError` (`app/use_cases/validation_error.rb`), which subclasses it and
   carries a per-field `errors` hash so the contact and hire forms can highlight the offending
-  inputs. Controllers catch it via `rescue_from ArgumentError`, `ScheduleMeetingTool` via a direct
-  `rescue`; `ContactsController` adds a `rescue_from ActionController::InvalidAuthenticityToken` so
-  an expired session redirects with a flash instead of a raw 422, and anything else falls through
+  inputs. Controllers catch it via `rescue_from ArgumentError`, MCP tools via `ApplicationTool.call`; `Api::FormController` adds a `rescue_from ActionController::InvalidAuthenticityToken` so
+  an expired session gets a localized JSON 422, and anything else falls through
   to a generic `rescue_from StandardError`. A malformed JSON body is a 400 (`render_bad_request`), not a 500:
   `rescue_from StandardError` would otherwise catch the `ParseError` and report an error-level event,
-  so `ContactsController`, `JobMatchesController` and `Api::BaseController` each rescue it *after*
-  their `StandardError` handler, and `request_locale` falls back to the default locale instead of
-  re-raising.
-- **Rate limiting**: Rails 8's declarative `rate_limit` macro in `ContactsController`,
-  `JobMatchesController` and `Api::McpController`, backed by `Rails.cache` (Solid Cache in dev/production, `MemoryStore` in
+  so `Api::BaseController` rescues it *after* its `StandardError` handler, and `request_locale`
+  falls back to the default locale instead of re-raising.
+- **Api controller hierarchy**: every JSON endpoint lives under `Api::` and `/api`, and inherits
+  one of two abstract classes, picked by *who calls it*. `Api::BaseController` owns the shared
+  500/400/429 handlers and asks subclasses for `event_namespace`, `internal_server_error_body` and
+  `too_many_requests_body` (it raises `NotImplementedError` otherwise). `Api::PublicController`
+  (hire, mcp, telemetry) is for arbitrary clients: it skips CSRF, replies in English and emits
+  `api.*` events tagged with controller/action. `Api::FormController` (contacts, job_matches) is
+  for the page's own Stimulus forms: CSRF stays on (`spec/security/csrf_spec.rb` guards it),
+  replies come from `t("<controller_name>.*", locale: request_locale)` via `localized`, and events
+  use the subclass's own namespace (`contact.*`, `job_match.*`). A new endpoint picks its parent
+  by that question; never make a browser-form endpoint a `PublicController`, since that silently
+  drops CSRF.
+- **Rate limiting**: Rails 8's declarative `rate_limit` macro in `Api::ContactsController`,
+  `Api::JobMatchesController` and `Api::McpController`, backed by `Rails.cache` (Solid Cache in dev/production, `MemoryStore` in
   test). `ApplicationController#rate_limit_identifier` prefers the `CF-Connecting-IP` header,
   falling back to `request.remote_ip` only when absent (local dev/test) — `X-Forwarded-For` arrives
   corrupted in production, collapsing every visitor into one bucket. Trusting `CF-Connecting-IP`
   unconditionally is safe only because the origin firewall restricts inbound 80/443 to Cloudflare's
   ranges, so nobody can reach the app to forge it. `Api::McpController` declares two named limiters
-  on the same action — a general one and a `schedule_meeting`-specific one whose `unless:` proc
-  parses and rewinds the JSON-RPC body so it only counts calls by that name (`match_job` has its
+  on the same action — a general one and a `schedule_meeting`-specific one whose `if:` proc
+  reads the JSON-RPC body through `JsonRpcRequest` (which rewinds it for the transport) so it only counts calls by that name (`match_job` has its
   own too). The controllers catch `ActionController::TooManyRequests` via `rescue_from` rather
   than the macro's `with:`. The exceptions are the two global limiters below. Each job match
   is billed by OpenAI, so both surfaces stack per-IP limits (web: 3/10 min and
   10/day; MCP `match_job`: 5/10 min and 10/day) and then one shared cap of
-  `GLOBAL_DAILY_LIMIT` (100/day, a constant in each controller that must stay equal, `by: -> { "all" }`). Both controllers
+  `MatchJobUseCase::GLOBAL_DAILY_LIMIT` (100/day, `by: -> { "all" }`). Both controllers
   declare it with `scope: :job_match`, so they increment the same `rate-limit:job_match:global:all`
   key rather than the default per-controller one. Its `with:` renders a "try again tomorrow"
   message and a `job_match.budget_exhausted` error event tagged with `surface`. **Order is
@@ -165,11 +177,15 @@ config/
   it's a public, unauthenticated, cookie-free endpoint called by arbitrary external MCP clients
   whose `Origin` values can't be enumerated, and `Host` is already validated by Rails'
   `config.hosts`. `set_cors_headers` reflects whatever `Origin` is present for the same reason —
-  safe because the endpoint never sets `Access-Control-Allow-Credentials`. The 5 `MCP::Tool`
-  subclasses deliberately don't declare `required:` in their `input_schema`: the gem would
-  short-circuit before calling the tool, but this app records the agent connection *before*
-  validating, even for calls that go on to fail. Validation happens inside the use cases, with
-  domain errors caught in the tool's `call` and turned into `error: true` responses, not raised.
+  safe because the endpoint never sets `Access-Control-Allow-Credentials`. The 5 tools subclass
+  `ApplicationTool < MCP::Tool`, the same template-method shape as `Api::BaseController`: its
+  `call` records the agent connection under `tool_name`, runs the subclass's `perform` and
+  JSON-encodes the result. They deliberately don't declare `required:` in their `input_schema`:
+  the gem would short-circuit before calling the tool, but the connection is recorded *before*
+  validating, even for calls that go on to fail. Validation happens inside the use cases. An
+  `ArgumentError` goes to the subclass's `rejected` hook: `match_job` and `schedule_meeting`
+  override it to emit their `.rejected` event and answer `error: true` at HTTP 200; the default
+  re-raises, so a bug elsewhere still reaches `mcp.exception`.
 - **Locale routing**: every user-facing page sits under `scope "/:locale"` (`en|pt-BR`), and
   `ApplicationController#switch_locale` reads `params[:locale]` generically, serving both the route
   segment and the `locale` field in the contact form's JSON body. The bare `/` has no locale, so
@@ -200,10 +216,10 @@ config/
   link must recognize under some HTTP verb.
 - **RAG job-fit matcher** (study guide: [docs/RAG.md](docs/RAG.md)): a job description goes to
   `MatchJobUseCase`. It embeds the text with OpenAI (`text-embedding-3-small` at 1024 dimensions), takes the 8 nearest `KnowledgeChunk`s by cosine distance
-  (`neighbor` gem), at most 2 per source title so one README can't fill the prompt,, and sends them to `gpt-6-luna` (`OpenaiClient`, Responses API, plain REST) as numbered
+  (`neighbor` gem), at most 2 per source title so one README can't fill the prompt, and sends them to `gpt-6-luna` (`OpenaiClient`, Responses API, plain REST) as numbered
   documents. There are no native citations for passed-in text, so a strict `RESPONSE_SCHEMA` forces a JSON reply of paragraphs
   with the document numbers behind each. Out-of-range numbers are dropped, and the rest map to a
-  deduped source list. Only MCP gets the citations and sources: `POST /job_match` returns just the
+  deduped source list. Only MCP gets the citations and sources: `POST /api/job_match` returns just the
   joined `summary` string, which is all the page shows. Refusals and content-filter stops raise
   `ArgumentError` (a 422); any other non-`completed` status raises `OpenaiClient::Error` (a 500). The corpus is built
   offline, by hand (`bin/rails knowledge:ingest`; there's no scheduled job), by `IngestKnowledgeUseCase` from `profile.yml` (en) and the READMEs in
@@ -211,8 +227,8 @@ config/
   content (not `source_ref`, which shifts with position), so only changed chunks are re-embedded and chunks nothing produces any more are deleted. A README 404
   counts as "gone", but any other GitHub failure raises, so an outage can't wipe a repo's chunks.
   The Stimulus controller writes model output with `textContent` only, never `innerHTML`.
-  `rescue_from` handlers run outside `switch_locale`, so `JobMatchesController` translates them
-  via `request_locale`.
+  `rescue_from` handlers run outside `switch_locale`, so `Api::FormController#localized`
+  translates them via `request_locale`.
 - **Edge WAF (Cloudflare)**: production sits behind Cloudflare with **Block AI bots** on site-wide,
   which would 403 agent traffic before it reaches this app. `/api/mcp` is exempted by a
   dashboard-only Custom Rule (Skip) that must have **both** "All managed rules" and "All Super Bot
@@ -235,11 +251,11 @@ config/
   The events: `mcp.request`/`mcp.exception` (`config/initializers/mcp.rb`, covering all five
   tools), `mcp.meeting.booked`/`mcp.meeting.rejected` (`ScheduleMeetingTool`),
   `mcp.meeting.budget_exhausted` (`Api::McpController`), `api.error`/
-  `api.rate_limited` (`Api::BaseController`, the latter extended per-endpoint via
+  `api.rate_limited` (`Api::PublicController`, the latter extended per-endpoint via
   `rate_limited_event_payload`), `hire.request.received`/`hire.request.rejected`, and
   `contact.message.sent`/`.rejected`/`contact.rate_limited`/`contact.csrf_rejected`/`contact.error`,
-  `job_match.completed`/`.rejected` (`JobMatchesController` and `MatchJobTool`, told apart by
-  `surface`) plus `job_match.rate_limited`/`.budget_exhausted`/`.csrf_rejected`/`.error`.
+  `job_match.completed`/`.rejected` (`JobMatchEvents.completed`, called by `Api::JobMatchesController` and
+  `MatchJobTool` and told apart by `surface`) plus `job_match.rate_limited`/`.budget_exhausted`/`.csrf_rejected`/`.error`.
   Filter-parameter gotcha: any payload key containing `token` is `[FILTERED]`, hence
   `llm_input`/`llm_output` rather than `input_tokens`.
 - **`@/` alias**: none — this is a standard Rails app, autoloaded via Zeitwerk from `app/*`. Every
@@ -251,7 +267,8 @@ config/
 ## Testing
 
 RSpec, with specs co-located by type under `spec/`, mirroring `app/` and `lib/`. Every production
-file has a spec, bar two empty Rails base classes (`ApplicationRecord`, `ApplicationHelper`). Controllers are covered by `spec/requests/*` rather than controller specs —
+file has a spec, bar two empty Rails base classes (`ApplicationRecord`, `ApplicationHelper`). Controllers are covered by `spec/requests/*` rather than controller specs (the one exception,
+`spec/controllers/api/base_controller_spec.rb`, only pins the abstract hooks) —
 `ApplicationController#rate_limit_identifier` and `Api::BaseController`'s shared `rescue_from`
 handlers are pinned in `spec/requests/api/telemetry_spec.rb` and `spec/requests/api/mcp_spec.rb`.
 
