@@ -1,4 +1,10 @@
-<p>Name: <%= @name %></p>
-<p>Contact: <%= @contact %></p>
-<p>Brief: <%= @brief %></p>
-<% if @agent.present? %><p>Agent: <%= @agent %></p><% end %>
+<% content_for :preheader, "#{@name} sent a hire request through an agent." %>
+
+<%= mail_heading "Agent hire request" %>
+
+<%= mail_fields do %>
+  <%= mail_field "Name", @name %>
+  <%= mail_field "Contact", @contact %>
+  <%= mail_field "Brief", @brief %>
+  <% if @agent.present? %><%= mail_field "Agent", @agent %><% end %>
+<% end %>
