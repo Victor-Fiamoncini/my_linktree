@@ -2,10 +2,16 @@ module Api
   class JobMatchesController < FormController
     rate_limit to: 3, within: 10.minutes, by: -> { rate_limit_identifier }, only: :create
     rate_limit to: 10, within: 1.day, name: "daily", by: -> { rate_limit_identifier }, only: :create
-    rate_limit to: MatchJobUseCase::GLOBAL_DAILY_LIMIT, within: 1.day, name: "global", scope: :job_match, by: -> { "all" }, with: :render_budget_exhausted, if: -> { MatchJobUseCase.acceptable?(params[:job_description]) }, only: :create
+    rate_limit to: MatchJobUseCase::GLOBAL_DAILY_LIMIT, within: 1.day, name: "global", scope: :job_match, by: -> { "all" }, with: -> { render_error :too_many_requests, "job_match.budget_exhausted", { message: localized(:budget_exhausted) }, severity: "error", surface: "web" }, if: -> { MatchJobUseCase.acceptable?(params[:job_description]) }, only: :create
 
-    rescue_from ArgumentError, with: :render_declined
-    rescue_from ValidationError, with: :render_validation_error
+    rescue_from ArgumentError do |e|
+      render_error :unprocessable_content, "job_match.rejected", { message: localized(:declined) }, surface: "web", reason: e.message
+    end
+
+    rescue_from ValidationError do |e|
+      render_error :unprocessable_content, "job_match.rejected", { message: localized(:validation_failed), errors: e.errors },
+        surface: "web", reason: e.errors.keys.join(",")
+    end
 
     def create
       result = JobMatchEvents.completed(surface: "web") do
@@ -16,24 +22,6 @@ module Api
     end
 
     private
-
-    def render_validation_error(e)
-      Rails.event.notify("job_match.rejected", severity: "warn", surface: "web", reason: e.errors.keys.join(","))
-
-      render json: { message: localized(:validation_failed), errors: e.errors }, status: :unprocessable_content
-    end
-
-    def render_declined(e)
-      Rails.event.notify("job_match.rejected", severity: "warn", surface: "web", reason: e.message)
-
-      render json: { message: localized(:declined) }, status: :unprocessable_content
-    end
-
-    def render_budget_exhausted
-      Rails.event.notify("job_match.budget_exhausted", severity: "error", surface: "web")
-
-      render json: { message: localized(:budget_exhausted) }, status: :too_many_requests
-    end
 
     def event_namespace
       "job_match"

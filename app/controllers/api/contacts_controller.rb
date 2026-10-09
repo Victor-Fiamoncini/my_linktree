@@ -2,7 +2,10 @@ module Api
   class ContactsController < FormController
     rate_limit to: 2, within: 10.minutes, by: -> { rate_limit_identifier }, only: :create
 
-    rescue_from ValidationError, with: :render_validation_error
+    rescue_from ValidationError do |e|
+      render_error :unprocessable_content, "contact.message.rejected", { message: localized(:validation_failed), errors: e.errors },
+        fields: e.errors.keys.map(&:to_s)
+    end
 
     def create
       SendContactEmailUseCase.new.execute(**contact_params)
@@ -21,12 +24,6 @@ module Api
 
     def contact_params
       params.permit(:name, :email, :message).to_h.symbolize_keys
-    end
-
-    def render_validation_error(e)
-      Rails.event.notify("contact.message.rejected", severity: "warn", fields: e.errors.keys.map(&:to_s))
-
-      render json: { message: localized(:validation_failed), errors: e.errors }, status: :unprocessable_content
     end
 
     def event_namespace

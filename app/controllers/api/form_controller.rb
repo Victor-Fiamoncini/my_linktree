@@ -1,14 +1,10 @@
 module Api
   class FormController < BaseController
-    rescue_from ActionController::InvalidAuthenticityToken, with: :render_invalid_authenticity_token
+    rescue_from ActionController::InvalidAuthenticityToken do
+      render_error :unprocessable_content, "#{event_namespace}.csrf_rejected", { message: localized(:invalid_authenticity_token) }
+    end
 
     private
-
-    def render_invalid_authenticity_token
-      Rails.event.notify("#{event_namespace}.csrf_rejected", severity: "warn")
-
-      render json: { message: localized(:invalid_authenticity_token) }, status: :unprocessable_content
-    end
 
     def internal_server_error_body
       { message: localized(:internal_error) }
