@@ -1,4 +1,12 @@
-<p>Name: <%= @name %></p>
-<p>Email: <%= @email %></p>
-<% if @company.present? %><p>Company: <%= @company %></p><% end %>
-<p>Slot: <%= @slot_start %></p>
+<% content_for :preheader, "#{@name} booked #{@slot_start}." %>
+
+<%= mail_heading "New meeting booked" %>
+
+<%= mail_fields do %>
+  <%= mail_field "Name", @name %>
+  <%= mail_field "Email", @email %>
+  <% if @company.present? %><%= mail_field "Company", @company %><% end %>
+  <%= mail_field "Slot", @slot_start %>
+<% end %>
+
+<%= mail_button "Email #{@name}", "mailto:#{@email}" %>
