@@ -1,39 +1,32 @@
 module Api
   class BaseController < ApplicationController
-    rescue_from StandardError, with: :render_internal_server_error
-    rescue_from ActionDispatch::Http::Parameters::ParseError, with: :render_bad_request
-    rescue_from ActionController::TooManyRequests, with: :render_too_many_requests
-
-    private
-
     # Log class + message, not the exception — the default formatter drops both.
-    def render_internal_server_error(e)
+    rescue_from StandardError do |e|
       Rails.logger.error("#{e.class}: #{e.message}")
 
-      Rails.event.notify(
-        "#{event_namespace}.error",
-        severity: "error",
-        error_class: e.class.name,
-        error_message: e.message,
-        backtrace: e.backtrace&.first(5)
-      )
-
-      render json: internal_server_error_body, status: :internal_server_error
+      render_error :internal_server_error, "#{event_namespace}.error", internal_server_error_body,
+        severity: "error", error_class: e.class.name, error_message: e.message, backtrace: e.backtrace&.first(5)
     end
 
-    def render_bad_request
+    rescue_from ActionDispatch::Http::Parameters::ParseError do
       render json: { message: "Malformed request body" }, status: :bad_request
     end
 
-    def render_too_many_requests
-      Rails.event.notify("#{event_namespace}.rate_limited", **rate_limited_event_payload)
+    rescue_from ActionController::TooManyRequests do
+      render_error :too_many_requests, "#{event_namespace}.rate_limited", too_many_requests_body, **rate_limited_event_payload
+    end
 
-      render json: too_many_requests_body, status: :too_many_requests
+    private
+
+    def render_error(status, event, body, severity: "warn", **payload)
+      Rails.event.notify(event, severity:, **payload)
+
+      render json: body, status:
     end
 
     # Subclasses extend this instead of overriding the handler, which would emit a second event.
     def rate_limited_event_payload
-      { severity: "warn" }
+      {}
     end
 
     def event_namespace

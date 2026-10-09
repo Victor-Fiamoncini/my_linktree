@@ -126,14 +126,16 @@ config/
   carries a per-field `errors` hash so the contact and hire forms can highlight the offending
   inputs. Controllers catch it via `rescue_from ArgumentError`, MCP tools via `ApplicationTool.call`; `Api::FormController` adds a `rescue_from ActionController::InvalidAuthenticityToken` so
   an expired session gets a localized JSON 422, and anything else falls through
-  to a generic `rescue_from StandardError`. A malformed JSON body is a 400 (`render_bad_request`), not a 500:
+  to a generic `rescue_from StandardError`. A malformed JSON body is a 400, not a 500:
   `rescue_from StandardError` would otherwise catch the `ParseError` and report an error-level event,
   so `Api::BaseController` rescues it *after* its `StandardError` handler, and `request_locale`
   falls back to the default locale instead of re-raising.
 - **Api controller hierarchy**: every JSON endpoint lives under `Api::` and `/api`, and inherits
   one of two abstract classes, picked by *who calls it*. `Api::BaseController` owns the shared
   500/400/429 handlers and asks subclasses for `event_namespace`, `internal_server_error_body` and
-  `too_many_requests_body` (it raises `NotImplementedError` otherwise). `Api::PublicController`
+  `too_many_requests_body` (it raises `NotImplementedError` otherwise). Every error response —
+  shared or per-controller, `rescue_from` block or `rate_limit … with:` lambda — goes through its
+  `render_error(status, event, body, **payload)`, which emits the event then renders the JSON. `Api::PublicController`
   (hire, mcp, telemetry) is for arbitrary clients: it skips CSRF, replies in English and emits
   `api.*` events tagged with controller/action. `Api::FormController` (contacts, job_matches) is
   for the page's own Stimulus forms: CSRF stays on (`spec/security/csrf_spec.rb` guards it),

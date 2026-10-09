@@ -15,10 +15,10 @@ module Api
     rate_limit to: 3, within: 10.minutes, name: "schedule_meeting", by: -> { rate_limit_identifier }, if: -> { schedule_meeting_call? }, only: :create
     rate_limit to: 3, within: 1.day, name: "schedule_meeting_daily", by: -> { rate_limit_identifier }, if: -> { schedule_meeting_call? }, only: :create
     # After the per-IP limiters, so one IP can't drain everyone's bookings.
-    rate_limit to: BOOKING_DAILY_LIMIT, within: 1.day, name: "schedule_meeting_global", by: -> { "all" }, with: :render_booking_budget_exhausted, if: -> { schedule_meeting_call? }, only: :create
+    rate_limit to: BOOKING_DAILY_LIMIT, within: 1.day, name: "schedule_meeting_global", by: -> { "all" }, with: -> { render_error :too_many_requests, "mcp.meeting.budget_exhausted", daily_limit_body("schedule_meeting"), severity: "error" }, if: -> { schedule_meeting_call? }, only: :create
     rate_limit to: 5, within: 10.minutes, name: "match_job", by: -> { rate_limit_identifier }, if: -> { match_job_call? }, only: :create
     rate_limit to: 10, within: 1.day, name: "match_job_daily", by: -> { rate_limit_identifier }, if: -> { match_job_call? }, only: :create
-    rate_limit to: MatchJobUseCase::GLOBAL_DAILY_LIMIT, within: 1.day, name: "global", scope: :job_match, by: -> { "all" }, with: :render_budget_exhausted, if: -> { billable_match_job_call? }, only: :create
+    rate_limit to: MatchJobUseCase::GLOBAL_DAILY_LIMIT, within: 1.day, name: "global", scope: :job_match, by: -> { "all" }, with: -> { render_error :too_many_requests, "job_match.budget_exhausted", daily_limit_body("match_job"), severity: "error", surface: "mcp" }, if: -> { billable_match_job_call? }, only: :create
 
     def create
       return head :ok if request.options?
@@ -86,16 +86,8 @@ module Api
       @jsonrpc ||= JsonRpcRequest.new(request)
     end
 
-    def render_budget_exhausted
-      Rails.event.notify("job_match.budget_exhausted", severity: "error", surface: "mcp")
-
-      render json: { message: "Daily limit reached", action: "match_job has reached its daily limit. Please try again tomorrow." }, status: :too_many_requests
-    end
-
-    def render_booking_budget_exhausted
-      Rails.event.notify("mcp.meeting.budget_exhausted", severity: "error")
-
-      render json: { message: "Daily limit reached", action: "schedule_meeting has reached its daily limit. Please try again tomorrow." }, status: :too_many_requests
+    def daily_limit_body(tool)
+      { message: "Daily limit reached", action: "#{tool} has reached its daily limit. Please try again tomorrow." }
     end
 
     def rate_limited_event_payload
