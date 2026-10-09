@@ -63,7 +63,8 @@ RSpec.describe "Email injection", type: :request do
     ActionMailer::Base.deliveries.each do |mail|
       expect(mail.bcc).to be_nil
       expect(mail.to).to eq([ Rails.application.credentials.dig(:mailer, :recipient_email) ])
-      expect(html_body(mail).css("h1")).to be_empty
+      expect(html_body(mail).css("h1").map(&:text)).not_to include("forged body")
+      expect(html_body(mail).text).to include("<h1>forged body</h1>")
     end
   end
 

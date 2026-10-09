@@ -1,3 +1,11 @@
-<p>Name: <%= @name %></p>
-<p>Email: <%= @email %></p>
-<p>Message: <%= @message %></p>
+<% content_for :preheader, "#{@name} sent a message through the contact form." %>
+
+<%= mail_heading "New contact" %>
+
+<%= mail_fields do %>
+  <%= mail_field "Name", @name %>
+  <%= mail_field "Email", @email %>
+  <%= mail_field "Message", @message %>
+<% end %>
+
+<%= mail_button "Reply to #{@name}", "mailto:#{@email}" %>

@@ -17,7 +17,21 @@ RSpec.describe ApplicationMailer do
       .to eq([ "other@example.com" ])
   end
 
-  it "wraps every mail in the shared mailer layout" do
-    expect(mail.body.encoded).to include("<!DOCTYPE html>", "<html>")
+  it "sends both an HTML and a plain-text part" do
+    expect(mail.html_part).to be_present
+    expect(mail.text_part).to be_present
+  end
+
+  it "wraps the HTML part in the branded layout, with the logo and a link back to the site" do
+    html = Nokogiri::HTML(mail.html_part.body.decoded)
+
+    expect(mail.html_part.body.decoded).to start_with("<!DOCTYPE html>")
+    expect(html.at_css("img")["src"]).to eq("#{SeoConfig::SITE_URL}/icon.png")
+    expect(html.css("a").map { it["href"] }).to include(SeoConfig::SITE_URL, SeoConfig::GITHUB_URL, SeoConfig::LINKEDIN_URL)
+    expect(html.at_css("body")["style"]).to include(MailerHelper::FRAPPE[:crust])
+  end
+
+  it "signs the text part with a link back to the site" do
+    expect(mail.text_part.body.decoded).to include(SeoConfig::SITE_URL)
   end
 end

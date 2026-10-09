@@ -84,7 +84,8 @@ app/
       telemetry_controller.rb   # GET /api/telemetry — last 50 {tool, timestamp}, no auth
       mcp_controller.rb         # POST/GET /api/mcp — see "MCP server" below
       hire_controller.rb        # POST /api/hire — the endpoint /AGENTS.md points agents at
-  mailers/                      # ContactMailer, MeetingMailer
+  mailers/                      # ContactMailer, MeetingMailer — HTML + text parts, Catppuccin
+                                # Frappé layout styled inline via MailerHelper (clients strip <style>)
   models/
     booking.rb                  # unique index on slot_start prevents double-booking
     agent_connection.rb         # MCP tool-call telemetry
@@ -276,7 +277,8 @@ handlers are pinned in `spec/requests/api/telemetry_spec.rb` and `spec/requests/
 
 There are **no view specs** and `config.infer_spec_type_from_file_location!` stays commented out,
 so a file under `spec/views/` wouldn't even get `type: :view` without saying so. Templates are
-covered through the layer that renders them: mailer views by `spec/mailers/*`, `sitemap.xml.erb`
+covered through the layer that renders them: mailer views by `spec/mailers/*` (eyeball them at
+`/rails/mailers`, fed by `spec/mailers/previews/`), `sitemap.xml.erb`
 by `spec/requests/static_spec.rb`, the contact form and telemetry feed by `spec/system/*`, and the
 `<head>` SEO block by `spec/requests/pages_spec.rb` (JSON-LD, hreflang and canonical fail silently
 — a broken one looks fine on the page). The rest of `app/views/` is smoke-covered only: it renders

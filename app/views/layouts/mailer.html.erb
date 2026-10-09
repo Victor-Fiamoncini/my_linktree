@@ -1,13 +1,51 @@
 <!DOCTYPE html>
-<html>
+<% c = MailerHelper::FRAPPE %>
+<html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <style>
-      /* Email styles need to be inline */
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <meta name="supported-color-schemes" content="dark">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+    <title><%= message.subject %></title>
   </head>
 
-  <body>
-    <%= yield %>
+  <body style="margin:0;padding:0;background-color:<%= c[:crust] %>;">
+    <% if content_for?(:preheader) %>
+      <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:<%= c[:crust] %>;"><%= yield :preheader %></div>
+    <% end %>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:<%= c[:crust] %>;">
+      <tr>
+        <td align="center" style="padding:32px 16px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background-color:<%= c[:base] %>;border:1px solid <%= c[:surface0] %>;">
+            <tr>
+              <td style="padding:18px 28px;background-color:<%= c[:mantle] %>;border-bottom:2px solid <%= c[:mauve] %>;">
+                <a href="<%= SeoConfig::SITE_URL %>" style="text-decoration:none;">
+                  <img src="<%= SeoConfig::SITE_URL %>/icon.png" alt="" width="32" height="32" style="display:inline-block;width:32px;height:32px;border:0;vertical-align:middle;">
+                  <span style="display:inline-block;padding-left:10px;vertical-align:middle;font-family:<%= MailerHelper::FONT_SANS %>;font-size:17px;font-weight:600;color:<%= c[:text] %>;"><%= SeoConfig::AUTHOR_NAME %></span>
+                </a>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:32px 28px;font-family:<%= MailerHelper::FONT_SANS %>;font-size:15px;line-height:1.6;color:<%= c[:text] %>;">
+                <%= yield %>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:18px 28px;background-color:<%= c[:mantle] %>;border-top:1px solid <%= c[:surface0] %>;font-family:<%= MailerHelper::FONT_MONO %>;font-size:12px;line-height:1.8;color:<%= c[:overlay1] %>;">
+                <a href="<%= SeoConfig::SITE_URL %>" style="color:<%= c[:blue] %>;text-decoration:none;"><%= URI(SeoConfig::SITE_URL).host %></a>
+                &nbsp;·&nbsp;
+                <a href="<%= SeoConfig::GITHUB_URL %>" style="color:<%= c[:blue] %>;text-decoration:none;">GitHub</a>
+                &nbsp;·&nbsp;
+                <a href="<%= SeoConfig::LINKEDIN_URL %>" style="color:<%= c[:blue] %>;text-decoration:none;">LinkedIn</a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
   </body>
 </html>
