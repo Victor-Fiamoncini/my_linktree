@@ -19,6 +19,17 @@ RSpec.describe "Api::Hire", type: :request do
     expect(AgentConnection.last.tool).to eq("hire")
   end
 
+  it "accepts every documented field without unpermitted parameters" do
+    original = ActionController::Parameters.action_on_unpermitted_parameters
+    ActionController::Parameters.action_on_unpermitted_parameters = :raise
+
+    perform_enqueued_jobs { post_hire(valid_params.merge(agent: "claude")) }
+
+    expect(response).to have_http_status(:ok)
+  ensure
+    ActionController::Parameters.action_on_unpermitted_parameters = original
+  end
+
   it "returns a field error when name is blank" do
     post_hire(valid_params.merge(name: ""))
 

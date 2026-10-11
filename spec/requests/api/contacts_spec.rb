@@ -16,6 +16,17 @@ RSpec.describe "Api::Contacts", type: :request do
     expect(ActionMailer::Base.deliveries.size).to eq(1)
   end
 
+  it "accepts the form's own payload without unpermitted parameters" do
+    original = ActionController::Parameters.action_on_unpermitted_parameters
+    ActionController::Parameters.action_on_unpermitted_parameters = :raise
+
+    perform_enqueued_jobs { post_contact(valid_params.merge(locale: "en")) }
+
+    expect(response).to have_http_status(:ok)
+  ensure
+    ActionController::Parameters.action_on_unpermitted_parameters = original
+  end
+
   describe "structured events" do
     it "reports contact.message.sent with the address redacted" do
       events = captured_events { perform_enqueued_jobs { post_contact(valid_params) } }
