@@ -23,7 +23,7 @@ module Api
     private
 
     def contact_params
-      params.permit(:name, :email, :message).to_h.symbolize_keys
+      params.permit(:name, :email, :message, :locale).to_h.symbolize_keys.except(:locale)
     end
 
     def event_namespace

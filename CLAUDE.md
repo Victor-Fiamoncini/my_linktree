@@ -136,8 +136,9 @@ config/
   500/400/429 handlers and asks subclasses for `event_namespace`, `internal_server_error_body` and
   `too_many_requests_body` (it raises `NotImplementedError` otherwise). Every error response —
   shared or per-controller, `rescue_from` block or `rate_limit … with:` lambda — goes through its
-  `render_error(status, event, body, **payload)`, which emits the event then renders the JSON. `Api::PublicController`
-  (hire, mcp, telemetry) is for arbitrary clients: it skips CSRF, replies in English and emits
+  `render_error(status, event, body, **payload)`, which emits the event then renders the JSON. It
+  also turns off `wrap_parameters`: endpoints read top-level keys, so the controller-named copy
+  only logged as unpermitted. `Api::PublicController` (hire, mcp, telemetry) is for arbitrary clients: it skips CSRF, replies in English and emits
   `api.*` events tagged with controller/action. `Api::FormController` (contacts, job_matches) is
   for the page's own Stimulus forms: CSRF stays on (`spec/security/csrf_spec.rb` guards it),
   replies come from `t("<controller_name>.*", locale: request_locale)` via `localized`, and events

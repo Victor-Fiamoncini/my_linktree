@@ -1,5 +1,7 @@
 module Api
   class BaseController < ApplicationController
+    wrap_parameters false
+
     # Log class + message, not the exception — the default formatter drops both.
     rescue_from StandardError do |e|
       Rails.logger.error("#{e.class}: #{e.message}")
@@ -24,7 +26,6 @@ module Api
       render json: body, status:
     end
 
-    # Subclasses extend this instead of overriding the handler, which would emit a second event.
     def rate_limited_event_payload
       {}
     end
