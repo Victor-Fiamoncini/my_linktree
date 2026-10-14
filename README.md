@@ -286,8 +286,20 @@ shared web + MCP cap of 100 calls/day was reached (`surface` says which one hit 
 
 `victorfiamon.com.br` is proxied through Cloudflare (Free plan). Two settings matter for this app:
 
-- **SSL/TLS mode** must be **Full** (not Flexible), so Cloudflare-to-origin traffic is encrypted —
-  see the note in `config/deploy.yml`.
+- **SSL/TLS mode** is **Full (strict)**: Cloudflare-to-origin traffic is encrypted *and* the
+  origin's certificate is validated. Kamal's proxy holds a real Let's Encrypt cert for both
+  hostnames (renewed through Cloudflare), so strict validation passes; plain **Full** would accept
+  any cert, self-signed or expired. The flip side: if renewal ever fails, visitors get a **526**
+  instead of the site silently carrying on — check the origin cert from the VPS with:
+
+  ```bash
+  echo | openssl s_client -connect 127.0.0.1:443 -servername www.victorfiamon.com.br 2>/dev/null \
+    | openssl x509 -noout -subject -enddate
+  ```
+
+  Never use **Flexible**: it talks plain HTTP to the origin, which `force_ssl` redirects back to
+  HTTPS forever. **Minimum TLS Version** (SSL/TLS → Edge Certificates) is **1.2**. HSTS is left
+  off in Cloudflare on purpose — Rails' `force_ssl` already sends it.
 - **Block AI bots** (Security → AI Crawl Control) is enabled site-wide, which would otherwise 403
   every AI-agent request to `/api/mcp` (Claude, ChatGPT, etc. connector infra) at the edge, before
   it ever reaches Rails. A Custom Rule ("Allow AI agents on MCP endpoint", under Security →
