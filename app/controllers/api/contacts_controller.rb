@@ -1,6 +1,6 @@
 module Api
   class ContactsController < FormController
-    rate_limit to: 2, within: 10.minutes, by: -> { rate_limit_identifier }, only: :create
+    rate_limit to: 2, within: 10.minutes, only: :create
 
     rescue_from ValidationError do |e|
       render_error :unprocessable_content, "contact.message.rejected", { message: localized(:validation_failed), errors: e.errors },

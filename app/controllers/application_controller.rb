@@ -31,13 +31,9 @@ class ApplicationController < ActionController::Base
   def set_event_context
     Rails.event.set_context(
       request_id: request.request_id,
-      ip: rate_limit_identifier,
+      ip: request.remote_ip,
       path: request.path,
       user_agent: request.user_agent
     )
-  end
-
-  def rate_limit_identifier
-    request.headers["CF-Connecting-IP"].presence || request.remote_ip
   end
 end

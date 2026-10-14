@@ -56,9 +56,9 @@ lib/                           # static, request-independent site facts and the 
   prevention is a DB-level unique index on `slot_start` instead of a Redis `SETNX` reservation key.
 - **Controllers** are composition roots — they wire models/services to use cases and translate
   HTTP (or JSON-RPC, for `/api/mcp`) concerns. Rate limiting uses Rails 8's `rate_limit` macro,
-  keyed by `ApplicationController#rate_limit_identifier` — Cloudflare's `CF-Connecting-IP` header,
-  falling back to `request.remote_ip` only when it's absent (local dev/test). See that method's
-  comment for why `X-Forwarded-For` isn't trusted here. Use cases raise plain `ArgumentError` for
+  keyed by its default, `request.remote_ip` — the real visitor, because kamal-proxy forwards
+  Cloudflare's `X-Forwarded-For` and `config/initializers/trusted_proxies.rb` trusts Cloudflare's
+  ranges (see that file's comment). Use cases raise plain `ArgumentError` for
   validation/business-rule failures rather than a deep error hierarchy; controllers and MCP tools
   catch it via `rescue_from`/`rescue` and turn it into a user-facing message. The contact and hire
   use cases both raise the shared `ValidationError` subclass of it, which carries a per-field
@@ -344,8 +344,8 @@ shared web + MCP cap of 100 calls/day was reached (`surface` says which one hit 
   the same way "Block AI bots" would.
 - **IP Geolocation** (Rules → Settings) must stay **on**, or `CF-IPCountry` never reaches Rails and
   `PagesController#root_redirect` silently falls back to `Accept-Language` — nothing looks broken.
-  Safe to trust unconditionally for the same reason as `CF-Connecting-IP`: the origin firewall
-  below restricts inbound 80/443 to Cloudflare's ranges, so no outside client can forge it.
+  Safe to trust unconditionally because the origin firewall below restricts inbound 80/443 to
+  Cloudflare's ranges, so no outside client can forge it.
 
   ```bash
   curl -s -o /dev/null -w "%{redirect_url}\n" -H 'Accept-Language: pt-BR' \
@@ -364,7 +364,8 @@ shared web + MCP cap of 100 calls/day was reached (`surface` says which one hit 
   whether the IP ever leaks elsewhere). The origin's firewall (Hetzner Cloud Firewall, or `ufw` on
   the box) should allow inbound 80/443 **only** from
   [Cloudflare's published IP ranges](https://www.cloudflare.com/ips/), plus SSH from a trusted IP.
-  This isn't configured from this repo — set it up in the Hetzner console or over SSH. Verify with:
+  This isn't configured from this repo — set it up in the Hetzner console or over SSH, and keep
+  its ranges in sync with `config/initializers/trusted_proxies.rb`. Verify with:
 
   ```bash
   curl -s -o /dev/null -w "%{http_code}\n" -k -H "Host: victorfiamon.com.br" https://<VPS_IP>/

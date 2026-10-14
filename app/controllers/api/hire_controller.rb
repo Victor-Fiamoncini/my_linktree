@@ -1,6 +1,6 @@
 module Api
   class HireController < PublicController
-    rate_limit to: 2, within: 10.minutes, by: -> { rate_limit_identifier }, only: :create
+    rate_limit to: 2, within: 10.minutes, only: :create
 
     rescue_from ValidationError do |e|
       render_error :unprocessable_content, "hire.request.rejected", { message: "Check the highlighted fields and try again.", errors: e.errors },

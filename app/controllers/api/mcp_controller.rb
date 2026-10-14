@@ -11,13 +11,13 @@ module Api
 
     before_action :set_cors_headers
 
-    rate_limit to: 30, within: 1.minute, by: -> { rate_limit_identifier }, only: :create, unless: -> { request.options? }
-    rate_limit to: 3, within: 10.minutes, name: "schedule_meeting", by: -> { rate_limit_identifier }, if: -> { schedule_meeting_call? }, only: :create
-    rate_limit to: 3, within: 1.day, name: "schedule_meeting_daily", by: -> { rate_limit_identifier }, if: -> { schedule_meeting_call? }, only: :create
+    rate_limit to: 30, within: 1.minute, only: :create, unless: -> { request.options? }
+    rate_limit to: 3, within: 10.minutes, name: "schedule_meeting", if: -> { schedule_meeting_call? }, only: :create
+    rate_limit to: 3, within: 1.day, name: "schedule_meeting_daily", if: -> { schedule_meeting_call? }, only: :create
     # After the per-IP limiters, so one IP can't drain everyone's bookings.
     rate_limit to: BOOKING_DAILY_LIMIT, within: 1.day, name: "schedule_meeting_global", by: -> { "all" }, with: -> { render_error :too_many_requests, "mcp.meeting.budget_exhausted", daily_limit_body("schedule_meeting"), severity: "error" }, if: -> { schedule_meeting_call? }, only: :create
-    rate_limit to: 5, within: 10.minutes, name: "match_job", by: -> { rate_limit_identifier }, if: -> { match_job_call? }, only: :create
-    rate_limit to: 10, within: 1.day, name: "match_job_daily", by: -> { rate_limit_identifier }, if: -> { match_job_call? }, only: :create
+    rate_limit to: 5, within: 10.minutes, name: "match_job", if: -> { match_job_call? }, only: :create
+    rate_limit to: 10, within: 1.day, name: "match_job_daily", if: -> { match_job_call? }, only: :create
     rate_limit to: MatchJobUseCase::GLOBAL_DAILY_LIMIT, within: 1.day, name: "global", scope: :job_match, by: -> { "all" }, with: -> { render_error :too_many_requests, "job_match.budget_exhausted", daily_limit_body("match_job"), severity: "error", surface: "mcp" }, if: -> { billable_match_job_call? }, only: :create
 
     def create

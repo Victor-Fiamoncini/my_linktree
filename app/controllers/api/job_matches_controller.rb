@@ -1,7 +1,7 @@
 module Api
   class JobMatchesController < FormController
-    rate_limit to: 3, within: 10.minutes, by: -> { rate_limit_identifier }, only: :create
-    rate_limit to: 10, within: 1.day, name: "daily", by: -> { rate_limit_identifier }, only: :create
+    rate_limit to: 3, within: 10.minutes, only: :create
+    rate_limit to: 10, within: 1.day, name: "daily", only: :create
     rate_limit to: MatchJobUseCase::GLOBAL_DAILY_LIMIT, within: 1.day, name: "global", scope: :job_match, by: -> { "all" }, with: -> { render_error :too_many_requests, "job_match.budget_exhausted", { message: localized(:budget_exhausted) }, severity: "error", surface: "web" }, if: -> { MatchJobUseCase.acceptable?(params[:job_description]) }, only: :create
 
     rescue_from ArgumentError do |e|

@@ -72,7 +72,7 @@ book a meeting, and get a cited summary of how Victor fits a job description (RA
 ```
 app/
   controllers/
-    application_controller.rb   # allow_browser, switch_locale, rate_limit_identifier
+    application_controller.rb   # allow_browser, switch_locale, event context
     static_controller.rb        # AGENTS.md, llms.txt, sitemap.xml
     pages_controller.rb, telemetry_page_controller.rb
     api/
@@ -147,11 +147,11 @@ config/
   drops CSRF.
 - **Rate limiting**: Rails 8's declarative `rate_limit` macro in `Api::ContactsController`,
   `Api::JobMatchesController` and `Api::McpController`, backed by `Rails.cache` (Solid Cache in dev/production, `MemoryStore` in
-  test). `ApplicationController#rate_limit_identifier` prefers the `CF-Connecting-IP` header,
-  falling back to `request.remote_ip` only when absent (local dev/test) — `X-Forwarded-For` arrives
-  corrupted in production, collapsing every visitor into one bucket. Trusting `CF-Connecting-IP`
-  unconditionally is safe only because the origin firewall restricts inbound 80/443 to Cloudflare's
-  ranges, so nobody can reach the app to forge it. `Api::McpController` declares two named limiters
+  test). Limits key on the macro's default, `request.remote_ip`: kamal-proxy runs with
+  `forward_headers: true` and `config/initializers/trusted_proxies.rb` trusts Cloudflare's ranges,
+  so it resolves to the real visitor, and forged `X-Forwarded-For` values from a non-Cloudflare
+  hop are ignored. Don't key on `CF-Connecting-IP` — it's only unforgeable while the origin
+  firewall holds. Specs vary the client with `REMOTE_ADDR`. `Api::McpController` declares two named limiters
   on the same action — a general one and a `schedule_meeting`-specific one whose `if:` proc
   reads the JSON-RPC body through `JsonRpcRequest` (which rewinds it for the transport) so it only counts calls by that name (`match_job` has its
   own too). The controllers catch `ActionController::TooManyRequests` via `rescue_from` rather
@@ -273,7 +273,7 @@ config/
 RSpec, with specs co-located by type under `spec/`, mirroring `app/` and `lib/`. Every production
 file has a spec, bar two empty Rails base classes (`ApplicationRecord`, `ApplicationHelper`). Controllers are covered by `spec/requests/*` rather than controller specs (the one exception,
 `spec/controllers/api/base_controller_spec.rb`, only pins the abstract hooks) —
-`ApplicationController#rate_limit_identifier` and `Api::BaseController`'s shared `rescue_from`
+Client-IP resolution behind Cloudflare (`trusted_proxies`) and `Api::BaseController`'s shared `rescue_from`
 handlers are pinned in `spec/requests/api/telemetry_spec.rb` and `spec/requests/api/mcp_spec.rb`.
 
 There are **no view specs** and `config.infer_spec_type_from_file_location!` stays commented out,
