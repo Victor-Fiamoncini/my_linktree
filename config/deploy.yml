@@ -14,8 +14,13 @@ servers:
 # Remove this section when using multiple web servers and ensure you terminate SSL at your load balancer.
 #
 # Cloudflare's SSL/TLS mode is "Full (strict)", which validates this Let's Encrypt cert (see README).
+#
+# With ssl: true kamal-proxy would replace X-Forwarded-For with its own peer — a Cloudflare edge
+# IP — dropping the visitor. forward_headers keeps the visitor Cloudflare put there, and
+# config/initializers/trusted_proxies.rb lets request.remote_ip walk past the Cloudflare hop.
 proxy:
   ssl: true
+  forward_headers: true
   hosts:
     - victorfiamon.com.br
     - www.victorfiamon.com.br

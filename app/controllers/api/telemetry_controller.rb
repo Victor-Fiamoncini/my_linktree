@@ -1,6 +1,6 @@
 module Api
   class TelemetryController < PublicController
-    rate_limit to: 60, within: 1.minute, by: -> { rate_limit_identifier }, only: :index
+    rate_limit to: 60, within: 1.minute, only: :index
 
     def index
       render json: ListRecentConnectionsUseCase.new.execute, status: :ok

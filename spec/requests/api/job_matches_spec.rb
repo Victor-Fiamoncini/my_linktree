@@ -14,7 +14,7 @@ RSpec.describe "Api::JobMatches", type: :request do
   before { allow(MatchJobUseCase).to receive(:new).and_return(use_case) }
 
   def post_job_match(job_description, locale: "en", ip: nil)
-    headers = ip ? json_headers.merge("CF-Connecting-IP" => ip) : json_headers
+    headers = ip ? json_headers.merge("REMOTE_ADDR" => ip) : json_headers
     post "/api/job_match", params: { job_description: job_description, locale: locale }.to_json, headers: headers
   end
 
@@ -150,7 +150,7 @@ RSpec.describe "Api::JobMatches", type: :request do
       post_job_match("Rails role", ip: "4.4.4.4")
       post "/api/mcp",
         params: { jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: "match_job", arguments: { job_description: "Rails role" } } }.to_json,
-        headers: { "Content-Type" => "application/json", "Accept" => "application/json, text/event-stream", "CF-Connecting-IP" => "5.5.5.5" }
+        headers: { "Content-Type" => "application/json", "Accept" => "application/json, text/event-stream", "REMOTE_ADDR" => "5.5.5.5" }
 
       expect(response).to have_http_status(:ok)
       expect(Rails.cache.read("rate-limit:job_match:global:all", raw: true).to_i).to eq(2)

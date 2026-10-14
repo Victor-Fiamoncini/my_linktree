@@ -71,15 +71,12 @@ RSpec.describe "Api::Telemetry", type: :request do
     )
   end
 
-  it "falls back to rate limiting by X-Forwarded-For (past a trusted Cloudflare hop) when CF-Connecting-IP is absent" do
-    # kamal-proxy appends its previous hop (Cloudflare's edge) to X-Forwarded-For, so Rails sees
-    # "<visitor ip>, <cloudflare ip>" — trusted_proxies (config/initializers/trusted_proxies.rb)
-    # must walk past the Cloudflare hop or every visitor collapses into one shared bucket. This is
-    # only the fallback path in production (see next test) since X-Forwarded-For has been observed
-    # to arrive corrupted for real visitors; CF-Connecting-IP is used whenever present.
-    cloudflare_edge_ip = "173.245.48.1"
-    visitor_a = { "X-Forwarded-For" => "1.1.1.1, #{cloudflare_edge_ip}" }
-    visitor_b = { "X-Forwarded-For" => "2.2.2.2, #{cloudflare_edge_ip}" }
+  it "rate limits by the visitor's IP, walking past the Cloudflare and kamal-proxy hops" do
+    # Production chain: Cloudflare puts the visitor in X-Forwarded-For, kamal-proxy
+    # (forward_headers: true) appends Cloudflare's edge, Thruster appends kamal-proxy's
+    # Docker IP. trusted_proxies (config/initializers/trusted_proxies.rb) skips both hops.
+    visitor_a = { "X-Forwarded-For" => "1.1.1.1, 173.245.48.1, 172.18.0.2" }
+    visitor_b = { "X-Forwarded-For" => "2804:30c:1f75:a100:aaaa:bbbb:cccc:dddd, 173.245.48.1, 172.18.0.2" }
 
     60.times { get "/api/telemetry", headers: visitor_a }
     get "/api/telemetry", headers: visitor_a
@@ -89,20 +86,11 @@ RSpec.describe "Api::Telemetry", type: :request do
     expect(response).to have_http_status(:ok)
   end
 
-  it "rate limits by CF-Connecting-IP, ignoring a misleading X-Forwarded-For, when present" do
-    # X-Forwarded-For has been observed in production to carry a Cloudflare-owned IP instead of
-    # the real visitor's (most visibly for IPv6 clients hitting this IPv4-only origin).
-    # CF-Connecting-IP is Cloudflare's own dedicated header for the true client IP and takes
-    # priority — see ApplicationController#rate_limit_identifier.
-    misleading_xff = { "X-Forwarded-For" => "172.70.83.94, 172.18.0.2" }
-    visitor_a = misleading_xff.merge("CF-Connecting-IP" => "2804:30c:1f75:a100:da80:83ff:fe76:76d7")
-    visitor_b = misleading_xff.merge("CF-Connecting-IP" => "2804:30c:1f75:a100:aaaa:bbbb:cccc:dddd")
+  it "ignores forged X-Forwarded-For and CF-Connecting-IP values when the hop isn't Cloudflare" do
+    forged = ->(index) { { "X-Forwarded-For" => "1.1.1.#{index}, 203.0.113.9, 172.18.0.2", "CF-Connecting-IP" => "1.1.1.#{index}" } }
 
-    60.times { get "/api/telemetry", headers: visitor_a }
-    get "/api/telemetry", headers: visitor_a
+    60.times { |index| get "/api/telemetry", headers: forged.call(index) }
+    get "/api/telemetry", headers: forged.call(99)
     expect(response).to have_http_status(:too_many_requests)
-
-    get "/api/telemetry", headers: visitor_b
-    expect(response).to have_http_status(:ok)
   end
 end

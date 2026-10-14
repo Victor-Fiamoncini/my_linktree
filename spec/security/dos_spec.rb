@@ -63,7 +63,7 @@ RSpec.describe "Denial of service", type: :request do
   it "bills OpenAI for at most 3 matches in a burst from one IP, however it rotates X-Forwarded-For" do
     10.times do |index|
       post "/api/job_match", params: { job_description: "Rails role" }.to_json,
-        headers: json_headers.merge("CF-Connecting-IP" => "7.7.7.7", "X-Forwarded-For" => "10.0.0.#{index}")
+        headers: json_headers.merge("REMOTE_ADDR" => "7.7.7.7", "X-Forwarded-For" => "10.0.0.#{index}")
     end
 
     expect(response).to have_http_status(:too_many_requests)
@@ -76,7 +76,7 @@ RSpec.describe "Denial of service", type: :request do
 
     call = ->(name, arguments, ip) do
       rpc = { jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: name, arguments: arguments } }
-      perform_enqueued_jobs { post "/api/mcp", params: rpc.to_json, headers: mcp_headers.merge("CF-Connecting-IP" => ip) }
+      perform_enqueued_jobs { post "/api/mcp", params: rpc.to_json, headers: mcp_headers.merge("REMOTE_ADDR" => ip) }
     end
 
     call.call("check_availability", {}, "9.9.9.9")
@@ -93,7 +93,7 @@ RSpec.describe "Denial of service", type: :request do
   end
 
   it "bills OpenAI for at most 5 MCP matches in a burst from one IP" do
-    10.times { post "/api/mcp", params: match_job_rpc("Rails role").to_json, headers: mcp_headers.merge("CF-Connecting-IP" => "8.8.8.8") }
+    10.times { post "/api/mcp", params: match_job_rpc("Rails role").to_json, headers: mcp_headers.merge("REMOTE_ADDR" => "8.8.8.8") }
 
     expect(response).to have_http_status(:too_many_requests)
     expect(sent_to_model.size).to eq(5)

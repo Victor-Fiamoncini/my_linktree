@@ -268,7 +268,7 @@ RSpec.describe "Api::Mcp", type: :request do
     def post_schedule_meeting(ip)
       post "/api/mcp",
         params: rpc(id: 1, method: "tools/call", params: { name: "schedule_meeting", arguments: { name: "X", email: "x@x.com", slot_start: "2099-01-01T00:00:00.000Z" } }),
-        headers: headers.merge("CF-Connecting-IP" => ip)
+        headers: headers.merge("REMOTE_ADDR" => ip)
     end
 
     it "caps everyone at 10 calls a day, with its own message and an error event" do
@@ -336,7 +336,7 @@ RSpec.describe "Api::Mcp", type: :request do
     end
 
     def post_match_job(ip)
-      post "/api/mcp", params: match_job_params, headers: headers.merge("CF-Connecting-IP" => ip)
+      post "/api/mcp", params: match_job_params, headers: headers.merge("REMOTE_ADDR" => ip)
     end
 
     it "caps one IP at 10 match_job calls a day, even when it stays under the burst limit" do
@@ -371,7 +371,7 @@ RSpec.describe "Api::Mcp", type: :request do
 
     it "leaves the global budget alone for match_job calls that fail validation" do
       post "/api/mcp", params: rpc(id: 1, method: "tools/call", params: { name: "match_job", arguments: { job_description: " " } }),
-        headers: headers.merge("CF-Connecting-IP" => "8.8.4.4")
+        headers: headers.merge("REMOTE_ADDR" => "8.8.4.4")
 
       expect(response).to have_http_status(:ok)
       expect(Rails.cache.read("rate-limit:job_match:global:all", raw: true)).to be_nil
