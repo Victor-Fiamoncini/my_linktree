@@ -326,6 +326,30 @@ shared web + MCP cap of 100 calls/day was reached (`surface` says which one hit 
   of a "mixed-purpose crawlers" preference under AI Crawl Control. Re-check this exemption still
   passes the `curl` above after that date.
 
+- **Custom WAF rules** (Security → Security rules → Custom rules) drop obvious junk at the edge
+  before it reaches Rails. Two Block rules sit *after* the MCP Skip rule above, so neither touches
+  `/api/mcp`:
+  1. **Block scanner paths** — `lower(http.request.uri.path)` containing `/.env`, `/.git`,
+     `/wp-login`, `/wp-admin`, `/wordpress`, `/xmlrpc.php`, `/phpmyadmin`, `/.aws` or `/.ssh`. None
+     of this app's real paths match; these are all vulnerability-scanner probes.
+  2. **Block non-standard methods** — `not (http.request.method in {"GET" "POST" "HEAD"
+     "OPTIONS"})`. `OPTIONS` is in the allow-list on purpose: the MCP endpoint answers cross-origin
+     CORS preflight, so dropping it would break agent clients. The app has no `PUT`/`PATCH`/`DELETE`
+     routes, so blocking them (and `TRACE`/`TRACK`/`CONNECT`) costs nothing. Free plan allows 5
+     custom rules; these two plus the MCP Skip rule use 3. Like the Skip rule, they live only in the
+     dashboard — no Terraform/API config in this repo.
+
+  Verify both fire at the edge (each `403` is Cloudflare's block page, not the origin), while the
+  agent surface still passes:
+
+  ```bash
+  H=victorfiamon.com.br
+  curl -s -o /dev/null -w "%{http_code}\n" https://$H/up                  # 200 — control
+  curl -s -o /dev/null -w "%{http_code}\n" -X TRACK https://$H/up         # 403 — method allow-list
+  curl -s -o /dev/null -w "%{http_code}\n" https://$H/.env                # 403 — scanner paths
+  curl -s -o /dev/null -w "%{http_code}\n" -X OPTIONS https://$H/api/mcp  # 200 — MCP preflight passes
+  ```
+
 - **Rate limiting rule** ("Flood protection (all paths)", Security → Security rules → Rate
   limiting rules) throttles floods at the edge before they reach Rails: expression `true` (every
   path, `/api/mcp` included) → block an IP for 10 seconds once it crosses 60 requests/10 seconds.
