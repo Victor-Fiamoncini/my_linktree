@@ -134,6 +134,20 @@ RSpec.describe "Api::Contacts", type: :request do
     expect(response.parsed_body["errors"].keys).to contain_exactly("name", "email", "message")
   end
 
+  it "treats missing fields as blank rather than failing with a 500" do
+    post_contact({ name: "Jane" })
+
+    expect(response).to have_http_status(:unprocessable_content)
+    expect(response.parsed_body["errors"].keys).to contain_exactly("email", "message")
+  end
+
+  it "returns a field error rather than a 500 when email is not a string" do
+    post_contact(valid_params.merge(email: 5))
+
+    expect(response).to have_http_status(:unprocessable_content)
+    expect(response.parsed_body["errors"]).to eq("email" => "is invalid")
+  end
+
   it "returns translated messages when locale is pt-BR" do
     post_contact(valid_params.merge(name: "", locale: "pt-BR"))
 

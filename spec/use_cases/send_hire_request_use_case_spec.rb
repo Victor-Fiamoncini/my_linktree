@@ -68,4 +68,12 @@ RSpec.describe SendHireRequestUseCase do
       expect(error.errors.keys).to contain_exactly(:name, :contact, :brief)
     }
   end
+
+  it "raises a ValidationError, not a missing-keyword error, when fields are omitted" do
+    expect {
+      described_class.new.execute
+    }.to raise_error(ValidationError) { |error|
+      expect(error.errors.keys).to contain_exactly(:name, :contact, :brief)
+    }
+  end
 end
