@@ -28,3 +28,8 @@ Rails.application.configure do
   config.content_security_policy_nonce_generator = ->(request) { SecureRandom.base64(16) }
   config.content_security_policy_nonce_directives = %w[script-src style-src]
 end
+
+# /up renders a static inline-styled page with no user input, so CSP only hides its color.
+Rails.application.config.to_prepare do
+  Rails::HealthController.content_security_policy false
+end
