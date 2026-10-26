@@ -58,6 +58,13 @@ RSpec.describe "Api::Hire", type: :request do
     expect(response.parsed_body["errors"].keys).to contain_exactly("name", "contact", "brief")
   end
 
+  it "treats missing fields as blank rather than failing with a 500" do
+    post_hire({ name: "Jane" })
+
+    expect(response).to have_http_status(:unprocessable_content)
+    expect(response.parsed_body["errors"].keys).to contain_exactly("contact", "brief")
+  end
+
   it "logs an agent connection even when validation fails" do
     expect {
       post_hire(valid_params.merge(name: ""))

@@ -1,13 +1,13 @@
 class SendContactEmailUseCase
   EMAIL_FORMAT = URI::MailTo::EMAIL_REGEXP
 
-  def execute(name:, email:, message:)
+  def execute(name: nil, email: nil, message: nil)
     errors = {}
     errors[:name] = I18n.t("contacts.errors.blank") if name.blank?
 
     if email.blank?
       errors[:email] = I18n.t("contacts.errors.blank")
-    elsif !email.match?(EMAIL_FORMAT)
+    elsif !email.to_s.match?(EMAIL_FORMAT)
       errors[:email] = I18n.t("contacts.errors.invalid_email")
     end
 

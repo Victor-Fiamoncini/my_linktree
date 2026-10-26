@@ -1,5 +1,5 @@
 class SendHireRequestUseCase
-  def execute(name:, contact:, brief:, agent: nil)
+  def execute(name: nil, contact: nil, brief: nil, agent: nil)
     errors = {}
     errors[:name] = "can't be blank" if name.blank?
     errors[:contact] = "can't be blank" if contact.blank?

@@ -44,6 +44,14 @@ RSpec.describe SendContactEmailUseCase do
     }
   end
 
+  it "raises with an email error when email is not a string" do
+    expect {
+      described_class.new.execute(name: "Jane", email: 5, message: "Hello!")
+    }.to raise_error(ValidationError) { |error|
+      expect(error.errors).to eq(email: "is invalid")
+    }
+  end
+
   it "raises with a message error when message is blank" do
     expect {
       described_class.new.execute(name: "Jane", email: "jane@example.com", message: "")
@@ -55,6 +63,14 @@ RSpec.describe SendContactEmailUseCase do
   it "raises with multiple errors when several fields are blank" do
     expect {
       described_class.new.execute(name: "", email: "", message: "")
+    }.to raise_error(ValidationError) { |error|
+      expect(error.errors.keys).to contain_exactly(:name, :email, :message)
+    }
+  end
+
+  it "raises a ValidationError, not a missing-keyword error, when fields are omitted" do
+    expect {
+      described_class.new.execute
     }.to raise_error(ValidationError) { |error|
       expect(error.errors.keys).to contain_exactly(:name, :email, :message)
     }
