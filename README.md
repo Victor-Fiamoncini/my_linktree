@@ -95,7 +95,7 @@ bin/dev                       # Rails server + Tailwind watcher
 
 No `.env` file needed — database connection and mailer sender/recipient are pulled from Rails'
 encrypted credentials at `config/credentials/development.yml.enc`, prefilled to match
-`compose.yml` (`my_linktree`/`my_linktree` on `localhost:5432`). To change any of it:
+`compose.yml` (`my_linktree`/`my_linktree` on `localhost:5433`). To change any of it:
 
 ```bash
 bin/rails credentials:edit --environment development
@@ -127,7 +127,7 @@ should contain:
 | Key                          | Example value (matches `compose.yml`) |
 | ----------------------------- | -------------------------------------- |
 | `database.host`               | `localhost`                            |
-| `database.port`               | `5432`                                 |
+| `database.port`               | `5433`                                 |
 | `database.username`           | `my_linktree`                          |
 | `database.password`           | `my_linktree`                          |
 | `mailer.sender_email`         | `dev@example.com`                      |
