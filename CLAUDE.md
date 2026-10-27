@@ -18,7 +18,9 @@ bin/rails knowledge:ingest      # (Re)embed the RAG corpus — needs real `rag.*
 Rails 8.1; Ruby version in `.ruby-version`. Postgres 16 with the pgvector extension is required
 locally (`docker compose up -d` runs the `pgvector/pgvector:pg16` image, see `compose.yml`). There
 is no Redis: rate limiting, jobs, and ActionCable all ride on Rails 8's Postgres-backed Solid Cache
-/ Solid Queue / Solid Cable.
+/ Solid Queue / Solid Cable. In production, Kamal runs Solid Queue in its own `job` role
+(`bin/jobs`), not inside Puma — never set `SOLID_QUEUE_IN_PUMA`, not even to `false`, and pass
+`--roles=web` to non-interactive `kamal app exec` (see [README](README.md#deployment)).
 
 ## Validating changes
 

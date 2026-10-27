@@ -164,7 +164,14 @@ bin/rails knowledge:ingest # (Re)embed the RAG corpus; only changed chunks are r
 ## Deployment
 
 Deployed with [Kamal](https://kamal-deploy.org) (`config/deploy.yml`) to a single VPS, pulling a
-Docker Hub image built from the repo's `Dockerfile`.
+Docker Hub image built from the repo's `Dockerfile`. The image runs as two containers on that host:
+`web` (Puma, 2 workers × 5 threads, behind kamal-proxy) and `job` (`bin/jobs`, the Solid Queue
+supervisor). `SOLID_QUEUE_IN_PUMA` stays unset — `config/puma.rb` treats any value, even `false`,
+as on, which would start a duplicate supervisor per Puma worker.
+
+A non-interactive `kamal app exec` runs in *every* role's container, so pass `--roles=web` for
+one-off tasks. Interactive commands (the `console`/`shell`/`dbc` aliases) and `kamal app logs -f`
+already target `web`; use `kamal app logs -f --roles=job` for the queue.
 
 Secrets split across two mechanisms, depending on who needs them and when:
 
@@ -193,9 +200,10 @@ Secrets split across two mechanisms, depending on who needs them and when:
   `KAMAL_REGISTRY_PASSWORD` (a Docker Hub access token, exported in your shell before deploying) and
   `RAILS_MASTER_KEY` (read straight from `config/credentials/production.key` on disk — note this is
   the production-scoped key). This is what lets the container decrypt the
-  credentials file above at boot — it's the only env var `config/deploy.yml` injects into the app
-  container. `KAMAL_SERVER_IP` is also exported here — not a credential, but kept out of
-  `config/deploy.yml` (`servers: web: - <%= ENV.fetch("KAMAL_SERVER_IP") %>`) since that file is
+  credentials file above at boot — it's the only secret `config/deploy.yml` injects (the `web` role
+  also gets the Puma sizing in plain env). `KAMAL_SERVER_IP` is also exported here — not a
+  credential, but kept out of `config/deploy.yml` (each role's
+  `hosts: - <%= ENV.fetch("KAMAL_SERVER_IP") %>`) since that file is
   committed to a public repo and the origin otherwise isn't discoverable except through Cloudflare's
   proxy — see the origin firewall note under Cloudflare below.
 
@@ -270,7 +278,7 @@ design notes: [docs/RAG.md](docs/RAG.md).
 4. `kamal deploy`, then build the corpus:
 
    ```bash
-   kamal app exec --reuse "bin/rails knowledge:ingest"
+   kamal app exec --reuse --roles=web "bin/rails knowledge:ingest"
    ```
 
    Nothing re-indexes on a schedule. Run the task again whenever `config/profile.yml`, a README
