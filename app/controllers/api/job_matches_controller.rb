@@ -18,7 +18,7 @@ module Api
         MatchJobUseCase.new.execute(job_description: params[:job_description])
       end
 
-      render json: { summary: result[:summary].sum("") { |paragraph| paragraph[:text] } }, status: :ok
+      render json: { summary: result[:summary].map { |paragraph| paragraph[:text] }.join("\n\n") }, status: :ok
     end
 
     private

@@ -13,7 +13,7 @@ RSpec.describe MatchJobUseCase do
   let(:paragraphs) do
     [
       { text: "Strong Rails fit.", sources: [ 1, 2, 3, 9, 0 ] },
-      { text: "Solid API design.", sources: [] }
+      { text: "  Solid API design.\n", sources: [] }
     ]
   end
   let(:response) do
@@ -77,7 +77,7 @@ RSpec.describe MatchJobUseCase do
     ])
     expect(result[:summary]).to eq([
       { text: "Strong Rails fit.", citations: [ { source: 0, cited_text: "alpha part 1" }, { source: 1, cited_text: "Acme" } ] },
-      { text: "\n\nSolid API design.", citations: [] }
+      { text: "Solid API design.", citations: [] }
     ])
     expect(result[:usage]).to eq(input_tokens: 1200, output_tokens: 200)
   end
