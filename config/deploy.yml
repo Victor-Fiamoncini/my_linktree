@@ -8,7 +8,18 @@ image: victorfiamon/my_linktree
 # is otherwise only reachable through Cloudflare's proxy) — exported via .kamal/secrets.
 servers:
   web:
-    - <%= ENV.fetch("KAMAL_SERVER_IP") %>
+    hosts:
+      - <%= ENV.fetch("KAMAL_SERVER_IP") %>
+    env:
+      clear:
+        WEB_CONCURRENCY: 2 # 1 Puma worker per vCPU
+        RAILS_MAX_THREADS: 5 # 10 concurrent requests; mostly IO-bound (OpenAI, SMTP)
+
+  # Solid Queue supervisor only. Its default single worker covers the handful of mailer jobs.
+  job:
+    hosts:
+      - <%= ENV.fetch("KAMAL_SERVER_IP") %>
+    cmd: bin/jobs
 
 # Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
 # Remove this section when using multiple web servers and ensure you terminate SSL at your load balancer.
@@ -43,26 +54,12 @@ registry:
 env:
   secret:
     - RAILS_MASTER_KEY
-  clear:
-    # Run the Solid Queue supervisor inside Puma (single-server setup).
-    # Move to a dedicated `job:` server when you scale horizontally.
-    SOLID_QUEUE_IN_PUMA: true
-
-    # Operational tuning — adjust to match your VPS core count and workload.
-    # Bumped from Puma's default of 3: with SOLID_QUEUE_IN_PUMA, the supervisor,
-    # dispatcher, and job worker threads share this same process/thread pool with
-    # web requests, so 3 threads left almost no headroom (a single slow request,
-    # e.g. one blocked on a synchronous mailer deliver_now call, could starve the
-    # whole process and cause the proxy to 502 unrelated requests).
-    RAILS_MAX_THREADS: 5
-    # Leave WEB_CONCURRENCY unset (single worker process) while SOLID_QUEUE_IN_PUMA
-    # is on — cluster mode would start one Solid Queue supervisor per worker,
-    # causing jobs to be picked up and processed more than once.
-    # WEB_CONCURRENCY: 2
-    # JOB_CONCURRENCY: 1
-
-    # Increase log verbosity temporarily for debugging deploys.
-    # RAILS_LOG_LEVEL: debug
+  # Leave SOLID_QUEUE_IN_PUMA unset: jobs run in the `job` role, and puma.rb treats any
+  # value (even "false") as on, so each Puma worker would start a duplicate supervisor.
+  #
+  # Increase log verbosity temporarily for debugging deploys:
+  # clear:
+  #   RAILS_LOG_LEVEL: debug
 
 # Useful shortcuts for day-to-day operations.
 aliases:
