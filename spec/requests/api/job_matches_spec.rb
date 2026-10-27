@@ -19,7 +19,7 @@ RSpec.describe "Api::JobMatches", type: :request do
   end
 
   it "returns the summary as plain prose, without citations, sources or usage" do
-    result[:summary] << { text: "\n\nSolid APIs.", citations: [] }
+    result[:summary] << { text: "Solid APIs.", citations: [] }
     allow(use_case).to receive(:execute).with(job_description: "Rails role").and_return(result)
 
     post_job_match("Rails role")

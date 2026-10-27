@@ -114,14 +114,14 @@ class MatchJobUseCase
 
     text = message_parts(response).select { |part| part["type"] == "output_text" }.sum("") { |part| part["text"].to_s }
 
-    summary = JSON.parse(text).fetch("paragraphs").each_with_index.map do |paragraph, position|
+    summary = JSON.parse(text).fetch("paragraphs").map do |paragraph|
       citations = Array(paragraph["sources"]).filter_map do |number|
         chunk = chunks[number - 1] if number.is_a?(Integer) && number.between?(1, chunks.size)
 
         { source: source_index[number - 1], cited_text: chunk.content.truncate(CITED_TEXT_LENGTH) } if chunk
       end
 
-      { text: (position.zero? ? "" : "\n\n") + paragraph["text"].to_s, citations: citations.uniq { |citation| citation[:source] } }
+      { text: paragraph["text"].to_s.strip, citations: citations.uniq { |citation| citation[:source] } }
     end
 
     usage = response["usage"] || {}
