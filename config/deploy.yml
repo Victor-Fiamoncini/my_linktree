@@ -14,12 +14,18 @@ servers:
       clear:
         WEB_CONCURRENCY: 2 # 1 Puma worker per vCPU
         RAILS_MAX_THREADS: 5 # 10 concurrent requests; mostly IO-bound (OpenAI, SMTP)
+    # ~4x the observed steady state (~390MiB), so a bloated process is OOM-killed in here.
+    options:
+      memory: 1536m
 
   # Solid Queue supervisor only. Its default single worker covers the handful of mailer jobs.
   job:
     hosts:
       - <%= ENV.fetch("KAMAL_SERVER_IP") %>
     cmd: bin/jobs
+    # ~2.2x the observed steady state (~340MiB).
+    options:
+      memory: 768m
 
 # Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
 # Remove this section when using multiple web servers and ensure you terminate SSL at your load balancer.
