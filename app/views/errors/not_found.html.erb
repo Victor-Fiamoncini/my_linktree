@@ -4,21 +4,30 @@
 <% content_for :canonical, @localized_path %>
 <% content_for :robots, "noindex, nofollow" %>
 
-<main class="bg-ctp-base flex flex-1 flex-col items-center px-8 py-16">
+<main class="flex flex-1 flex-col items-center overflow-x-clip px-8 py-16">
   <section class="w-full max-w-[1080px]">
-    <p class="text-ctp-pink mb-3.5 font-mono text-[13px] tracking-[0.06em] break-all">$ cd <%= @localized_path %></p>
+    <%= render "shared/section_heading", tag_name: :h1, prompt: "$ cd #{@localized_path}", heading: t("errors.not_found.heading"), prompt_class: "bg-ctp-pink text-on-accent" %>
 
-    <h1 class="text-ctp-text mb-4 text-[28px] font-semibold tracking-[-0.025em] sm:text-[34px]"><%= t("errors.not_found.heading") %></h1>
+    <p class="text-ctp-subtext0 mb-9 w-full text-lg leading-[1.7] text-pretty text-justify"><%= t("errors.not_found.body") %></p>
 
-    <p class="text-ctp-subtext0 mb-6 w-full text-[17px] leading-[1.7] text-pretty"><%= t("errors.not_found.body") %></p>
+    <div class="border-ink bg-term-bg shadow-brut-lg shadow-ctp-red mb-10 border-4">
+      <div class="border-ink bg-term-bar flex items-center gap-3 border-b-4 px-4 py-2.5">
+        <span class="flex gap-1.5" aria-hidden="true">
+          <span class="border-ink bg-term-red h-3.5 w-3.5 border-2"></span>
+          <span class="border-ink bg-term-yellow h-3.5 w-3.5 border-2"></span>
+          <span class="border-ink bg-term-green h-3.5 w-3.5 border-2"></span>
+        </span>
+        <span class="text-term-text font-mono text-[13px] font-extrabold tracking-[0.08em]">zsh</span>
+      </div>
 
-    <div class="border-ctp-surface0 rounded-btn mb-8 border bg-term-bg px-4 py-3 font-mono text-xs">
-      <p class="text-ctp-red"><%= t("errors.not_found.shell_error") %></p>
+      <div class="px-5 py-4 font-mono text-sm font-bold">
+        <p class="text-term-red"><%= t("errors.not_found.shell_error") %></p>
+      </div>
     </div>
 
-    <div class="flex flex-wrap items-center gap-4 font-mono text-[13px]">
-      <%= link_to t("errors.not_found.home_label"), root_path, title: t("errors.not_found.home_title"), class: "bg-ctp-blue text-ctp-crust rounded-btn hover:bg-ctp-lavender inline-flex items-center px-4 py-2 transition-all duration-200 hover:-translate-y-0.5" %>
-      <%= link_to t("errors.not_found.telemetry_label"), telemetry_path, title: t("errors.not_found.telemetry_title"), class: "text-ctp-subtext0 hover:text-ctp-green transition-colors" %>
+    <div class="flex flex-wrap items-center gap-4 font-mono text-[15px] font-bold">
+      <%= link_to t("errors.not_found.home_label"), root_path, title: t("errors.not_found.home_title"), class: "bg-ink text-ctp-base hover:text-ctp-base border-ink shadow-brut shadow-ctp-blue press inline-flex min-h-[54px] items-center border-[3px] px-[26px]" %>
+      <%= link_to t("errors.not_found.telemetry_label"), telemetry_path, title: t("errors.not_found.telemetry_title"), class: "bg-ctp-mantle text-ctp-text hover:text-ctp-text border-ink shadow-brut shadow-ctp-green press inline-flex min-h-[54px] items-center border-[3px] px-[22px]" %>
     </div>
   </section>
 </main>

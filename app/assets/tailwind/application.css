@@ -52,6 +52,16 @@ html {
   --color-term-green: #a6e3a1;
   --color-term-yellow: #f9e2af;
   --color-term-red: #f38ba8;
+
+  /* Neo-brutalist ink (borders, hard shadows) and text on accent fills */
+  --color-ink: var(--color-ctp-text);
+  --color-on-accent: #232634;
+  --color-on-strong: #232634;
+  --color-dot: var(--color-ctp-surface0);
+
+  --shadow-brut-sm: 4px 4px 0 0 var(--color-ink);
+  --shadow-brut: 6px 6px 0 0 var(--color-ink);
+  --shadow-brut-lg: 10px 10px 0 0 var(--color-ink);
 }
 
 :root {
@@ -92,14 +102,19 @@ html {
   --color-term-green: #40a02b;
   --color-term-yellow: #df8e1d;
   --color-term-red: #d20f39;
-}
 
-::selection {
-  background-color: var(--color-ctp-mauve);
-  color: var(--color-ctp-crust);
+  /* Latte's mid-tone accents need Mocha-dark text; blue and mauve need light text */
+  --color-on-accent: #1e1e2e;
+  --color-on-strong: #eff1f5;
 }
 
 @layer base {
+  /* In base so selection:* utilities can override it per section */
+  ::selection {
+    background-color: var(--color-ctp-mauve);
+    color: var(--color-ctp-crust);
+  }
+
   a {
     @apply text-ctp-blue;
   }
@@ -123,6 +138,80 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-ctp-blue;
+}
+
+@utility bg-dots {
+  background-image: radial-gradient(var(--color-dot) 1.2px, transparent 1.6px);
+  background-size: 24px 24px;
+}
+
+/* Lifts on hover, presses flat on click; pair with a shadow-brut-* utility */
+@utility press {
+  transition: transform 120ms ease, box-shadow 120ms ease, background-color 150ms ease;
+
+  &:hover {
+    transform: translate(-2px, -2px);
+  }
+
+  &:active {
+    transform: translate(3px, 3px);
+    box-shadow: none;
+  }
+
+  &:disabled {
+    transform: none;
+  }
+}
+
+/* Inline link, same as the header nav: accent text and a growing underline on hover.
+   Set --link-accent (and --link-color / --link-hover) per link. */
+@utility link-brut {
+  position: relative;
+  color: var(--link-color, var(--color-ctp-text));
+  font-weight: 700;
+  transition: color 150ms ease;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: var(--link-accent);
+    transition: width 300ms ease;
+  }
+
+  &:hover {
+    color: var(--link-hover, var(--link-accent));
+  }
+
+  &:hover::after {
+    width: 100%;
+  }
+}
+
+@utility field {
+  outline: none;
+  transition: box-shadow 120ms ease;
+
+  &:focus {
+    box-shadow: 6px 6px 0 0 var(--color-ctp-blue);
+  }
+
+  &::placeholder {
+    color: var(--color-ctp-subtext0);
+  }
+}
+
+@utility animate-marquee {
+  animation: marquee 38s linear infinite;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes fr-fade {

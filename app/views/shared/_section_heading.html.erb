@@ -1,0 +1,15 @@
+<%
+  tag_name ||= :h2
+  counter ||= nil
+  heading_class ||= "text-ctp-text"
+  counter_class ||= "text-ctp-subtext0"
+%>
+<div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+  <div class="min-w-0">
+    <p class="<%= prompt_class %> border-ink shadow-brut-sm mb-[18px] inline-block -rotate-2 border-[3px] px-3 py-1.5 font-mono text-sm font-extrabold [overflow-wrap:anywhere]"><%= prompt %></p>
+
+    <%= content_tag tag_name, heading, class: "#{heading_class} text-[clamp(36px,5vw,60px)] leading-none font-bold tracking-[-0.035em]" %>
+  </div>
+
+  <% if counter %><span class="<%= counter_class %> font-mono text-[15px] font-extrabold"><%= counter %></span><% end %>
+</div>

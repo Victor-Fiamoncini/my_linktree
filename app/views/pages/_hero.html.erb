@@ -1,12 +1,13 @@
-<section id="about" class="grid w-full max-w-[1080px] items-center gap-12 pt-16 pb-14 min-[900px]:grid-cols-[1fr_320px] min-[900px]:gap-16 min-[900px]:pt-24">
-  <div>
-    <p class="text-ctp-green mb-5 font-mono text-[13px] tracking-[0.06em]">$ whoami</p>
+<section id="about" class="flex w-full max-w-[1080px] flex-wrap items-center gap-14 pt-16 pb-12 min-[900px]:pt-20">
+  <div class="min-w-0 flex-[999_1_520px]">
+    <p class="bg-ctp-green text-on-accent border-ink shadow-brut-sm mb-7 inline-block -rotate-2 border-[3px] px-3 py-1.5 font-mono text-sm font-extrabold">$ whoami</p>
 
-    <h1 class="text-ctp-text mb-6 text-[40px] leading-[1.04] font-bold tracking-[-0.035em] min-[900px]:text-[58px]">
-      Victor <span class="text-ctp-mauve">Fiamoncini</span>
+    <h1 class="text-ctp-text mb-8 text-[clamp(48px,7.2vw,96px)] leading-[0.95] font-bold tracking-[-0.045em]">
+      <span class="block">Victor</span>
+      <span class="bg-ctp-mauve text-on-strong border-ink shadow-brut mt-2.5 inline-block -rotate-[1.2deg] border-4 px-[18px] pt-0.5 pb-2.5">Fiamoncini</span>
     </h1>
 
-    <p class="text-ctp-subtext1 mb-[18px] max-w-[46ch] text-[19px] leading-[1.6] text-pretty">
+    <p class="text-ctp-text mb-4 max-w-[34ch] text-2xl leading-[1.35] font-bold tracking-[-0.015em] text-pretty">
       <%= t("pages.hero.lede", year: start_year_of_work) %>
     </p>
 
@@ -14,35 +15,35 @@
       rails_link = link_to(
         content_tag(:span, svg_icon(:gem), class: "text-ctp-red h-[13px] w-[13px]") + "Ruby on Rails",
         "https://rubyonrails.org/", target: "_blank", rel: "noopener noreferrer", title: t("pages.hero.rails_link_title"),
-        class: "text-ctp-text hover:text-ctp-red after:bg-ctp-red relative inline-flex items-center gap-1 font-semibold transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:transition-all after:duration-300 hover:after:w-full"
+        class: "link-brut group inline-flex items-center gap-1 px-0.5 [--link-accent:var(--color-ctp-red)]"
       )
       nextjs_link = link_to(
         content_tag(:span, svg_icon(:nextjs), class: "h-[13px] w-[13px]") + "Next.js",
         "https://nextjs.org/", target: "_blank", rel: "noopener noreferrer", title: t("pages.hero.nextjs_link_title"),
-        class: "text-ctp-text hover:text-ctp-blue after:bg-ctp-blue relative inline-flex items-center gap-1 font-semibold transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:transition-all after:duration-300 hover:after:w-full"
+        class: "link-brut group inline-flex items-center gap-1 px-0.5 [--link-accent:var(--color-ctp-blue)]"
       )
     %>
-    <p class="text-ctp-subtext0 mb-[18px] max-w-[52ch] text-[17px] leading-[1.7] text-pretty">
+    <p class="text-ctp-subtext0 mb-7 max-w-[54ch] text-lg leading-[1.65] text-pretty">
       <%= t("pages.hero.intro_html", rails_link: rails_link, nextjs_link: nextjs_link) %>
     </p>
 
-    <blockquote class="border-ctp-mauve text-ctp-text mb-[18px] max-w-[52ch] border-l-2 pl-4 text-[17px] leading-[1.7] italic">
-      "<%= t("pages.hero.pull_quote") %>"
+    <blockquote class="bg-ctp-yellow text-on-accent border-ink shadow-brut mb-7 max-w-[46ch] rotate-[0.8deg] border-[3px] px-[22px] py-[18px] text-[19px] leading-[1.45] font-bold">
+      “<%= t("pages.hero.pull_quote") %>”
     </blockquote>
 
-    <p class="text-ctp-subtext0 mb-9 max-w-[52ch] text-[17px] leading-[1.7] text-pretty">
+    <p class="text-ctp-subtext0 mb-9 max-w-[54ch] text-lg leading-[1.65] text-pretty">
       <%= t("pages.hero.agents_note") %>
     </p>
 
-    <div class="flex flex-wrap gap-3">
+    <div class="flex flex-wrap gap-4">
       <%= render "shared/get_in_touch_button" %>
-      <%= render "shared/external_link", icon: :github, link: SeoConfig::GITHUB_URL, label: "GitHub", variant: "outline", accent: "blue" %>
-      <%= render "shared/external_link", icon: :linkedin, link: SeoConfig::LINKEDIN_URL, label: "LinkedIn", variant: "outline", accent: "blue" %>
+      <%= render "shared/external_link", icon: :github, link: SeoConfig::GITHUB_URL, label: "GitHub", variant: "outline", accent: "mauve" %>
+      <%= render "shared/external_link", icon: :linkedin, link: SeoConfig::LINKEDIN_URL, label: "LinkedIn", variant: "outline", accent: "teal" %>
     </div>
   </div>
 
-  <div class="relative order-first justify-self-center min-[900px]:order-none min-[900px]:justify-self-end">
-    <div class="absolute -inset-1 rounded-card bg-[linear-gradient(150deg,var(--color-ctp-blue),var(--color-ctp-mauve)_55%,var(--color-ctp-green))] opacity-50"></div>
+  <div class="relative order-first mx-auto pr-[18px] pb-[18px] min-[900px]:order-none min-[900px]:mr-0">
+    <div class="bg-ctp-blue border-ink absolute top-[18px] right-0 bottom-0 left-[18px] border-4"></div>
 
     <a
       href="<%= SeoConfig::LINKEDIN_URL %>"
@@ -50,7 +51,7 @@
       rel="noopener noreferrer"
       aria-label="<%= t("pages.hero.photo_link_title") %>"
       title="<%= t("pages.hero.photo_link_title") %>"
-      class="group rounded-card relative block"
+      class="group relative block transition-transform duration-150 hover:-translate-x-1 hover:-translate-y-1"
       data-controller="photo-pixelate"
       data-action="theme:change@window->photo-pixelate#render"
     >
@@ -60,7 +61,7 @@
         alt="<%= t("pages.hero.photo_alt") %>"
         width="300"
         height="350"
-        class="border-ctp-surface1 rounded-card relative block h-[350px] w-[300px] border object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        class="border-ink bg-ctp-mantle relative block h-[358px] w-[308px] border-4 object-cover"
       >
 
       <canvas
@@ -68,8 +69,12 @@
         width="300"
         height="350"
         aria-hidden="true"
-        class="border-ctp-surface1 rounded-card pointer-events-none absolute inset-0 block h-[350px] w-[300px] border opacity-100 transition-opacity duration-500 group-hover:opacity-0"
+        class="border-ink bg-ctp-mantle pointer-events-none absolute inset-0 block h-[358px] w-[308px] border-4 opacity-100 transition-opacity duration-500 ease-out group-hover:opacity-0"
       ></canvas>
     </a>
+
+    <span class="bg-ctp-peach text-on-accent border-ink shadow-brut-sm pointer-events-none absolute -top-[22px] -right-2 flex h-[118px] w-[118px] rotate-[10deg] items-center justify-center rounded-full border-[3px] p-3 text-center font-mono text-xs leading-tight font-extrabold uppercase">
+      <%= t("pages.hero.open_badge") %>
+    </span>
   </div>
 </section>
