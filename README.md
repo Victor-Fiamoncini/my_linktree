@@ -169,6 +169,13 @@ Docker Hub image built from the repo's `Dockerfile`. The image runs as two conta
 supervisor). `SOLID_QUEUE_IN_PUMA` stays unset — `config/puma.rb` treats any value, even `false`,
 as on, which would start a duplicate supervisor per Puma worker.
 
+Each role has a Docker memory cap (`web` 1536m, `job` 768m — ~4x and ~2.2x their measured steady
+state), so a bloating process is OOM-killed inside its container rather than starving the host;
+Puma respawns a killed worker, and Kamal's `unless-stopped` restart policy covers the container.
+If restarts show up without a traffic spike, check `docker inspect <container> --format
+'{{.State.OOMKilled}}'` and re-measure with `docker stats` before raising a cap. Docker's log
+rotation needs no config: Kamal defaults every container to `--log-opt max-size=10m`.
+
 A non-interactive `kamal app exec` runs in *every* role's container, so pass `--roles=web` for
 one-off tasks. Interactive commands (the `console`/`shell`/`dbc` aliases) and `kamal app logs -f`
 already target `web`; use `kamal app logs -f --roles=job` for the queue.
