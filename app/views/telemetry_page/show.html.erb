@@ -4,11 +4,11 @@
 <% content_for :canonical, request.path %>
 <% content_for :robots, "noindex, nofollow" %>
 
-<main class="flex flex-1 flex-col items-center overflow-x-clip px-8 py-16">
+<main class="flex flex-1 flex-col items-center overflow-x-clip px-5 min-[640px]:px-8 py-16">
   <section class="w-full max-w-[1080px]">
     <%= render "shared/section_heading", tag_name: :h1, prompt: t("telemetry_page.prompt"), heading: t("telemetry_page.heading"), prompt_class: "bg-ctp-pink text-on-accent" %>
 
-    <p class="text-ctp-subtext0 mb-7 w-full text-lg leading-[1.7] text-pretty text-justify">
+    <p class="text-ctp-subtext0 mb-7 w-full text-lg leading-[1.7] text-pretty min-[640px]:text-justify">
       <%= t("telemetry_page.intro_html", mcp: content_tag(:span, "MCP", class: "text-ctp-text font-bold")) %>
     </p>
 

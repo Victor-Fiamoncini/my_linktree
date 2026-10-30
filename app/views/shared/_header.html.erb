@@ -25,7 +25,7 @@
   data-controller="mobile-nav"
   class="border-ink bg-ctp-mantle sticky top-0 z-20 w-full border-b-4"
 >
-  <nav class="mx-auto flex max-w-[1080px] items-center justify-between gap-4 px-6 py-3.5 min-[900px]:px-8">
+  <nav class="mx-auto flex max-w-[1080px] items-center justify-between gap-4 px-5 py-3.5 min-[640px]:px-8">
     <%= link_to root_path, title: t("shared.header.home_title"), class: "flex items-center gap-3" do %>
       <span aria-hidden="true" class="bg-ctp-mauve text-on-strong border-ink shadow-brut-sm flex h-11 w-11 items-center justify-center border-[3px] font-mono text-base font-extrabold">VF</span>
 
@@ -65,7 +65,7 @@
     </div>
   </nav>
 
-  <div data-mobile-nav-target="menu" class="border-ink bg-ctp-mantle hidden border-t-4 px-6 py-5 min-[900px]:hidden">
+  <div data-mobile-nav-target="menu" class="border-ink bg-ctp-mantle hidden border-t-4 px-5 py-5 min-[640px]:px-8 min-[900px]:hidden">
     <ul class="flex flex-col items-start gap-4 font-mono text-sm">
       <% section_links.each do |link| %>
         <li><%= link_to link[:label], link[:href], title: link[:title], class: nav_link_classes.fetch(link[:accent]), data: { action: "mobile-nav#close" } %></li>

@@ -1,10 +1,10 @@
 <section id="job-match" class="w-full max-w-[1080px] py-14">
-  <div class="bg-ctp-mauve text-on-strong border-ink shadow-brut-lg border-4 selection:bg-ink selection:text-ctp-base p-[clamp(24px,4vw,48px)]">
+  <div class="bg-ctp-mauve text-on-strong border-ink shadow-brut-lg border-4 selection:bg-ink selection:text-ctp-base p-[clamp(20px,4vw,48px)]">
     <%= render "shared/section_heading", prompt: t("pages.job_match.prompt"), heading: t("pages.job_match.heading"), prompt_class: "bg-ctp-base text-ctp-text", heading_class: "text-on-strong", counter: "[03/04]", counter_class: "text-on-strong" %>
 
     <% rag_link = link_to("RAG", "https://en.wikipedia.org/wiki/Retrieval-augmented_generation", target: "_blank", rel: "noreferrer", title: t("pages.job_match.rag_link_title"), class: "link-brut px-0.5 [--link-color:var(--color-on-strong)] [--link-accent:var(--color-ctp-base)]") %>
 
-    <p class="mb-7 w-full text-lg leading-[1.65] font-medium text-pretty text-justify">
+    <p class="mb-7 w-full text-lg leading-[1.65] font-medium text-pretty min-[640px]:text-justify">
       <%= t("pages.job_match.intro_html", rag_link: rag_link) %>
     </p>
 

@@ -4,11 +4,11 @@
 <% content_for :canonical, @localized_path %>
 <% content_for :robots, "noindex, nofollow" %>
 
-<main class="flex flex-1 flex-col items-center overflow-x-clip px-8 py-16">
+<main class="flex flex-1 flex-col items-center overflow-x-clip px-5 min-[640px]:px-8 py-16">
   <section class="w-full max-w-[1080px]">
     <%= render "shared/section_heading", tag_name: :h1, prompt: "$ cd #{@localized_path}", heading: t("errors.not_found.heading"), prompt_class: "bg-ctp-pink text-on-accent" %>
 
-    <p class="text-ctp-subtext0 mb-9 w-full text-lg leading-[1.7] text-pretty text-justify"><%= t("errors.not_found.body") %></p>
+    <p class="text-ctp-subtext0 mb-9 w-full text-lg leading-[1.7] text-pretty min-[640px]:text-justify"><%= t("errors.not_found.body") %></p>
 
     <div class="border-ink bg-term-bg shadow-brut-lg shadow-ctp-red mb-10 border-4">
       <div class="border-ink bg-term-bar flex items-center gap-3 border-b-4 px-4 py-2.5">

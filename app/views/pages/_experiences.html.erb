@@ -5,12 +5,12 @@
   end
   active_class = "shadow-brut-sm -translate-x-0.5 -translate-y-0.5"
   inactive_class = "bg-ctp-mantle text-ctp-text hover:bg-ctp-surface0"
-  base_tab_class = "border-ink press min-h-12 cursor-pointer border-[3px] px-5 font-mono text-[15px] font-extrabold whitespace-nowrap"
+  base_tab_class = "border-ink press min-h-12 cursor-pointer border-[3px] px-3 py-2 font-mono text-[15px] leading-tight font-extrabold min-[640px]:px-5 min-[640px]:py-0 min-[640px]:whitespace-nowrap"
 %>
 <section id="experience" class="w-full max-w-[1080px] py-14" data-controller="experiences-tabs">
   <%= render "shared/section_heading", prompt: t("pages.experiences.prompt"), heading: t("pages.experiences.heading"), prompt_class: "bg-ctp-yellow text-on-accent", counter: "[01/04]" %>
 
-  <div class="mb-7 flex flex-wrap gap-3.5">
+  <div class="mb-7 grid grid-cols-2 gap-3.5 min-[640px]:flex min-[640px]:flex-wrap">
     <% companies.each_with_index do |group, index| %>
       <% accent = ExperiencesHelper::TAB_ACCENTS[index % ExperiencesHelper::TAB_ACCENTS.size] %>
       <button
@@ -35,12 +35,12 @@
       data-company="<%= group[:company] %>"
       class="bg-ctp-mantle border-ink shadow-brut-lg animate-[fr-fade_0.28s_ease_both] border-4 <%= accent[:shadow] %> <%= "hidden" unless index == 0 %>"
     >
-      <div class="<%= accent[:fill] %> border-ink flex flex-wrap items-center justify-between gap-x-5 gap-y-2.5 border-b-4 px-7 py-4">
+      <div class="<%= accent[:fill] %> border-ink flex flex-wrap items-center justify-between gap-x-5 gap-y-2.5 border-b-4 px-5 py-4 min-[640px]:px-7">
         <span class="text-[26px] font-bold tracking-[-0.02em]"><%= group[:company] %></span>
         <span class="font-mono text-[13px] font-extrabold uppercase"><%= [ (t("pages.experiences.remote") if first[:remote]), first[:country_name] ].compact_blank.join(" · ") %></span>
       </div>
 
-      <div class="p-7">
+      <div class="p-5 min-[640px]:p-7">
         <% group[:entries].each_with_index do |exp, entry_index| %>
           <% if entry_index > 0 %><hr class="border-ink my-8 border-t-[3px] border-dashed"><% end %>
           <%= render "pages/experience_entry", experience: exp %>

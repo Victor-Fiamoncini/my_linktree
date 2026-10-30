@@ -7,12 +7,12 @@
   card_icon_class = { "blue" => "text-ctp-blue", "mauve" => "text-ctp-mauve", "teal" => "text-ctp-teal" }.fetch(accent)
 %>
 <% if variant == "card" %>
-  <a href="<%= link %>" target="_blank" rel="noopener noreferrer" title="<%= title %>" class="bg-ctp-mantle border-ink shadow-brut press flex min-h-16 items-center justify-between gap-3 border-[3px] px-5 <%= shadow_class %>">
-    <span class="flex items-center gap-3">
+  <a href="<%= link %>" target="_blank" rel="noopener noreferrer" title="<%= title %>" class="bg-ctp-mantle border-ink shadow-brut press flex min-h-16 items-center justify-between gap-3 border-[3px] px-4 min-[640px]:px-5 <%= shadow_class %>">
+    <span class="flex shrink-0 items-center gap-3">
       <span class="<%= card_icon_class %> h-[18px] w-[18px]"><%= svg_icon(icon) %></span>
       <% if label %><span class="text-ctp-text text-[17px] font-bold"><%= label %></span><% end %>
     </span>
-    <% if handle %><span class="text-ctp-subtext0 font-mono text-[13px]"><%= handle %> ↗</span><% end %>
+    <% if handle %><span class="text-ctp-subtext0 min-w-0 truncate font-mono text-[13px]"><%= handle %> ↗</span><% end %>
   </a>
 <% else %>
   <a href="<%= link %>" target="_blank" rel="noopener noreferrer" title="<%= title %>" class="bg-ctp-mantle border-ink text-ctp-text hover:text-ctp-text shadow-brut press inline-flex min-h-[54px] items-center justify-center gap-[9px] border-[3px] px-[22px] max-[531px]:w-full <%= shadow_class %>">

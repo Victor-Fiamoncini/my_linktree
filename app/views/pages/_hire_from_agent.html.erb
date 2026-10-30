@@ -20,8 +20,8 @@
 <%
   terminal_class = "border-ink bg-term-bg shadow-brut-lg w-full border-4 text-left"
   terminal_bar_class = "border-ink bg-term-bar flex items-center justify-between gap-3 border-b-4 px-4 py-2.5"
-  traffic_light_class = "border-ink h-3.5 w-3.5 border-2"
-  copy_button_class = "bg-ctp-peach text-on-accent border-ink press min-h-9 cursor-pointer border-2 px-3.5 font-mono text-xs font-extrabold tracking-[0.08em] uppercase"
+  traffic_light_class = "border-ink h-3.5 w-3.5 shrink-0 border-2"
+  copy_button_class = "bg-ctp-peach text-on-accent border-ink press min-h-9 shrink-0 cursor-pointer border-2 px-3.5 font-mono text-xs font-extrabold tracking-[0.08em] uppercase"
   tool_accents = %w[border-t-ctp-blue border-t-ctp-mauve border-t-ctp-green border-t-ctp-yellow border-t-ctp-peach]
 %>
 
@@ -35,19 +35,19 @@
     mcp_link = link_to("MCP", "https://modelcontextprotocol.io/", target: "_blank", rel: "noreferrer", title: t("pages.hire_from_agent.mcp_link_title"), class: "link-brut px-0.5 [--link-accent:var(--color-ctp-mauve)]")
     mcp_server = content_tag(:span, t("pages.hire_from_agent.mcp_server"), class: "text-ctp-text font-bold")
   %>
-  <p class="text-ctp-subtext0 mb-9 w-full text-lg leading-[1.7] text-pretty text-justify">
+  <p class="text-ctp-subtext0 mb-9 w-full text-lg leading-[1.7] text-pretty min-[640px]:text-justify">
     <%= t("pages.hire_from_agent.intro_html", mcp_link: mcp_link, mcp_server: mcp_server) %>
   </p>
 
   <div class="<%= terminal_class %> shadow-ctp-peach mb-9">
     <div class="<%= terminal_bar_class %>">
-      <div class="flex items-center gap-3">
+      <div class="flex min-w-0 items-center gap-3">
         <span class="flex gap-1.5" aria-hidden="true">
           <span class="<%= traffic_light_class %> bg-term-red"></span>
           <span class="<%= traffic_light_class %> bg-term-yellow"></span>
           <span class="<%= traffic_light_class %> bg-term-green"></span>
         </span>
-        <span class="text-term-text font-mono text-[13px] font-extrabold tracking-[0.08em]">MY_MCP_ENDPOINT.md</span>
+        <span class="text-term-text min-w-0 truncate font-mono text-[13px] font-extrabold tracking-[0.08em] max-[424px]:tracking-normal">MY_MCP_ENDPOINT.md</span>
       </div>
 
       <button
@@ -73,19 +73,19 @@
     <% end %>
   </ul>
 
-  <p class="text-ctp-subtext0 mb-9 w-full text-lg leading-[1.7] text-pretty text-justify">
+  <p class="text-ctp-subtext0 mb-9 w-full text-lg leading-[1.7] text-pretty min-[640px]:text-justify">
     <%= t("pages.hire_from_agent.follow_up") %>
   </p>
 
   <div class="<%= terminal_class %> shadow-ctp-mauve">
     <div class="<%= terminal_bar_class %>">
-      <div class="flex items-center gap-3">
+      <div class="flex min-w-0 items-center gap-3">
         <span class="flex gap-1.5" aria-hidden="true">
           <span class="<%= traffic_light_class %> bg-term-red"></span>
           <span class="<%= traffic_light_class %> bg-term-yellow"></span>
           <span class="<%= traffic_light_class %> bg-term-green"></span>
         </span>
-        <span class="text-term-text font-mono text-[13px] font-extrabold tracking-[0.08em]">AGENTS.md</span>
+        <span class="text-term-text min-w-0 truncate font-mono text-[13px] font-extrabold tracking-[0.08em] max-[424px]:tracking-normal">AGENTS.md</span>
       </div>
 
       <button
