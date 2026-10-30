@@ -4,7 +4,7 @@
     group ? group[:entries] << exp : acc << { company: exp[:company], entries: [ exp ] }
   end
   active_class = "shadow-brut-sm -translate-x-0.5 -translate-y-0.5"
-  inactive_class = "bg-ctp-mantle text-ctp-text hover:bg-ctp-surface0"
+  inactive_class = "bg-ctp-mantle text-ctp-text"
   base_tab_class = "border-ink press min-h-12 cursor-pointer border-[3px] px-3 py-2 font-mono text-[15px] leading-tight font-extrabold min-[640px]:px-5 min-[640px]:py-0 min-[640px]:whitespace-nowrap"
 %>
 <section id="experience" class="w-full max-w-[1080px] py-14" data-controller="experiences-tabs">
