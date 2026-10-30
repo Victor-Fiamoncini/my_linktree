@@ -72,6 +72,24 @@ RSpec.describe "Theme toggle", type: :system do
     expect(theme_color_meta).to eq("#1e66f5")
   end
 
+  it "switches by clicking the inactive flavor in the Theme card, and ignores the active one" do
+    visit root_path(locale: "en")
+
+    find("[data-theme-theme-param='latte']").click
+
+    expect(page).to have_css('html[data-theme="latte"]', visible: :all)
+    expect(page).to have_css("button[role='switch'][aria-checked='true']")
+    expect(highlighted_flavor).to eq("Catppuccin Latte")
+
+    find("[data-theme-theme-param='latte']").click
+
+    expect(page).to have_css('html[data-theme="latte"]', visible: :all)
+
+    find("[data-theme-theme-param='frappe']").click
+
+    expect(page).to have_css('html[data-theme="frappe"]', visible: :all)
+  end
+
   it "toggles from the mobile header" do
     page.driver.resize(375, 800)
     visit root_path(locale: "en")

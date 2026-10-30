@@ -17,59 +17,75 @@
   MARKDOWN
 %>
 
-<section id="agents" class="border-ctp-surface0 w-full max-w-[1080px] border-t pt-14 pb-14"
+<%
+  terminal_class = "border-ink bg-term-bg shadow-brut-lg w-full border-4 text-left"
+  terminal_bar_class = "border-ink bg-term-bar flex items-center justify-between gap-3 border-b-4 px-4 py-2.5"
+  traffic_light_class = "border-ink h-3.5 w-3.5 shrink-0 border-2"
+  copy_button_class = "bg-ctp-peach text-on-accent border-ink press min-h-9 shrink-0 cursor-pointer border-2 px-3.5 font-mono text-xs font-extrabold tracking-[0.08em] uppercase"
+  tool_accents = %w[border-t-ctp-blue border-t-ctp-mauve border-t-ctp-green border-t-ctp-yellow border-t-ctp-peach]
+%>
+
+<section id="agents" class="w-full max-w-[1080px] py-14"
   data-controller="hire-from-agent"
   data-hire-from-agent-copy-label-value="<%= t("pages.hire_from_agent.copy") %>"
   data-hire-from-agent-copied-label-value="<%= t("pages.hire_from_agent.copied") %>">
-  <p class="text-ctp-peach mb-3.5 font-mono text-[13px] tracking-[0.06em]"><%= t("pages.hire_from_agent.prompt") %></p>
+  <%= render "shared/section_heading", prompt: t("pages.hire_from_agent.prompt"), heading: t("pages.hire_from_agent.heading"), prompt_class: "bg-ctp-peach text-on-accent", counter: "[02/04]" %>
 
-  <h2 class="text-ctp-text mb-4 text-[28px] font-semibold tracking-[-0.025em] min-[900px]:text-[34px]"><%= t("pages.hire_from_agent.heading") %></h2>
-
-	<%
-	  mcp_link = link_to("MCP", "https://modelcontextprotocol.io/", target: "_blank", rel: "noreferrer", title: t("pages.hire_from_agent.mcp_link_title"), class: "text-ctp-mauve hover:text-ctp-pink transition-colors")
-	  mcp_server = content_tag(:span, t("pages.hire_from_agent.mcp_server"), class: "text-ctp-text font-semibold")
-	%>
-	<p class="text-ctp-subtext0 mb-8 w-full text-[17px] leading-[1.7] text-pretty text-justify">
-		<%= t("pages.hire_from_agent.intro_html", mcp_link: mcp_link, mcp_server: mcp_server) %>
-	</p>
-
-	<div class="mt-6 w-full text-left mb-8">
-		<div class="border-ctp-surface0 rounded-t-btn flex items-center justify-between border border-b-0 bg-term-bar px-4 py-2">
-			<div class="flex items-center gap-3">
-        <span class="flex gap-1.5">
-          <span class="h-2.5 w-2.5 rounded-full bg-term-red"></span>
-          <span class="h-2.5 w-2.5 rounded-full bg-term-yellow"></span>
-          <span class="h-2.5 w-2.5 rounded-full bg-term-green"></span>
-        </span>
-				<span class="text-xs font-bold tracking-widest text-term-text">MY_MCP_ENDPOINT.md</span>
-			</div>
-
-			<button
-				type="button"
-				title="<%= t("pages.hire_from_agent.copy_endpoint_title") %>"
-				data-action="hire-from-agent#copy"
-				data-hire-from-agent-content-param="<%= SeoConfig::MCP_ENDPOINT %>"
-				class="cursor-pointer text-xs font-bold tracking-widest uppercase transition-colors text-term-blue hover:text-term-text"
-			><%= t("pages.hire_from_agent.copy") %></button>
-		</div>
-
-		<pre class="border-ctp-surface0 rounded-b-btn w-full overflow-x-auto border bg-term-bg p-4 text-xs leading-relaxed font-semibold text-term-green"><code><%= SeoConfig::MCP_ENDPOINT %> <span class="text-ctp-overlay0 font-mono text-xs"><%= t("pages.hire_from_agent.no_auth_note") %></span>
-			<span class="text-ctp-overlay0 font-mono text-xs block"><%= t("pages.hire_from_agent.watch_telemetry_note_html", url: "#{SeoConfig::SITE_URL}/#{I18n.locale}/telemetry") %></span></code></pre>
-	</div>
-
-  <p class="text-ctp-subtext0 mb-8 w-full text-[17px] leading-[1.7] text-pretty text-justify">
-		<%= t("pages.hire_from_agent.follow_up") %>
+  <%
+    mcp_link = link_to("MCP", "https://modelcontextprotocol.io/", target: "_blank", rel: "noreferrer", title: t("pages.hire_from_agent.mcp_link_title"), class: "link-brut px-0.5 [--link-accent:var(--color-ctp-mauve)]")
+    mcp_server = content_tag(:span, t("pages.hire_from_agent.mcp_server"), class: "text-ctp-text font-bold")
+  %>
+  <p class="text-ctp-subtext0 mb-9 w-full text-lg leading-[1.7] text-pretty min-[640px]:text-justify">
+    <%= t("pages.hire_from_agent.intro_html", mcp_link: mcp_link, mcp_server: mcp_server) %>
   </p>
 
-  <div class="w-full text-left">
-    <div class="border-ctp-surface0 rounded-t-btn flex items-center justify-between border border-b-0 bg-term-bar px-4 py-2">
-      <div class="flex items-center gap-3">
-        <span class="flex gap-1.5">
-          <span class="h-2.5 w-2.5 rounded-full bg-term-red"></span>
-          <span class="h-2.5 w-2.5 rounded-full bg-term-yellow"></span>
-          <span class="h-2.5 w-2.5 rounded-full bg-term-green"></span>
+  <div class="<%= terminal_class %> shadow-ctp-peach mb-9">
+    <div class="<%= terminal_bar_class %>">
+      <div class="flex min-w-0 items-center gap-3">
+        <span class="flex gap-1.5" aria-hidden="true">
+          <span class="<%= traffic_light_class %> bg-term-red"></span>
+          <span class="<%= traffic_light_class %> bg-term-yellow"></span>
+          <span class="<%= traffic_light_class %> bg-term-green"></span>
         </span>
-        <span class="text-xs font-bold tracking-widest text-term-text">AGENTS.md</span>
+        <span class="text-term-text min-w-0 truncate font-mono text-[13px] font-extrabold tracking-[0.08em] max-[424px]:tracking-normal">MY_MCP_ENDPOINT.md</span>
+      </div>
+
+      <button
+        type="button"
+        title="<%= t("pages.hire_from_agent.copy_endpoint_title") %>"
+        data-action="hire-from-agent#copy"
+        data-hire-from-agent-content-param="<%= SeoConfig::MCP_ENDPOINT %>"
+        class="<%= copy_button_class %>"
+      ><%= t("pages.hire_from_agent.copy") %></button>
+    </div>
+
+    <pre class="text-term-green w-full overflow-x-auto px-5 py-[22px] font-mono text-[15px] leading-[1.8] font-bold"><code><%= SeoConfig::MCP_ENDPOINT %> <span class="text-ctp-subtext1"><%= t("pages.hire_from_agent.no_auth_note") %></span>
+<span class="text-ctp-subtext1"><%= t("pages.hire_from_agent.watch_telemetry_note_html", url: "#{SeoConfig::SITE_URL}/#{I18n.locale}/telemetry") %></span></code></pre>
+  </div>
+
+  <ul class="mb-12 grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-[18px]">
+    <% Api::McpController::TOOLS.map(&:tool_name).each_with_index do |tool_name, index| %>
+      <li class="bg-ctp-mantle border-ink shadow-brut-sm border-[3px] border-t-[12px] p-[18px] <%= tool_accents[index % tool_accents.size] %>">
+        <span class="text-ctp-subtext0 font-mono text-xs font-extrabold"><%= t("pages.hire_from_agent.tool_label", number: format("%02d", index + 1)) %></span>
+        <code class="text-ctp-text mt-2 mb-2.5 block font-mono text-sm font-extrabold [overflow-wrap:anywhere]"><%= tool_name %></code>
+        <p class="text-ctp-subtext0 text-[15px] leading-normal"><%= t("pages.hire_from_agent.tools.#{tool_name}") %></p>
+      </li>
+    <% end %>
+  </ul>
+
+  <p class="text-ctp-subtext0 mb-9 w-full text-lg leading-[1.7] text-pretty min-[640px]:text-justify">
+    <%= t("pages.hire_from_agent.follow_up") %>
+  </p>
+
+  <div class="<%= terminal_class %> shadow-ctp-mauve">
+    <div class="<%= terminal_bar_class %>">
+      <div class="flex min-w-0 items-center gap-3">
+        <span class="flex gap-1.5" aria-hidden="true">
+          <span class="<%= traffic_light_class %> bg-term-red"></span>
+          <span class="<%= traffic_light_class %> bg-term-yellow"></span>
+          <span class="<%= traffic_light_class %> bg-term-green"></span>
+        </span>
+        <span class="text-term-text min-w-0 truncate font-mono text-[13px] font-extrabold tracking-[0.08em] max-[424px]:tracking-normal">AGENTS.md</span>
       </div>
 
       <button
@@ -77,11 +93,11 @@
         title="<%= t("pages.hire_from_agent.copy_agents_md_title") %>"
         data-action="hire-from-agent#copy"
         data-hire-from-agent-content-param="<%= agents_md_preview %>"
-        class="cursor-pointer text-xs font-bold tracking-widest uppercase transition-colors text-term-blue hover:text-term-text"
+        class="<%= copy_button_class %>"
       ><%= t("pages.hire_from_agent.copy") %></button>
     </div>
 
-    <pre class="border-ctp-surface0 rounded-b-btn w-full overflow-x-auto border bg-term-bg p-4 text-xs leading-relaxed font-semibold text-term-green"><code><span class="text-ctp-overlay0 font-mono text-xs"><%= agents_md_preview.lines.first.chomp %></span>
+    <pre class="text-term-green w-full overflow-x-auto p-5 font-mono text-[13px] leading-relaxed font-bold"><code><span class="text-ctp-subtext1"><%= agents_md_preview.lines.first.chomp %></span>
 <%= agents_md_preview.lines.drop(1).join %></code></pre>
   </div>
 </section>

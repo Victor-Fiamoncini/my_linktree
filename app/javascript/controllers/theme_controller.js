@@ -24,4 +24,11 @@ export default class extends Controller {
 
     this.dispatch("change", { detail: { theme } })
   }
+
+  // Picks a flavor row in the Theme card; its name link still opens the palette page instead
+  select({ params: { theme }, target }) {
+    if (target.closest("a") || (document.documentElement.dataset.theme === "latte") === (theme === "latte")) return
+
+    this.toggle()
+  }
 }

@@ -1,16 +1,17 @@
 module ExperiencesHelper
   TECH_CATEGORIES = [
-    { key: :backend, label_key: "experiences_helper.tech_categories.backend", accent_class: "text-ctp-blue" },
-    { key: :frontend, label_key: "experiences_helper.tech_categories.frontend", accent_class: "text-ctp-mauve" },
-    { key: :infra, label_key: "experiences_helper.tech_categories.infra", accent_class: "text-ctp-green" },
-    { key: :other_tools, label_key: "experiences_helper.tech_categories.tools", accent_class: "text-ctp-yellow" }
+    { key: :backend, label_key: "experiences_helper.tech_categories.backend", accent_class: "bg-ctp-blue text-on-strong" },
+    { key: :frontend, label_key: "experiences_helper.tech_categories.frontend", accent_class: "bg-ctp-mauve text-on-strong" },
+    { key: :infra, label_key: "experiences_helper.tech_categories.infra", accent_class: "bg-ctp-green text-on-accent" },
+    { key: :other_tools, label_key: "experiences_helper.tech_categories.tools", accent_class: "bg-ctp-yellow text-on-accent" }
   ].freeze
 
-  TAB_ACCENT_CLASSES = [
-    "text-ctp-blue min-[900px]:border-ctp-blue",
-    "text-ctp-mauve min-[900px]:border-ctp-mauve",
-    "text-ctp-green min-[900px]:border-ctp-green",
-    "text-ctp-yellow min-[900px]:border-ctp-yellow"
+  # fill: the active tab and the panel's header strip; shadow: the panel's hard shadow
+  TAB_ACCENTS = [
+    { fill: "bg-ctp-blue text-on-strong", shadow: "shadow-ctp-blue" },
+    { fill: "bg-ctp-mauve text-on-strong", shadow: "shadow-ctp-mauve" },
+    { fill: "bg-ctp-green text-on-accent", shadow: "shadow-ctp-green" },
+    { fill: "bg-ctp-yellow text-on-accent", shadow: "shadow-ctp-yellow" }
   ].freeze
 
   def format_experience_date(date_str)

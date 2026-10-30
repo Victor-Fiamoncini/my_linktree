@@ -46,9 +46,11 @@ en:
       agents_note: "Lately that includes shipping things AI agents can talk to directly, like the MCP server running this very page."
       photo_alt: "Victor Fiamoncini"
       photo_link_title: "Victor Fiamoncini on LinkedIn"
+      open_badge: "Open to remote roles"
     experiences:
       prompt: "$ cat career.log"
       heading: "Where I've worked"
+      remote: "Remote"
     contact_form_section:
       prompt: "$ echo \"let's talk\""
       heading: "Reach out"
@@ -77,6 +79,13 @@ en:
       agents_md_services_line: "Services: Frontend & Backend Software Development, Agentic Systems & Integrations, Websites & Landing Pages and Mobile Apps"
       copy: "Copy"
       copied: "Copied!"
+      tool_label: "tool %{number}"
+      tools:
+        get_resume: "Read my resume: experience, education and stack."
+        list_services: "See the kinds of work I take on."
+        check_availability: "Find open meeting slots in my calendar."
+        schedule_meeting: "Book one of those slots, confirmed by email."
+        match_job: "Get a cited summary of how I fit a job description."
     job_match:
       prompt: "$ cat job.txt | ./match --rag"
       heading: "Do I fit your role?"

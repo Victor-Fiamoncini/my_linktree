@@ -1,13 +1,11 @@
-<section id="contact" class="border-ctp-surface0 w-full max-w-[1080px] border-t pt-14 pb-14">
-  <p class="text-ctp-teal mb-3.5 font-mono text-[13px] tracking-[0.06em]"><%= t("pages.contact_form_section.prompt") %></p>
+<section id="contact" class="w-full max-w-[1080px] pt-14 pb-24">
+  <%= render "shared/section_heading", prompt: t("pages.contact_form_section.prompt"), heading: t("pages.contact_form_section.heading"), prompt_class: "bg-ctp-teal text-on-accent", counter: "[04/04]" %>
 
-  <h2 class="text-ctp-text mb-4 text-[28px] font-semibold tracking-[-0.025em] min-[900px]:text-[34px]"><%= t("pages.contact_form_section.heading") %></h2>
-
-  <p class="text-ctp-subtext0 mb-10 w-full text-[17px] leading-[1.7] text-pretty text-justify">
+  <p class="text-ctp-subtext0 mb-10 w-full text-lg leading-[1.7] text-pretty min-[640px]:text-justify">
     <%= t("pages.contact_form_section.intro") %>
   </p>
 
-  <div class="grid gap-12 min-[900px]:grid-cols-[1.2fr_1fr] min-[900px]:items-start">
+  <div class="grid grid-cols-1 gap-10 min-[900px]:grid-cols-[1.3fr_1fr] min-[900px]:items-start">
     <%= render "pages/contact_form" %>
     <%= render "pages/contact_aside" %>
   </div>

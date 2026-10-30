@@ -11,13 +11,11 @@ export default class extends Controller {
       await navigator.clipboard.writeText(content)
 
       button.textContent = this.copiedLabelValue
-      button.classList.remove("text-term-blue", "hover:text-term-text")
-      button.classList.add("text-term-green")
+      button.classList.replace("bg-ctp-peach", "bg-ctp-green")
 
       setTimeout(() => {
         button.textContent = this.copyLabelValue
-        button.classList.add("text-term-blue", "hover:text-term-text")
-        button.classList.remove("text-term-green")
+        button.classList.replace("bg-ctp-green", "bg-ctp-peach")
       }, 2000)
     } catch {
       // The browser can deny clipboard access; the snippet is still selectable/readable.

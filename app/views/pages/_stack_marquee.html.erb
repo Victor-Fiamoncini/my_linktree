@@ -1,0 +1,10 @@
+<% stack = [ "Ruby on Rails", "Next.js", "Hotwire", "Laravel", "PHP", "Postgres", "pgvector", "MongoDB", "MCP", "RAG", "TypeScript", "React", "Pusher", "Auth0", "Twilio", "AWS", "Docker", "Nginx", "Jenkins", "Sentry", "Kamal" ] %>
+<div aria-hidden="true" class="w-[calc(100%+2.5rem)] overflow-hidden min-[640px]:w-[calc(100%+4rem)] py-7">
+  <div class="bg-ctp-yellow text-on-accent border-ink -mx-10 -rotate-[1.6deg] overflow-hidden border-y-4 py-3.5">
+    <div class="animate-marquee flex w-max font-mono text-xl font-extrabold whitespace-nowrap uppercase motion-reduce:animate-none">
+      <% (stack + stack).each do |tech| %>
+        <span class="px-[22px]"><%= tech %></span><span>✦</span>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -46,9 +46,11 @@ pt-BR:
       agents_note: "Ultimamente isso inclui lançar coisas com as quais agentes de IA podem conversar diretamente, como o servidor MCP que roda esta própria página."
       photo_alt: "Victor Fiamoncini"
       photo_link_title: "Victor Fiamoncini no LinkedIn"
+      open_badge: "Aberto a vagas remotas"
     experiences:
       prompt: "$ cat career.log"
       heading: "Onde eu trabalhei"
+      remote: "Remoto"
     contact_form_section:
       prompt: "$ echo \"vamos conversar\""
       heading: "Vamos conversar"
@@ -77,6 +79,13 @@ pt-BR:
       agents_md_services_line: "Serviços: Desenvolvimento de Software Frontend & Backend, Sistemas Agênticos & Integrações, Sites & Landing Pages e Aplicativos Mobile"
       copy: "Copiar"
       copied: "Copiado!"
+      tool_label: "ferramenta %{number}"
+      tools:
+        get_resume: "Leia meu currículo: experiência, formação e stack."
+        list_services: "Veja os tipos de trabalho que eu aceito."
+        check_availability: "Encontre horários livres na minha agenda."
+        schedule_meeting: "Reserve um desses horários, confirmado por e-mail."
+        match_job: "Receba um resumo com fontes de como me encaixo numa vaga."
     job_match:
       prompt: "$ cat job.txt | ./match --rag"
       heading: "Tenho fit com a sua vaga?"

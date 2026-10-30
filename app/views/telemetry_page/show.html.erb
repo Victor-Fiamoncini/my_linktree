@@ -4,38 +4,36 @@
 <% content_for :canonical, request.path %>
 <% content_for :robots, "noindex, nofollow" %>
 
-<main class="bg-ctp-base flex flex-1 flex-col items-center px-8 py-16">
+<main class="flex flex-1 flex-col items-center overflow-x-clip px-5 min-[640px]:px-8 py-16">
   <section class="w-full max-w-[1080px]">
-    <p class="text-ctp-pink mb-3.5 font-mono text-[13px] tracking-[0.06em]"><%= t("telemetry_page.prompt") %></p>
+    <%= render "shared/section_heading", tag_name: :h1, prompt: t("telemetry_page.prompt"), heading: t("telemetry_page.heading"), prompt_class: "bg-ctp-pink text-on-accent" %>
 
-    <h1 class="text-ctp-text mb-4 text-[28px] font-semibold tracking-[-0.025em] sm:text-[34px]"><%= t("telemetry_page.heading") %></h1>
-
-    <p class="text-ctp-subtext0 mb-6 w-full text-[17px] leading-[1.7] text-pretty">
-      <%= t("telemetry_page.intro_html", mcp: content_tag(:span, "MCP", class: "text-ctp-text font-semibold")) %>
+    <p class="text-ctp-subtext0 mb-7 w-full text-lg leading-[1.7] text-pretty min-[640px]:text-justify">
+      <%= t("telemetry_page.intro_html", mcp: content_tag(:span, "MCP", class: "text-ctp-text font-bold")) %>
     </p>
 
-    <div class="text-ctp-green mb-5 flex items-center gap-2 font-mono text-xs">
-      <span class="relative flex h-2 w-2">
-        <span class="bg-ctp-green absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
-        <span class="bg-ctp-green relative inline-flex h-2 w-2 rounded-full"></span>
+    <div class="bg-ctp-green text-on-accent border-ink shadow-brut-sm mb-7 inline-flex items-center gap-2 border-2 px-2.5 py-1 font-mono text-xs font-extrabold tracking-[0.08em] uppercase">
+      <span class="relative flex h-2 w-2" aria-hidden="true">
+        <span class="bg-on-accent absolute inline-flex h-full w-full animate-ping opacity-75"></span>
+        <span class="bg-on-accent relative inline-flex h-2 w-2"></span>
       </span>
       <%= t("telemetry_page.live") %>
     </div>
 
-    <div class="text-left">
-      <div class="border-ctp-surface0 rounded-t-btn flex items-center gap-3 border border-b-0 bg-term-bar px-4 py-2">
-        <span class="flex gap-1.5">
-          <span class="h-2.5 w-2.5 rounded-full bg-term-red"></span>
-          <span class="h-2.5 w-2.5 rounded-full bg-term-yellow"></span>
-          <span class="h-2.5 w-2.5 rounded-full bg-term-green"></span>
+    <div class="border-ink bg-term-bg shadow-brut-lg shadow-ctp-pink border-4 text-left">
+      <div class="border-ink bg-term-bar flex items-center gap-3 border-b-4 px-4 py-2.5">
+        <span class="flex gap-1.5" aria-hidden="true">
+          <span class="border-ink bg-term-red h-3.5 w-3.5 border-2"></span>
+          <span class="border-ink bg-term-yellow h-3.5 w-3.5 border-2"></span>
+          <span class="border-ink bg-term-green h-3.5 w-3.5 border-2"></span>
         </span>
-        <span class="text-xs font-bold tracking-widest text-term-text">agents.log</span>
+        <span class="text-term-text font-mono text-[13px] font-extrabold tracking-[0.08em]">agents.log</span>
       </div>
 
-      <div class="border-ctp-surface0 rounded-b-btn border bg-term-bg px-4 py-3" data-controller="telemetry-feed" data-telemetry-feed-url-value="<%= api_telemetry_path %>">
-        <p data-telemetry-feed-target="loading" class="text-ctp-overlay0 py-2 font-mono text-xs"><%= t("telemetry_page.loading") %></p>
-        <p data-telemetry-feed-target="error" class="text-ctp-red hidden py-2 font-mono text-xs"><%= t("telemetry_page.error") %></p>
-        <p data-telemetry-feed-target="empty" class="text-ctp-overlay0 hidden py-2 font-mono text-xs"><%= t("telemetry_page.empty") %></p>
+      <div class="px-4 py-3" data-controller="telemetry-feed" data-telemetry-feed-url-value="<%= api_telemetry_path %>">
+        <p data-telemetry-feed-target="loading" class="text-ctp-subtext1 py-2 font-mono text-xs"><%= t("telemetry_page.loading") %></p>
+        <p data-telemetry-feed-target="error" class="text-term-red hidden py-2 font-mono text-xs font-bold"><%= t("telemetry_page.error") %></p>
+        <p data-telemetry-feed-target="empty" class="text-ctp-subtext1 hidden py-2 font-mono text-xs"><%= t("telemetry_page.empty") %></p>
         <ul data-telemetry-feed-target="list" class="hidden max-h-96 w-full flex-col overflow-y-auto pr-3"></ul>
       </div>
     </div>

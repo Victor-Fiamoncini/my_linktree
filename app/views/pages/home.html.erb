@@ -1,5 +1,7 @@
-<main class="flex flex-1 flex-col items-center px-8">
+<main class="flex flex-1 flex-col items-center overflow-x-clip px-5 min-[640px]:px-8">
   <%= render "pages/hero", start_year_of_work: @start_year_of_work %>
+
+  <%= render "pages/stack_marquee" %>
 
   <%= render "pages/experiences", experiences: @profile[:experiences] %>
 

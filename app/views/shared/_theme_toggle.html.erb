@@ -5,9 +5,9 @@
   aria-pressed="<%= current_theme == "latte" %>"
   aria-label="<%= t("shared.header.toggle_theme") %>"
   title="<%= t("shared.header.theme_title.#{current_theme}") %>"
-  class="border-ctp-surface1 text-ctp-subtext0 rounded-btn hover:border-theme-accent hover:text-theme-accent focus-visible:outline-theme-accent flex h-9 w-9 cursor-pointer items-center justify-center border transition-all duration-200 hover:scale-105 hover:shadow-[0_0_12px_-4px_var(--color-theme-accent)] focus-visible:outline-2 focus-visible:outline-offset-2"
+  class="bg-theme-accent text-on-accent border-ink shadow-brut-sm press focus-visible:outline-ink flex h-11 w-11 cursor-pointer items-center justify-center border-[3px] focus-visible:outline-2 focus-visible:outline-offset-4"
 >
-  <span class="h-4 w-4 latte:hidden"><%= svg_icon(:sun) %></span>
+  <span class="h-5 w-5 latte:hidden"><%= svg_icon(:sun) %></span>
 
-  <span class="hidden h-4 w-4 latte:block"><%= svg_icon(:moon) %></span>
+  <span class="hidden h-5 w-5 latte:block"><%= svg_icon(:moon) %></span>
 </button>

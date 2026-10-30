@@ -9,7 +9,7 @@ fit, check availability, and book a meeting directly.
 - **Ruby on Rails 8** — Hotwire (Turbo + Stimulus) via importmap, no Node/JS build step
 - **Postgres 16 + pgvector** — primary database and vector store (via the `neighbor` gem), plus
   Solid Cache (rate limiting), Solid Queue, and Solid Cable
-- **Tailwind CSS** — hand-rolled Catppuccin Frappé theme with a Latte light-theme toggle, via the `tailwindcss-rails` gem
+- **Tailwind CSS** — neo-brutalist styling on a hand-rolled Catppuccin palette: Frappé (dark) by default, Latte via a cookie-backed toggle, via the `tailwindcss-rails` gem
 - **`mcp`** — official Ruby MCP SDK, driving the MCP server (`/api/mcp`)
 - **OpenAI** (REST: `gpt-6-luna` + `text-embedding-3-small`) — generation and embeddings for the RAG job matcher
   (see [docs/RAG.md](docs/RAG.md))
@@ -38,7 +38,7 @@ app/
 ├── clients/                   # outbound HTTP: OpenaiEmbedder, OpenaiClient, GithubReadmeClient
 ├── mailers/                   # ContactMailer, MeetingMailer
 ├── models/                    # Booking (unique slot_start), AgentConnection, KnowledgeChunk
-└── javascript/controllers/    # 7 Stimulus controllers (telemetry polling, mobile nav, etc.)
+└── javascript/controllers/    # 9 Stimulus controllers (telemetry polling, mobile nav, theme, etc.)
 
 lib/                           # static, request-independent site facts and the text built from
                                 # them, autoloaded via config.autoload_lib
