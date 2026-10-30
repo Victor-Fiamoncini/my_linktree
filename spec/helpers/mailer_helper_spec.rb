@@ -28,7 +28,16 @@ RSpec.describe MailerHelper, type: :helper do
       html = Nokogiri::HTML.fragment(helper.mail_button("Reply", "mailto:jane@example.com"))
 
       expect(html.at_css("a")["href"]).to eq("mailto:jane@example.com")
-      expect(html.at_css("td")["style"]).to include(MailerHelper::FRAPPE[:mauve])
+      expect(html.at_css("td")["style"]).to include(MailerHelper::FRAPPE[:blue], MailerHelper::BRUT_SHADOW)
+    end
+  end
+
+  describe "#mail_prompt" do
+    it "renders an escaped chip on the given accent" do
+      html = Nokogiri::HTML.fragment(helper.mail_prompt("$ <b>meet</b>", :green))
+
+      expect(html.at_css("p").text).to eq("$ <b>meet</b>")
+      expect(html.at_css("p")["style"]).to include(MailerHelper::FRAPPE[:green])
     end
   end
 

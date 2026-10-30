@@ -1,5 +1,6 @@
 <% content_for :preheader, "#{@name} sent a hire request through an agent." %>
 
+<%= mail_prompt "$ hire --via-agent", :mauve %>
 <%= mail_heading "Agent hire request" %>
 
 <%= mail_fields do %>

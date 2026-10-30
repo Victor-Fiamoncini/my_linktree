@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="dark">
     <meta name="supported-color-schemes" content="dark">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
     <title><%= message.subject %></title>
   </head>
 
@@ -17,13 +17,13 @@
 
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:<%= c[:crust] %>;">
       <tr>
-        <td align="center" style="padding:32px 16px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background-color:<%= c[:base] %>;border:1px solid <%= c[:surface0] %>;">
+        <td align="center" style="padding:32px 26px 42px 16px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background-color:<%= c[:base] %>;border:4px solid <%= c[:ink] %>;box-shadow:10px 10px 0 0 <%= c[:blue] %>;">
             <tr>
-              <td style="padding:18px 28px;background-color:<%= c[:mantle] %>;border-bottom:2px solid <%= c[:mauve] %>;">
+              <td style="padding:18px 28px;background-color:<%= c[:mantle] %>;border-bottom:4px solid <%= c[:ink] %>;">
                 <a href="<%= SeoConfig::SITE_URL %>" style="text-decoration:none;">
-                  <img src="<%= SeoConfig::SITE_URL %>/icon.png" alt="" width="32" height="32" style="display:inline-block;width:32px;height:32px;border:0;vertical-align:middle;">
-                  <span style="display:inline-block;padding-left:10px;vertical-align:middle;font-family:<%= MailerHelper::FONT_SANS %>;font-size:17px;font-weight:600;color:<%= c[:text] %>;"><%= SeoConfig::AUTHOR_NAME %></span>
+                  <img src="<%= SeoConfig::SITE_URL %>/icon.png" alt="" width="32" height="32" style="display:inline-block;width:32px;height:32px;border:3px solid <%= c[:ink] %>;vertical-align:middle;">
+                  <span style="display:inline-block;padding-left:10px;vertical-align:middle;font-family:<%= MailerHelper::FONT_SANS %>;font-size:18px;font-weight:700;letter-spacing:-0.02em;color:<%= c[:text] %>;"><%= SeoConfig::AUTHOR_NAME %></span>
                 </a>
               </td>
             </tr>
@@ -35,7 +35,7 @@
             </tr>
 
             <tr>
-              <td style="padding:18px 28px;background-color:<%= c[:mantle] %>;border-top:1px solid <%= c[:surface0] %>;font-family:<%= MailerHelper::FONT_MONO %>;font-size:12px;line-height:1.8;color:<%= c[:overlay1] %>;">
+              <td style="padding:18px 28px;background-color:<%= c[:mantle] %>;border-top:4px solid <%= c[:ink] %>;font-family:<%= MailerHelper::FONT_MONO %>;font-size:12px;font-weight:700;line-height:1.8;color:<%= c[:overlay1] %>;">
                 <a href="<%= SeoConfig::SITE_URL %>" style="color:<%= c[:blue] %>;text-decoration:none;"><%= URI(SeoConfig::SITE_URL).host %></a>
                 &nbsp;·&nbsp;
                 <a href="<%= SeoConfig::GITHUB_URL %>" style="color:<%= c[:blue] %>;text-decoration:none;">GitHub</a>

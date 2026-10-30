@@ -1,5 +1,6 @@
 <% content_for :preheader, "#{@name} sent a message through the contact form." %>
 
+<%= mail_prompt "$ mail --new-contact", :pink %>
 <%= mail_heading "New contact" %>
 
 <%= mail_fields do %>
