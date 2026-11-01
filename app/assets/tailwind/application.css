@@ -152,7 +152,7 @@ html {
 
 /* Lifts on hover, presses flat on click; pair with a shadow-brut-* utility */
 @utility press {
-  transition: transform 120ms ease, box-shadow 120ms ease, background-color 150ms ease;
+  transition: transform 120ms ease, box-shadow 120ms ease, background-color 150ms ease, color 150ms ease;
 
   &:hover {
     transform: translate(-2px, -2px);
@@ -168,31 +168,14 @@ html {
   }
 }
 
-/* Inline link, same as the header nav: accent text and a growing underline on hover.
+/* Inline link colors: accent text on hover. Pair with press for the movement.
    Set --link-accent (and --link-color / --link-hover) per link. */
 @utility link-brut {
-  position: relative;
   color: var(--link-color, var(--color-ctp-text));
   font-weight: 700;
-  transition: color 150ms ease;
-
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 3px;
-    background: var(--link-accent);
-    transition: width 300ms ease;
-  }
 
   &:hover {
     color: var(--link-hover, var(--link-accent));
-  }
-
-  &:hover::after {
-    width: 100%;
   }
 }
 

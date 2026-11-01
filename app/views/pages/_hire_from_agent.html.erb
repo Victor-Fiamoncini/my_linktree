@@ -32,7 +32,7 @@
   <%= render "shared/section_heading", prompt: t("pages.hire_from_agent.prompt"), heading: t("pages.hire_from_agent.heading"), prompt_class: "bg-ctp-peach text-on-accent", counter: "[02/04]" %>
 
   <%
-    mcp_link = link_to("MCP", "https://modelcontextprotocol.io/", target: "_blank", rel: "noreferrer", title: t("pages.hire_from_agent.mcp_link_title"), class: "link-brut px-0.5 [--link-accent:var(--color-ctp-mauve)]")
+    mcp_link = link_to("MCP", "https://modelcontextprotocol.io/", target: "_blank", rel: "noreferrer", title: t("pages.hire_from_agent.mcp_link_title"), class: "link-brut press inline-block px-0.5 [--link-accent:var(--color-ctp-mauve)]")
     mcp_server = content_tag(:span, t("pages.hire_from_agent.mcp_server"), class: "text-ctp-text font-bold")
   %>
   <p class="text-ctp-subtext0 mb-9 w-full text-lg leading-[1.7] text-pretty min-[640px]:text-justify">

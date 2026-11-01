@@ -11,11 +11,11 @@
   switch_label = I18n.locale == :en ? "PT-BR" : "EN"
   switch_path = (content_for(:canonical) || request.path).sub(%r{\A/(en|pt-BR)}, "/#{other_locale}")
   nav_link_classes = {
-    "blue" => "text-ctp-text hover:text-ctp-blue relative pb-1 font-semibold transition-colors after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-0 after:bg-ctp-blue after:transition-all after:duration-300 hover:after:w-full",
-    "mauve" => "text-ctp-text hover:text-ctp-mauve relative pb-1 font-semibold transition-colors after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-0 after:bg-ctp-mauve after:transition-all after:duration-300 hover:after:w-full",
-    "peach" => "text-ctp-text hover:text-ctp-peach relative pb-1 font-semibold transition-colors after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-0 after:bg-ctp-peach after:transition-all after:duration-300 hover:after:w-full",
-    "lavender" => "text-ctp-text hover:text-ctp-lavender relative pb-1 font-semibold transition-colors after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-0 after:bg-ctp-lavender after:transition-all after:duration-300 hover:after:w-full",
-    "pink" => "text-ctp-text hover:text-ctp-pink relative pb-1 font-semibold transition-colors after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-0 after:bg-ctp-pink after:transition-all after:duration-300 hover:after:w-full",
+    "blue" => "text-ctp-text hover:text-ctp-blue press inline-block font-semibold",
+    "mauve" => "text-ctp-text hover:text-ctp-mauve press inline-block font-semibold",
+    "peach" => "text-ctp-text hover:text-ctp-peach press inline-block font-semibold",
+    "lavender" => "text-ctp-text hover:text-ctp-lavender press inline-block font-semibold",
+    "pink" => "text-ctp-text hover:text-ctp-pink press inline-block font-semibold",
   }
   telemetry_button_class = "bg-ctp-green text-on-accent hover:text-on-accent border-ink shadow-brut-sm press inline-flex min-h-11 items-center gap-1 border-[3px] px-3.5 font-extrabold"
   switch_class = "text-ctp-text hover:text-ctp-mauve inline-flex min-h-11 items-center font-mono text-sm font-extrabold transition-colors"
