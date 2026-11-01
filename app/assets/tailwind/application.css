@@ -129,15 +129,20 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-ctp-mantle;
+  @apply bg-ctp-base;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-ctp-surface1;
+  @apply bg-ctp-mauve;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-ctp-blue;
+  @apply bg-ctp-lavender;
+}
+
+/* Chrome 121+ and Firefox draw a native bar in these colors; the ::-webkit rules above are Safari's fallback */
+html {
+  scrollbar-color: var(--color-ctp-mauve) var(--color-ctp-base);
 }
 
 @utility bg-dots {
