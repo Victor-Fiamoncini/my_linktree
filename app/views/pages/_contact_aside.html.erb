@@ -4,7 +4,6 @@
     {
       name: "Catppuccin Frappé",
       theme: "frappe",
-      url: SeoConfig::CATPPUCCIN_FRAPPE_URL,
       # Active unless Latte is on
       row_classes: "bg-ctp-base border-ink shadow-brut-sm latte:border-transparent latte:bg-transparent latte:shadow-none latte:opacity-60 latte:hover:opacity-100 latte:cursor-pointer",
       active_badge_classes: "inline-flex latte:hidden",
@@ -13,7 +12,6 @@
     {
       name: "Catppuccin Latte",
       theme: "latte",
-      url: SeoConfig::CATPPUCCIN_LATTE_URL,
       row_classes: "border-transparent cursor-pointer opacity-60 hover:opacity-100 latte:cursor-default latte:border-ink latte:bg-ctp-base latte:shadow-brut-sm latte:opacity-100",
       active_badge_classes: "hidden latte:inline-flex",
       swatch_classes: %w[bg-[#1e66f5] bg-[#8839ef] bg-[#40a02b] bg-[#df8e1d] bg-[#fe640b] bg-[#179299]]
@@ -54,13 +52,7 @@
           class="border-[3px] px-3.5 py-3 transition-all duration-300 <%= flavor[:row_classes] %>"
         >
           <div class="mb-2.5 flex items-center justify-between gap-3">
-            <a
-              href="<%= flavor[:url] %>"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="<%= t("shared.contact_aside.theme_link_title", flavor: flavor[:name]) %>"
-              class="text-ctp-text hover:text-ctp-mauve inline-block text-[15px] font-bold transition-colors"
-            ><%= flavor[:name] %></a>
+            <span class="text-ctp-text text-[15px] font-bold"><%= flavor[:name] %></span>
 
             <span class="bg-ink text-ctp-base px-2 py-0.5 font-mono text-[11px] font-extrabold tracking-[0.08em] uppercase <%= flavor[:active_badge_classes] %>"><%= t("shared.contact_aside.theme_active") %></span>
           </div>

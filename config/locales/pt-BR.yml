@@ -33,7 +33,6 @@ pt-BR:
       title: "Ir para a seção de contato"
     contact_aside:
       theme_label: "Tema"
-      theme_link_title: "Página oficial da paleta Catppuccin (%{flavor})"
       theme_active: "ativo"
 
   pages:

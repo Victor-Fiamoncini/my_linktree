@@ -11,7 +11,7 @@ RSpec.describe "Theme toggle", type: :system do
 
   # Only the active flavor's badge is visible, so this is the flavor the Theme card highlights.
   def highlighted_flavor
-    find("span", text: /\Aactive\z/i).find(:xpath, "preceding-sibling::a").text
+    find("span", text: /\Aactive\z/i).find(:xpath, "preceding-sibling::span").text
   end
 
   it "switches to Latte and keeps it across a reload" do
