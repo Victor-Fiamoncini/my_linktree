@@ -23,7 +23,7 @@
   <%= render "shared/external_link", icon: :github, link: SeoConfig::GITHUB_URL, label: "GitHub", handle: "Victor-Fiamoncini", variant: "card", accent: "mauve" %>
 
   <div class="bg-ctp-mantle border-ink shadow-brut border-[3px] p-5">
-    <div class="mb-3.5 flex items-center justify-between gap-3">
+    <div class="mb-5 flex items-center justify-between gap-3">
       <p class="text-ctp-subtext0 font-mono text-[13px] font-extrabold tracking-[0.08em] uppercase"><%= t("shared.contact_aside.theme_label") %></p>
 
       <button
@@ -44,20 +44,20 @@
       </button>
     </div>
 
-    <div class="grid gap-3">
+    <div class="grid gap-4">
       <% flavors.each do |flavor| %>
         <div
           data-action="click->theme#select"
           data-theme-theme-param="<%= flavor[:theme] %>"
-          class="border-[3px] px-3.5 py-3 transition-all duration-300 <%= flavor[:row_classes] %>"
+          class="border-[3px] px-4 py-3.5 transition-all duration-300 <%= flavor[:row_classes] %>"
         >
-          <div class="mb-2.5 flex items-center justify-between gap-3">
+          <div class="mb-3 flex items-center justify-between gap-3">
             <span class="text-ctp-text text-[15px] font-bold"><%= flavor[:name] %></span>
 
             <span class="bg-ink text-ctp-base px-2 py-0.5 font-mono text-[11px] font-extrabold tracking-[0.08em] uppercase <%= flavor[:active_badge_classes] %>"><%= t("shared.contact_aside.theme_active") %></span>
           </div>
 
-          <div class="flex gap-1.5">
+          <div class="flex flex-wrap gap-2">
             <% flavor[:swatch_classes].each do |klass| %>
               <span class="border-ink h-[26px] w-[26px] border-2 <%= klass %>"></span>
             <% end %>

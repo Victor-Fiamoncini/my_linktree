@@ -9,7 +9,8 @@
     <%= render "shared/section_heading", tag_name: :h1, prompt: t("telemetry_page.prompt"), heading: t("telemetry_page.heading"), prompt_class: "bg-ctp-pink text-on-accent" %>
 
     <p class="text-ctp-subtext0 mb-7 w-full text-lg leading-[1.7] text-pretty min-[640px]:text-justify">
-      <%= t("telemetry_page.intro_html", mcp: content_tag(:span, "MCP", class: "text-ctp-text font-bold")) %>
+      <% mcp_link = link_to("MCP", "https://modelcontextprotocol.io/", target: "_blank", rel: "noreferrer", title: t("pages.hire_from_agent.mcp_link_title"), class: "link-brut press inline-block px-0.5 [--link-accent:var(--color-ctp-pink)]") %>
+      <%= t("telemetry_page.intro_html", mcp: mcp_link) %>
     </p>
 
     <div class="bg-ctp-green text-on-accent border-ink shadow-brut-sm mb-7 inline-flex items-center gap-2 border-2 px-2.5 py-1 font-mono text-xs font-extrabold tracking-[0.08em] uppercase">

@@ -124,27 +124,6 @@ html {
   }
 }
 
-::-webkit-scrollbar {
-  @apply w-[10px];
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-ctp-base;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-ctp-mauve;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-ctp-lavender;
-}
-
-/* Chrome 121+ and Firefox draw a native bar in these colors; the ::-webkit rules above are Safari's fallback */
-html {
-  scrollbar-color: var(--color-ctp-mauve) var(--color-ctp-base);
-}
-
 @utility bg-dots {
   background-image: radial-gradient(var(--color-dot) 1.2px, transparent 1.6px);
   background-size: 24px 24px;
@@ -211,34 +190,5 @@ html {
   to {
     opacity: 1;
     transform: none;
-  }
-}
-
-.cursor-trail-pixel {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 9999;
-  width: 10px;
-  height: 10px;
-  pointer-events: none;
-  mix-blend-mode: screen;
-  transform: translate(-50%, -50%);
-  animation: cursor-trail-fade 650ms steps(6, end) forwards;
-}
-
-[data-theme="latte"] .cursor-trail-pixel {
-  mix-blend-mode: multiply;
-}
-
-@keyframes cursor-trail-fade {
-  from {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-
-  to {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.2);
   }
 }
