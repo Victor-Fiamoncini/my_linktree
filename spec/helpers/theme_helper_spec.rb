@@ -21,13 +21,13 @@ RSpec.describe ThemeHelper, type: :helper do
 
   describe "#theme_color" do
     it "is Frappé's blue by default" do
-      expect(helper.theme_color).to eq("#8caaee")
+      expect(helper.theme_color).to eq("#ca9ee6")
     end
 
     it "is Latte's blue under the Latte theme" do
       helper.request.cookies[:theme] = "latte"
 
-      expect(helper.theme_color).to eq("#1e66f5")
+      expect(helper.theme_color).to eq("#8839ef")
     end
   end
 end

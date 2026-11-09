@@ -63,13 +63,13 @@ RSpec.describe "Theme toggle", type: :system do
     visit root_path(locale: "en")
 
     expect(highlighted_flavor).to eq("Catppuccin Frappé")
-    expect(theme_color_meta).to eq("#8caaee")
+    expect(theme_color_meta).to eq("#ca9ee6")
 
     find("button[role='switch']").click
 
     expect(page).to have_css('html[data-theme="latte"]', visible: :all)
     expect(highlighted_flavor).to eq("Catppuccin Latte")
-    expect(theme_color_meta).to eq("#1e66f5")
+    expect(theme_color_meta).to eq("#8839ef")
   end
 
   it "switches by clicking the inactive flavor in the Theme card, and ignores the active one" do

@@ -73,7 +73,7 @@ RSpec.describe "Pages", type: :request do
       get "/en"
 
       expect(response.body).to include('data-theme="frappe"')
-      expect(response.body).to include('<meta name="theme-color" content="#8caaee">')
+      expect(response.body).to include('<meta name="theme-color" content="#ca9ee6">')
       expect(response.body).to include('aria-pressed="false"')
       expect(response.body).to include('aria-checked="false"')
       expect(response.body.scan('title="Switch to light theme"').size).to eq(3)
@@ -85,7 +85,7 @@ RSpec.describe "Pages", type: :request do
       get "/en"
 
       expect(response.body).to include('data-theme="latte"')
-      expect(response.body).to include('<meta name="theme-color" content="#1e66f5">')
+      expect(response.body).to include('<meta name="theme-color" content="#8839ef">')
       expect(response.body).to include('aria-pressed="true"')
       expect(response.body).to include('aria-checked="true"')
       expect(response.body.scan('title="Switch to dark theme"').size).to eq(3)

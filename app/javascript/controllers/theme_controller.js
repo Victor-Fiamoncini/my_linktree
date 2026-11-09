@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 // Kept in sync with ThemeHelper::THEME_COLORS
-const THEME_COLORS = { frappe: "#8caaee", latte: "#1e66f5" }
+const THEME_COLORS = { frappe: "#ca9ee6", latte: "#8839ef" }
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 
 export default class extends Controller {
