@@ -1,8 +1,44 @@
-# My Linktree
+<p align="center">
+  <a href="https://victorfiamon.com.br/en">
+    <img src="docs/images/logo.png" alt="VF logo" width="112" height="112">
+  </a>
+</p>
+
+<h1 align="center">My Linktree</h1>
+
+<p align="center">
+  Personal landing page and AI-agent-ready resume, live at
+  <a href="https://victorfiamon.com.br/en"><strong>victorfiamon.com.br</strong></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Victor-Fiamoncini/my_linktree/actions/workflows/ci.yml"><img src="https://github.com/Victor-Fiamoncini/my_linktree/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <img src="https://img.shields.io/badge/Rails-8.1-CC0000?logo=rubyonrails&logoColor=white" alt="Rails 8.1">
+  <img src="https://img.shields.io/badge/Postgres-16%20%2B%20pgvector-4169E1?logo=postgresql&logoColor=white" alt="Postgres 16 + pgvector">
+  <img src="https://img.shields.io/badge/MCP-server-CA9EE6" alt="MCP server">
+</p>
+
+<p align="center">
+  <img src="docs/images/screenshot-desktop.png" alt="Desktop screenshot of victorfiamon.com.br" width="72%">
+  &nbsp;
+  <img src="docs/images/screenshot-mobile.png" alt="Mobile screenshot of victorfiamon.com.br" width="22%">
+</p>
 
 Personal landing page with social links, experience history, a contact form, a RAG-powered
 "Do I fit your role?" job matcher, and an MCP server so AI agents can read the resume, assess a job
 fit, check availability, and book a meeting directly.
+
+## Highlights
+
+- **MCP server** at `/api/mcp` — five tools (`get_resume`, `list_services`, `check_availability`,
+  `schedule_meeting`, `match_job`) any MCP client can call, with a public `/telemetry` feed of
+  recent tool calls.
+- **RAG job matcher** — paste a job description and get a cited fit summary built from the resume
+  and project READMEs, embedded in Postgres with pgvector.
+- **Agent-friendly surface** — `/AGENTS.md` and `/llms.txt` point crawlers and agents at the MCP
+  endpoint, with `POST /api/hire` as a plain-HTTP fallback.
+- **Neo-brutalist Catppuccin UI** — Frappé (dark) and Latte themes, English and Brazilian
+  Portuguese, built with Hotwire and Tailwind, no JS bundler.
 
 ## Tech Stack
 
