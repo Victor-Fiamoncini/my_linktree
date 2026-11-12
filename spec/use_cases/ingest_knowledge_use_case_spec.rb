@@ -11,7 +11,9 @@ RSpec.describe IngestKnowledgeUseCase do
         { id: 1, company: "Acme", role: "Engineer", start_date: "2020-01", end_date: nil, current: true,
           country_name: "Brazil", backend: [ "Ruby" ], frontend: [], infra: [], other_tools: [], description: "Built things." },
         { id: 2, company: "Initech", role: "Intern", start_date: "2018-01", end_date: "2019-01", current: false,
-          country_name: "Brazil", backend: [], frontend: [], infra: [], other_tools: [], description: "Learned things." }
+          country_name: "Brazil", backend: [], frontend: [], infra: [], other_tools: [], description: "Learned things." },
+        { id: 3, company: "Self", role: "Freelancer", current: true,
+          country_name: "Brazil", backend: [], frontend: [], infra: [], other_tools: [], description: "Gigs." }
       ],
       education: [ { institution: "IFC", degree: "Bachelor", field: "Computer Science" } ]
     })
@@ -29,16 +31,17 @@ RSpec.describe IngestKnowledgeUseCase do
   end
 
   it "embeds experiences, education, services and README chunks" do
-    expect(use_case.execute).to eq(total: 5, embedded: 5, removed: 0)
+    expect(use_case.execute).to eq(total: 6, embedded: 6, removed: 0)
     expect(embedder).to have_received(:embed).with(kind_of(Array))
 
-    expect(KnowledgeChunk.pluck(:source_type)).to contain_exactly("experience", "experience", "education", "services", "github_readme")
+    expect(KnowledgeChunk.pluck(:source_type)).to contain_exactly("experience", "experience", "experience", "education", "services", "github_readme")
 
     experience = KnowledgeChunk.find_by!(source_ref: "experience:1")
     expect(experience.title).to eq("Engineer at Acme")
     expect(experience.content).to include("2020-01 to present", "Backend: Ruby", "Built things.")
     expect(experience.content).not_to include("Frontend:")
     expect(KnowledgeChunk.find_by!(source_ref: "experience:2").content).to include("2018-01 to 2019-01")
+    expect(KnowledgeChunk.find_by!(source_ref: "experience:3").content).to start_with("Victor — Freelancer at Self (Brazil)\n")
 
     readme = KnowledgeChunk.find_by!(source_type: "github_readme")
     expect(readme).to have_attributes(source_ref: "alpha#0", title: "alpha", url: "https://github.com/octo/alpha")
@@ -48,7 +51,7 @@ RSpec.describe IngestKnowledgeUseCase do
   it "re-embeds nothing when the sources haven't changed" do
     use_case.execute
 
-    expect(use_case.execute).to eq(total: 5, embedded: 0, removed: 0)
+    expect(use_case.execute).to eq(total: 6, embedded: 0, removed: 0)
     expect(embedder).to have_received(:embed).once
   end
 
@@ -56,7 +59,7 @@ RSpec.describe IngestKnowledgeUseCase do
     use_case.execute
     allow(github).to receive(:fetch).with(owner: "octo", repo: "alpha").and_return("# Alpha\n\nNow a Hanami app.")
 
-    expect(use_case.execute).to eq(total: 5, embedded: 1, removed: 1)
+    expect(use_case.execute).to eq(total: 6, embedded: 1, removed: 1)
     expect(KnowledgeChunk.find_by!(source_type: "github_readme").content).to include("Hanami")
   end
 
@@ -66,7 +69,7 @@ RSpec.describe IngestKnowledgeUseCase do
     allow(github).to receive(:fetch).with(owner: "octo-org", repo: "empty").and_return(nil)
     moved =described_class.new(embedder: embedder, github: github, profile: profile, services: services, config: config.merge(github_owner: "octo-org"))
 
-    expect(moved.execute).to eq(total: 5, embedded: 1, removed: 1)
+    expect(moved.execute).to eq(total: 6, embedded: 1, removed: 1)
     expect(KnowledgeChunk.find_by!(source_type: "github_readme").url).to eq("https://github.com/octo-org/alpha")
   end
 end

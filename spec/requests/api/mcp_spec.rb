@@ -101,7 +101,7 @@ RSpec.describe "Api::Mcp", type: :request do
     post "/api/mcp", params: rpc(id: 2, method: "tools/call", params: { name: "list_services", arguments: {} }), headers: pt_headers
     services = JSON.parse(response.parsed_body.dig("result", "content", 0, "text"))
 
-    expect(resume["experiences"].first["role"]).to eq("Fullstack Software Engineer")
+    expect(resume["experiences"].first["role"]).to eq("Freelance Software Engineer")
     expect(services.first["name"]).to eq("Frontend & Backend Software Development")
   end
 

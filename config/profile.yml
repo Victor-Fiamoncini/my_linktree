@@ -2,6 +2,41 @@ shared: &shared
   name: Victor Fiamoncini
 
   experiences:
+    - id: 6
+      company: Freelance
+      backend: [Ruby, Ruby on Rails, Node.js, Strapi, Go, Fiber, Postgres, pgvector, SQLite, Redis, Firebase, Solid Queue, Solid Cache, JWT, OAuth 2, OpenAI, RAG, MCP, Stripe, Resend, ClickSend, RSpec, Minitest, Jest]
+      frontend: [React, Next.js, React Native, Expo, Hotwire, TypeScript, JavaScript, Tailwind CSS, Material UI, shadcn/ui, Framer Motion, Zustand, TanStack Query, React Hook Form, Zod, Jest, React Testing Library]
+      infra: [Hetzner, AWS, Neon, Netlify, Vercel, Docker, Docker Compose, Kamal, Kamal Proxy, Thruster, Nginx, PM2, Cloudflare, Let's Encrypt, GitHub Actions, EAS Build, Sentry, Better Stack, Datadog]
+      other_tools: [Linux, Ubuntu, Omarchy, Git, GitHub, Husky, Commitizen, Docker Hub, mise, Claude Code, Insomnia, ESLint, Prettier, RuboCop, Brakeman, Google Tag Manager, Google Search Console, Vercel Analytics]
+      remote: true
+      current: true
+      translations:
+        en:
+          role: Freelance Software Engineer
+          location: Rodeio, Santa Catarina, Brazil
+          country_name: Brazil
+          description: >-
+            Side projects for clients, delivered end to end. Built back-end systems from development to
+            deployment, such as a Rails API and admin dashboard behind a mobile health app, with CI/CD
+            pipelines, Docker-based deploys to hardened VPSs (SSH lockdown, firewall rules, network
+            setup), reverse proxies with TLS and Cloudflare at the edge. Designed and shipped
+            institutional websites and landing pages for local businesses and professionals, with a
+            focus on performance, accessibility and SEO. Developed cross-platform mobile apps with React
+            Native and Expo, from authentication and push notifications to store builds.
+        pt-BR:
+          role: Engenheiro de Software Freelancer
+          location: Rodeio, Santa Catarina, Brasil
+          country_name: Brasil
+          description: >-
+            Projetos paralelos para clientes, entregues de ponta a ponta. Construí sistemas back-end do
+            desenvolvimento ao deploy, como uma API Rails com painel administrativo por trás de um app
+            mobile de saúde, com pipelines de CI/CD, deploys com Docker em VPSs protegidas (bloqueio de
+            SSH, regras de firewall, configuração de rede), reverse proxies com TLS e Cloudflare na
+            borda. Desenvolvi e publiquei sites institucionais e landing pages para empresas e
+            profissionais locais, com foco em performance, acessibilidade e SEO. Criei aplicativos
+            mobile multiplataforma com React Native e Expo, da autenticação e notificações push até os
+            builds para as lojas.
+
     - id: 1
       company: Breaker19
       backend: [PHP, Laravel, Postgres, MongoDB, Pusher, Auth0, Postmark, PHPUnit, Twilio, MailMason, Highway, FrontApp]
@@ -37,43 +72,6 @@ shared: &shared
             Implementei jobs assíncronos em background no Laravel para validação de check-in/check-out
             de rotas dos motoristas, configurei um ambiente de CI com Jenkins integrado à Render
             Application Platform e introduzi testes de integração usando PHPUnit e Cypress.
-
-    - id: 6
-      company: Freelance
-      backend: [Ruby, Ruby on Rails, Node.js, Strapi, Go, Fiber, Postgres, pgvector, SQLite, Redis, Firebase, Solid Queue, Solid Cache, JWT, OAuth 2, OpenAI, RAG, MCP, Stripe, Resend, ClickSend, RSpec, Minitest, Jest]
-      frontend: [React, Next.js, React Native, Expo, Hotwire, TypeScript, JavaScript, Tailwind CSS, Material UI, shadcn/ui, Framer Motion, Zustand, TanStack Query, React Hook Form, Zod, Jest, React Testing Library]
-      infra: [Hetzner, AWS, Neon, Netlify, Vercel, Docker, Docker Compose, Kamal, Kamal Proxy, Thruster, Nginx, PM2, Cloudflare, Let's Encrypt, GitHub Actions, EAS Build, Sentry, Better Stack, Datadog]
-      other_tools: [Linux, Ubuntu, Omarchy, Git, GitHub, Husky, Commitizen, Docker Hub, mise, Claude Code, Insomnia, ESLint, Prettier, RuboCop, Brakeman, Google Tag Manager, Google Search Console, Vercel Analytics]
-      remote: true
-      start_date: "2022-05"
-      end_date:
-      current: true
-      translations:
-        en:
-          role: Freelance Software Engineer
-          location: Rodeio, Santa Catarina, Brazil
-          country_name: Brazil
-          description: >-
-            Side projects for clients, delivered end to end. Built back-end systems from development to
-            deployment, such as a Rails API and admin dashboard behind a mobile health app, with CI/CD
-            pipelines, Docker-based deploys to hardened VPSs (SSH lockdown, firewall rules, network
-            setup), reverse proxies with TLS and Cloudflare at the edge. Designed and shipped
-            institutional websites and landing pages for local businesses and professionals, with a
-            focus on performance, accessibility and SEO. Developed cross-platform mobile apps with React
-            Native and Expo, from authentication and push notifications to store builds.
-        pt-BR:
-          role: Engenheiro de Software Freelancer
-          location: Rodeio, Santa Catarina, Brasil
-          country_name: Brasil
-          description: >-
-            Projetos paralelos para clientes, entregues de ponta a ponta. Construí sistemas back-end do
-            desenvolvimento ao deploy, como uma API Rails com painel administrativo por trás de um app
-            mobile de saúde, com pipelines de CI/CD, deploys com Docker em VPSs protegidas (bloqueio de
-            SSH, regras de firewall, configuração de rede), reverse proxies com TLS e Cloudflare na
-            borda. Desenvolvi e publiquei sites institucionais e landing pages para empresas e
-            profissionais locais, com foco em performance, acessibilidade e SEO. Criei aplicativos
-            mobile multiplataforma com React Native e Expo, da autenticação e notificações push até os
-            builds para as lojas.
 
     - id: 2
       company: Rede Vistorias

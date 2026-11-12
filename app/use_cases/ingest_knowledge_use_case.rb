@@ -68,11 +68,11 @@ class IngestKnowledgeUseCase
   end
 
   def experience_text(name, experience)
-    period = "#{experience[:start_date]} to #{experience[:current] ? "present" : experience[:end_date]}"
+    period = "#{experience[:start_date]} to #{experience[:current] ? "present" : experience[:end_date]}" if experience[:start_date].present?
     stack = { "Backend" => :backend, "Frontend" => :frontend, "Infrastructure" => :infra, "Other tools" => :other_tools }
       .filter_map { |label, key| "#{label}: #{experience[key].join(", ")}" if experience[key].present? }
 
-    [ "#{name} — #{experience[:role]} at #{experience[:company]} (#{period}, #{experience[:country_name]})", *stack, "", experience[:description] ].join("\n")
+    [ "#{name} — #{experience[:role]} at #{experience[:company]} (#{[ period, experience[:country_name] ].compact.join(", ")})", *stack, "", experience[:description] ].join("\n")
   end
 
   def readme_documents
