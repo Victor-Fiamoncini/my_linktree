@@ -172,7 +172,7 @@ html {
 }
 
 @utility animate-marquee {
-  animation: marquee 66s linear infinite;
+  animation: marquee 98s linear infinite;
 }
 
 @keyframes marquee {
