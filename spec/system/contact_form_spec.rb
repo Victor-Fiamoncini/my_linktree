@@ -42,10 +42,12 @@ RSpec.describe "Contact form", type: :system do
     fill_in "email", with: "jane@example.com"
     fill_in "message", with: "Hello!"
     click_button "Reach Out"
+    wait_for_request_to_settle
 
     # The button is hidden after the first response, so later attempts resubmit the (now-reset)
     # form directly, the same way pressing Enter in a text field would trigger it without a
-    # visible button.
+    # visible button. Each submit waits for the previous response: concurrent requests can
+    # resolve out of order, letting a late 200 overwrite the 429 banner.
     2.times do
       fill_in "name", with: "Jane"
       fill_in "email", with: "jane@example.com"
@@ -53,8 +55,14 @@ RSpec.describe "Contact form", type: :system do
       page.execute_script(<<~JS)
         document.querySelector('[data-controller="contact-form"]').requestSubmit()
       JS
+      wait_for_request_to_settle
     end
 
     expect(page).to have_content("Too many requests")
+  end
+
+  # The controller disables the (possibly hidden) submit button while a request is in flight.
+  def wait_for_request_to_settle
+    expect(page).to have_css('[data-contact-form-target="submit"]:not([disabled])', visible: :all)
   end
 end
