@@ -14,10 +14,8 @@ require 'capybara/cuprite'
 
 # Cuprite drives a real headless Chrome via CDP (no chromedriver/Selenium version to manage) for
 # spec/system specs, so client-side JS (Stimulus controllers, fetch calls) gets real coverage
-# instead of just the JSON contract request specs already exercise.
-Capybara.register_driver(:cuprite) do |app|
-  Capybara::Cuprite::Driver.new(app, window_size: [ 1200, 800 ], process_timeout: 15, timeout: 10)
-end
+# instead of just the JSON contract request specs already exercise. Its options live on
+# `driven_by` below: that call re-registers :cuprite, so a `register_driver` here would be ignored.
 Capybara.default_driver = :cuprite
 Capybara.javascript_driver = :cuprite
 
@@ -54,7 +52,10 @@ RSpec.configure do |config|
   # toward another spec's rate limit.
   config.before { Rails.cache.clear }
 
-  config.before(:each, type: :system) { driven_by(:cuprite) }
+  # A cold headless Chrome on a CI runner can take over Ferrum's 10s default to start.
+  config.before(:each, type: :system) do
+    driven_by(:cuprite, screen_size: [ 1400, 1400 ], options: { process_timeout: 30, timeout: 10 })
+  end
 
   # `config.action_controller.allow_forgery_protection` is off for the test env (see
   # config/environments/test.rb), which makes `csrf_meta_tags` render nothing at all — but
