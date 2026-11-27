@@ -9,6 +9,8 @@ module IconHelper
     moon: '<svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><path d="M2 0h3v1H2z M1 1h2v1H1z M0 2h2v3H0z M0 5h3v1H0z M7 5h1v1H7z M1 6h6v1H1z M2 7h4v1H2z"/></svg>'.html_safe,
     cursor: '<svg viewBox="0 0 4 7" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><path d="M0 0h1v7H0z M1 1h1v5H1z M2 2h1v3H2z M3 3h1v1H3z"/></svg>'.html_safe,
     caret_down: '<svg viewBox="0 0 7 4" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><path d="M0 0h7v1H0z M1 1h5v1H1z M2 2h3v1H2z M3 3h1v1H3z"/></svg>'.html_safe,
+    # The "!" over the hero photo: the stem and dot stand apart, which Pixelify's glyph doesn't manage
+    exclaim: '<svg viewBox="0 0 2 7" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><path d="M0 0h2v4H0z M0 5h2v2H0z"/></svg>'.html_safe,
     envelope: '<svg viewBox="0 0 9 7" shape-rendering="crispEdges" fill="currentColor" fill-rule="evenodd" aria-hidden="true"><path d="M0 0h9v7H0z M1 1h7v5H1z M1 1h1v1H1z M2 2h1v1H2z M3 3h3v1H3z M6 2h1v1H6z M7 1h1v1H7z"/></svg>'.html_safe
   }.freeze
 

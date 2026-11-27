@@ -251,6 +251,43 @@ html {
   }
 }
 
+/* The "!" over an NPC's head: hops up in whole pixels, lands with a small rebound, then waits */
+@utility animate-hop {
+  animation: hop 1.6s steps(1) infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes hop {
+  0%,
+  50%,
+  100% {
+    transform: none;
+  }
+
+  8% {
+    transform: translateY(-4px);
+  }
+
+  16% {
+    transform: translateY(-8px);
+  }
+
+  24% {
+    transform: translateY(-4px);
+  }
+
+  32% {
+    transform: none;
+  }
+
+  40% {
+    transform: translateY(-2px);
+  }
+}
+
 @keyframes fr-fade {
   from {
     opacity: 0;
