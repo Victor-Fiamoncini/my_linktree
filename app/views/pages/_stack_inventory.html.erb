@@ -16,6 +16,7 @@
         <button
           type="button"
           aria-pressed="<%= item == first %>"
+          title="<%= t("pages.stack.item_title", name: item[:name]) %>"
           data-stack-target="item"
           data-action="stack#pick"
           data-name="<%= item[:name] %>"

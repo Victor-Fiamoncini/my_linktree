@@ -63,6 +63,7 @@
           role="tab"
           id="tool-tab-<%= tool_name %>"
           aria-controls="tool-panel-<%= tool_name %>"
+          title="<%= t("pages.hire_from_agent.tool_tab_title", tool: tool_name) %>"
           aria-selected="<%= index.zero? %>"
           tabindex="<%= index.zero? ? 0 : -1 %>"
           data-tabs-target="tab"

@@ -29,6 +29,7 @@
           role="tab"
           id="experience-tab-<%= key %>"
           aria-controls="experience-panel-<%= key %>"
+          title="<%= t("pages.experiences.tab_title", company: group[:company]) %>"
           aria-selected="<%= index.zero? %>"
           tabindex="<%= index.zero? ? 0 : -1 %>"
           data-tabs-target="tab"

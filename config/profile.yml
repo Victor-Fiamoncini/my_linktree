@@ -5,7 +5,7 @@ shared: &shared
     - id: 6
       company: Freelance
       backend: [Ruby, Ruby on Rails, Node.js, Express, Golang, Fiber, Strapi, Postgres, pgvector, SQLite, Redis, Firebase, Solid Queue, Solid Cache, JWT, OAuth 2, OpenAI, RAG, MCP, Stripe, Resend, ClickSend, RSpec, Minitest, Jest]
-      frontend: [React, Next.js, React Native, Expo, Hotwire, TypeScript, JavaScript, Tailwind CSS, Material UI, shadcn/ui, Framer Motion, Zustand, TanStack Query, React Hook Form, Zod, Jest, React Testing Library]
+      frontend: [React, Next.js, React Native, Expo, Hotwire, TypeScript, JavaScript, Tailwind CSS, Material UI, Shadcn/UI, Framer Motion, Zustand, TanStack Query, React Hook Form, Zod, Jest, React Testing Library]
       infra: [Hetzner, AWS, Neon, Netlify, Vercel, Docker, Docker Compose, Kamal, Kamal Proxy, Thruster, Nginx, PM2, Cloudflare, Let's Encrypt, GitHub Actions, EAS Build, Sentry, Better Stack, Datadog]
       other_tools: [Linux, Ubuntu, Omarchy, Git, GitHub, Husky, Commitizen, Docker Hub, Mise, Claude Code, OpenCode, RTK, Insomnia, ESLint, Prettier, RuboCop, Brakeman, Google Tag Manager, Google Search Console, Vercel Analytics]
       remote: true

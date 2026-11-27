@@ -33,6 +33,9 @@ en:
       copyright: "© %{year} Victor Fiamoncini"
       built_with: "built with"
       back_to_top: "back to top"
+      back_to_top_title: "Scroll back to the top of the page"
+    external_link:
+      title: "Open my %{name} profile in a new tab"
     get_in_touch_button:
       label: "Get in touch"
       title: "Go to contact section"
@@ -42,6 +45,7 @@ en:
       slot_label: "SLOT %{number} · %{time}"
       night: "night"
       day: "day"
+      select_theme_title: "Switch to the %{name} theme"
 
   pages:
     hero:
@@ -70,10 +74,12 @@ en:
         other: "%{count} items · pick one to see where I used it"
       used_in: "used in:"
       not_in_log: "— not in career.log"
+      item_title: "Show where I used %{name}"
     experiences:
       prompt: "$ cat career.log"
       heading: "Where I've worked"
       remote: "Remote"
+      tab_title: "Show my experience at %{company}"
     contact_form_section:
       prompt: "$ echo \"let's talk\""
       heading: "Reach out"
@@ -105,6 +111,7 @@ en:
       copied: "Copied!"
       tool_label: "tool %{number}"
       tools_label: "MCP tools"
+      tool_tab_title: "Show details of the %{tool} tool"
       tools:
         get_resume: "Read my resume: experience, education and stack."
         list_services: "See the kinds of work I take on."
@@ -119,6 +126,7 @@ en:
       label: "job description"
       placeholder: "Paste the job description here..."
       submit: "Check the fit"
+      submit_title: "Analyze how my experience fits this job description"
       submitting: "Reading the job and searching my work..."
       generic_error: "Something went wrong. Please check your connection and try again."
 
