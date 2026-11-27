@@ -38,7 +38,7 @@ shared: &shared
   llms_content: |
     # Victor Fiamoncini
 
-    > Software engineer, available for hire. This site runs an MCP server so an agent can read the resume, check open meeting slots and book one, without a human in the loop.
+    > Software engineer, available for hire. This site runs an MCP server so an agent can read the resume, get a cited summary of how I fit a job description, check open meeting slots and book one, without a human in the loop.
 
     No authentication and no signup — point an MCP client at the endpoint below and call a tool. Every call shows up on a public live feed.
 

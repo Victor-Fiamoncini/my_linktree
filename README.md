@@ -52,7 +52,9 @@ fit, check availability, and book a meeting directly.
 - **Resend** — transactional email for the contact form and meeting bookings (`:test` delivery in development)
 - **Sentry** (`sentry-ruby`/`sentry-rails`) — exception monitoring, DSN pulled from encrypted credentials
 - **Better Stack** (`logtail-rails`) — production log drain plus structured events on the API/MCP endpoints, emitted with Rails 8.1's `Rails.event`
-- **RSpec** — model, service, and request specs
+- **RSpec** — use case, model, request, mailer and Cuprite system specs, plus a `spec/security/`
+  attack suite (prompt injection, XSS, CSRF, SQL/email injection, DoS), with SimpleCov line and
+  branch coverage
 
 ## Architecture
 
@@ -63,7 +65,9 @@ the app had before this migration:
 app/
 ├── controllers/
 │   ├── api/                   # every JSON endpoint: Public (telemetry, mcp, hire) and Form (contact, job_match)
-│   ├── pages_controller.rb    # home page
+│   ├── pages_controller.rb    # home page + locale-detecting redirect from the bare /
+│   ├── static_controller.rb   # /AGENTS.md, /llms.txt, /sitemap.xml
+│   ├── errors_controller.rb   # localized 404 page (config.exceptions_app)
 │   └── telemetry_page_controller.rb
 ├── use_cases/                 # framework-agnostic business logic (constructor-injected deps)
 ├── events/                    # everything serving Rails.event: the non-production subscriber,
@@ -73,7 +77,8 @@ app/
 │                              # schedule_meeting, match_job
 ├── clients/                   # outbound HTTP: OpenaiEmbedder, OpenaiClient, GithubReadmeClient
 ├── mailers/                   # ContactMailer, MeetingMailer
-├── models/                    # Booking (unique slot_start), AgentConnection, KnowledgeChunk
+├── models/                    # Booking (unique slot_start), AgentConnection, KnowledgeChunk,
+│                              # JsonRpcRequest (plain object peeking at an MCP body)
 └── javascript/controllers/    # 9 Stimulus controllers (telemetry polling, mobile nav, theme, etc.)
 
 lib/                           # static, request-independent site facts and the text built from
@@ -191,8 +196,9 @@ what production would ship without sending anything.
 ```bash
 bin/dev                  # Rails server + Tailwind CSS watcher
 bin/rails server          # Rails server only
-bundle exec rspec         # Run the test suite
+bundle exec rspec         # Run the test suite (prints line + branch coverage)
 bin/rubocop               # Lint (rubocop-rails-omakase)
+bin/ci                    # Full CI gate: RuboCop, gem + importmap audits, Brakeman, Tailwind build, specs
 bin/rails db:migrate       # Run pending migrations
 bin/rails knowledge:ingest # (Re)embed the RAG corpus; only changed chunks are re-embedded
 ```
@@ -373,9 +379,9 @@ shared web + MCP cap of 100 calls/day was reached (`surface` says which one hit 
   `200` means it's working; `403` means the exception rule is missing, disabled, or the Skip
   checkboxes regressed to just "All managed rules".
 
-  **Note**: Cloudflare is deprecating the standalone "Block AI bots" toggle on 2026-09-15 in favor
-  of a "mixed-purpose crawlers" preference under AI Crawl Control. Re-check this exemption still
-  passes the `curl` above after that date.
+  **Note**: Cloudflare scheduled the standalone "Block AI bots" toggle's deprecation for 2026-09-15, in favor of
+  a "mixed-purpose crawlers" preference under AI Crawl Control. The exemption still passed the
+  `curl` above (`200`) when re-checked on 2026-11-27.
 
 - **Custom WAF rules** (Security → Security rules → Custom rules) drop obvious junk at the edge
   before it reaches Rails. Two Block rules sit *after* the MCP Skip rule above, so neither touches
@@ -409,10 +415,10 @@ shared web + MCP cap of 100 calls/day was reached (`surface` says which one hit 
   legitimate AI-agent traffic: the "Allow AI agents on MCP endpoint" Skip rule above does **not**
   check "All rate limiting rules" (so it can't exempt `/api/mcp` from this one even if we wanted
   it to), but 60 req/10s per IP is far more than a normal agent session's handful of tool calls
-  would ever hit — only an actual flood trips it. App-level rate limiting
-  (`Api::ContactsController`/`Api::McpController`'s `rate_limit` macro, see Architecture below) still
-  layers on top for `/api/mcp` and `/api/contact` with tighter, tool-aware thresholds (e.g. a stricter
-  limit specifically on `schedule_meeting` calls) that this coarse edge rule can't express.
+  would ever hit — only an actual flood trips it. App-level rate limiting (Rails' `rate_limit`
+  macro on every `Api::` endpoint, see [Architecture](#architecture) above) still layers on top
+  with tighter, tool-aware thresholds (e.g. a stricter limit specifically on `schedule_meeting`
+  calls, and a shared daily budget for `match_job`) that this coarse edge rule can't express.
 - **Bot Fight Mode** (Security → Settings, under "Bot traffic") is safe to enable here specifically
   *because* the MCP exemption rule already checks "All Super Bot Fight Mode Rules" — confirm that
   checkbox is still checked before turning this on, or it will 403 AI-agent traffic to `/api/mcp`
