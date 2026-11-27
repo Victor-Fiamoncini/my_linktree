@@ -50,6 +50,7 @@
         <div
           data-action="click->theme#select"
           data-theme-theme-param="<%= flavor[:theme] %>"
+          title="<%= t("shared.contact_aside.select_theme_title", name: flavor[:name]) %>"
           class="m-0.5 px-3.5 py-3 transition-opacity duration-200 <%= flavor[:row_classes] %>"
         >
           <p class="text-ctp-subtext0 mb-0.5 font-pixel text-xs"><%= flavor[:slot] %></p>

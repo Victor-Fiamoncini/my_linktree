@@ -33,6 +33,9 @@ pt-BR:
       copyright: "© %{year} Victor Fiamoncini"
       built_with: "feito com"
       back_to_top: "voltar ao topo"
+      back_to_top_title: "Voltar ao topo da página"
+    external_link:
+      title: "Abrir meu perfil no %{name} em uma nova aba"
     get_in_touch_button:
       label: "Entre em contato"
       title: "Ir para a seção de contato"
@@ -42,6 +45,7 @@ pt-BR:
       slot_label: "SLOT %{number} · %{time}"
       night: "noite"
       day: "dia"
+      select_theme_title: "Mudar para o tema %{name}"
 
   pages:
     hero:
@@ -70,10 +74,12 @@ pt-BR:
         other: "%{count} itens · toque num item para ver onde usei"
       used_in: "usado em:"
       not_in_log: "— fora do career.log"
+      item_title: "Ver onde usei %{name}"
     experiences:
       prompt: "$ cat career.log"
       heading: "Onde eu trabalhei"
       remote: "Remoto"
+      tab_title: "Ver minha experiência em %{company}"
     contact_form_section:
       prompt: "$ echo \"vamos conversar\""
       heading: "Vamos conversar"
@@ -105,6 +111,7 @@ pt-BR:
       copied: "Copiado!"
       tool_label: "ferramenta %{number}"
       tools_label: "Ferramentas MCP"
+      tool_tab_title: "Ver detalhes da ferramenta %{tool}"
       tools:
         get_resume: "Leia meu currículo: experiência, formação e stack."
         list_services: "Veja os tipos de trabalho que eu aceito."
@@ -119,6 +126,7 @@ pt-BR:
       label: "descrição da vaga"
       placeholder: "Cole a descrição da vaga aqui..."
       submit: "Avaliar o fit"
+      submit_title: "Analisar como minha experiência se encaixa nesta vaga"
       submitting: "Lendo a vaga e buscando no meu trabalho..."
       generic_error: "Algo deu errado. Verifique sua conexão e tente novamente."
 

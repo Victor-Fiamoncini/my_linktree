@@ -2,7 +2,7 @@
   variant ||= "outline"
   accent ||= "blue"
   handle ||= nil
-  title ||= label
+  title ||= t("shared.external_link.title", name: label)
   icon_class = { "blue" => "text-ctp-blue", "mauve" => "text-ctp-mauve", "teal" => "text-ctp-teal" }.fetch(accent)
 %>
 <% if variant == "card" %>
