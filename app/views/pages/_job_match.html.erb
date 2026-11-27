@@ -4,7 +4,7 @@
 
     <% rag_link = link_to("RAG", "https://en.wikipedia.org/wiki/Retrieval-augmented_generation", target: "_blank", rel: "noreferrer", title: t("pages.job_match.rag_link_title"), class: "link-px [--link-color:var(--color-on-accent)] [--link-accent:var(--color-on-accent)]") %>
 
-    <p class="mb-7 max-w-[72ch] text-lg leading-[1.65] font-medium text-pretty">
+    <p class="mb-7 text-lg leading-[1.65] font-medium text-pretty hyphens-auto min-[640px]:text-justify">
       <%= t("pages.job_match.intro_html", rag_link: rag_link) %>
     </p>
 

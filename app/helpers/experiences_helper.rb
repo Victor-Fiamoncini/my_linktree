@@ -19,9 +19,9 @@ module ExperiencesHelper
   # The stack grid under the hero. Each item's category and companies come from profile.yml, so the grid
   # can say where something was used without a second, hand-kept list.
   STACK = [
-    "Ruby on Rails", "Hotwire", "Node.js", "Golang", "Next.js", "React", "React Native", "TypeScript", "Laravel", "PHP",
-    "Postgres", "pgvector", "Redis", "MongoDB", "OpenAI", "RAG", "MCP", "Stripe", "Pusher", "Auth0", "Twilio", "AWS",
-    "Docker", "Kamal", "Nginx", "Cloudflare", "GitHub Actions", "Jenkins", "Sentry", "Datadog"
+    "Ruby on Rails", "Node.js", "Golang", "Next.js", "React", "React Native", "Expo", "TypeScript", "Laravel", "PHP",
+    "Postgres", "Redis", "MongoDB", "OpenAI", "RAG", "MCP", "Stripe", "Pusher", "Auth0", "Twilio", "AWS",
+    "Docker", "Kamal", "Nginx", "Cloudflare", "GitHub Actions", "Jenkins", "Sentry", "Datadog", "Claude Code", "OpenCode", "RTK"
   ].freeze
 
   def stack_inventory(experiences)

@@ -8,7 +8,7 @@
   <section class="w-full max-w-[1080px]">
     <%= render "shared/section_heading", tag_name: :h1, prompt: t("telemetry_page.prompt"), heading: t("telemetry_page.heading"), prompt_class: "bg-ctp-pink text-on-accent" %>
 
-    <p class="text-ctp-subtext1 mb-7 max-w-[68ch] text-lg leading-[1.7] text-pretty">
+    <p class="text-ctp-subtext1 mb-7 text-lg leading-[1.7] text-pretty hyphens-auto min-[640px]:text-justify">
       <% mcp_link = link_to("MCP", "https://modelcontextprotocol.io/", target: "_blank", rel: "noreferrer", title: t("pages.hire_from_agent.mcp_link_title"), class: "link-px [--link-accent:var(--color-ctp-pink)]") %>
       <%= t("telemetry_page.intro_html", mcp: mcp_link) %>
     </p>

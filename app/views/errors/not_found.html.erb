@@ -8,7 +8,7 @@
   <section class="w-full max-w-[1080px]">
     <%= render "shared/section_heading", tag_name: :h1, prompt: "$ cd #{@localized_path}", heading: t("errors.not_found.heading"), prompt_class: "bg-ctp-pink text-on-accent" %>
 
-    <p class="text-ctp-subtext1 mb-9 max-w-[68ch] text-lg leading-[1.7] text-pretty"><%= t("errors.not_found.body") %></p>
+    <p class="text-ctp-subtext1 mb-9 text-lg leading-[1.7] text-pretty hyphens-auto min-[640px]:text-justify"><%= t("errors.not_found.body") %></p>
 
     <div class="bg-term-bg px-panel m-1 mb-10 [--px-drop:var(--color-ctp-red)] [--px-step:6px]">
       <div class="bg-term-bar flex items-center gap-3 px-4 py-2.5 shadow-[0_4px_0_0_var(--color-line)]">

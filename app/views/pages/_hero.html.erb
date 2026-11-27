@@ -15,7 +15,7 @@
       rails_link = link_to("Ruby on Rails", "https://rubyonrails.org/", target: "_blank", rel: "noopener noreferrer", title: t("pages.hero.rails_link_title"), class: "link-px [--link-accent:var(--color-ctp-red)]")
       nextjs_link = link_to("Next.js", "https://nextjs.org/", target: "_blank", rel: "noopener noreferrer", title: t("pages.hero.nextjs_link_title"), class: "link-px [--link-accent:var(--color-ctp-blue)]")
     %>
-    <p class="text-ctp-subtext1 mb-8 max-w-[58ch] text-lg leading-[1.7] text-pretty">
+    <p class="text-ctp-subtext1 mb-8 max-w-[58ch] text-lg leading-[1.7] text-pretty hyphens-auto min-[640px]:text-justify">
       <%= t("pages.hero.intro_html", rails_link: rails_link, nextjs_link: nextjs_link) %>
     </p>
 
@@ -25,7 +25,7 @@
       <span class="text-ctp-yellow animate-blink absolute right-[18px] bottom-3 block h-2 w-3.5"><%= svg_icon(:caret_down) %></span>
     </figure>
 
-    <p class="text-ctp-subtext1 mb-9 max-w-[58ch] text-lg leading-[1.7] text-pretty">
+    <p class="text-ctp-subtext1 mb-9 max-w-[58ch] text-lg leading-[1.7] text-pretty hyphens-auto min-[640px]:text-justify">
       <%= t("pages.hero.agents_note") %>
     </p>
 

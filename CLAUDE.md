@@ -247,8 +247,10 @@ config/
   with `shape-rendering="crispEdges"`. The theme is server-rendered
   from a `theme` cookie (`ThemeHelper::DEFAULT_THEME` is `frappe`, the dark one, and the OS setting
   is deliberately ignored), so the first paint is already themed. Mobile is everything below
-  `min-[640px]`: a 20px gutter instead of 32px. Running text is left-aligned at every width, capped
-  near 68ch. The page is checked down to 320px. `main` is `overflow-x-clip`, so anything too wide is
+  `min-[640px]`: a 20px gutter instead of 32px. Section body paragraphs are justified from 640px up
+  (`min-[640px]:text-justify`; narrower, justify opens rivers) with `hyphens-auto`, which relies on
+  `<html lang>`. Body paragraphs span their container's full width; only the hero's
+  paragraphs stay capped (58ch, beside the stat sheet), and its tagline stays left-aligned. The page is checked down to 320px. `main` is `overflow-x-clip`, so anything too wide is
   silently cut off rather than scrolling the page: measure element rects, don't trust `scrollWidth`.
   The stack grid under the hero (`ExperiencesHelper::STACK`) derives each item's category and
   "used in" companies from `profile.yml`. The experience map and the MCP tool menu are WAI-ARIA

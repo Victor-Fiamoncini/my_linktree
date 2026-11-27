@@ -1,15 +1,18 @@
 <%
   agents_md_preview = <<~MARKDOWN
     #{t("pages.hire_from_agent.agents_md_title")}
+
     #{t("pages.hire_from_agent.agents_md_contact_line")}
     POST #{SeoConfig::SITE_URL}/api/hire
     Content-Type: application/json
+
     {
       "name": "Your name",
       "contact": "email or preferred channel",
       "brief": "What you want to discuss",
       "agent": "claude | chatgpt | deepseek | kimi | other"
     }
+
     #{t("pages.hire_from_agent.agents_md_services_line")}
   MARKDOWN
 %>
@@ -31,7 +34,7 @@
     mcp_link = link_to("MCP", "https://modelcontextprotocol.io/", target: "_blank", rel: "noreferrer", title: t("pages.hire_from_agent.mcp_link_title"), class: "link-px [--link-accent:var(--color-ctp-mauve)]")
     mcp_server = content_tag(:span, t("pages.hire_from_agent.mcp_server"), class: "text-ctp-text font-bold")
   %>
-  <p class="text-ctp-subtext1 mb-9 max-w-[68ch] text-lg leading-[1.7] text-pretty">
+  <p class="text-ctp-subtext1 mb-9 text-lg leading-[1.7] text-pretty hyphens-auto min-[640px]:text-justify">
     <%= t("pages.hire_from_agent.intro_html", mcp_link: mcp_link, mcp_server: mcp_server) %>
   </p>
 
@@ -68,7 +71,7 @@
           class="group text-ctp-text aria-selected:bg-ctp-surface0 flex min-h-12 w-full cursor-pointer items-center gap-3 px-3 text-left transition-colors"
         >
           <span aria-hidden="true" class="text-ctp-peach block h-[11px] w-1.5 shrink-0 opacity-0 group-aria-selected:opacity-100"><%= svg_icon(:cursor) %></span>
-          <span class="text-ctp-subtext0 font-pixel text-[13px]"><%= format("%02d", index + 1) %></span>
+          <span class="text-ctp-subtext0 group-aria-selected:text-ctp-peach font-pixel text-[13px]"><%= format("%02d", index + 1) %></span>
           <code class="min-w-0 font-mono text-[15px] font-bold [overflow-wrap:anywhere]"><%= tool_name %></code>
         </button>
       <% end %>
@@ -83,15 +86,28 @@
         data-tabs-key="<%= tool_name %>"
         class="flex min-w-0 flex-[999_1_360px] flex-col gap-3.5 px-5 py-[26px] min-[640px]:px-[30px] <%= "hidden" unless index.zero? %>"
       >
-        <span class="text-ctp-subtext0 font-pixel text-sm"><%= t("pages.hire_from_agent.tool_label", number: format("%02d", index + 1)) %></span>
+        <span class="text-ctp-peach font-pixel text-sm"><%= t("pages.hire_from_agent.tool_label", number: format("%02d", index + 1)) %></span>
         <code class="text-ctp-text font-mono text-xl font-bold [overflow-wrap:anywhere]"><%= tool_name %></code>
         <p class="text-ctp-text text-lg leading-[1.6]"><%= t("pages.hire_from_agent.tools.#{tool_name}") %></p>
-        <pre class="bg-term-bg text-term-text mt-2 overflow-x-auto px-4 py-3.5 font-mono text-[13px] leading-[1.7]"><code><%= { method: "tools/call", params: { name: tool_name } }.to_json %></code></pre>
+
+        <%# The same JSON-RPC body as to_json would give, pretty-printed and colored like the terminals above %>
+        <div class="bg-term-bg px-frame-sm mt-2 [--px-line:var(--color-line)]">
+          <div class="bg-term-bar flex items-center gap-2.5 px-4 py-2 font-mono text-[13px] font-bold shadow-[0_2px_0_0_var(--color-line)]">
+            <span class="text-term-yellow">POST</span>
+            <span class="text-term-text min-w-0 truncate">/api/mcp</span>
+          </div>
+          <pre class="text-ctp-subtext1 overflow-x-auto px-4 pt-4 pb-3.5 font-mono text-[13px] leading-[1.7]"><code>{
+  <span class="text-term-blue">"method"</span>: <span class="text-term-green">"tools/call"</span>,
+  <span class="text-term-blue">"params"</span>: {
+    <span class="text-term-blue">"name"</span>: <span class="text-term-green">"<%= tool_name %>"</span>
+  }
+}</code></pre>
+        </div>
       </div>
     <% end %>
   </div>
 
-  <p class="text-ctp-subtext1 mb-9 max-w-[68ch] text-lg leading-[1.7] text-pretty">
+  <p class="text-ctp-subtext1 mb-9 text-lg leading-[1.7] text-pretty hyphens-auto min-[640px]:text-justify">
     <%= t("pages.hire_from_agent.follow_up") %>
   </p>
 
