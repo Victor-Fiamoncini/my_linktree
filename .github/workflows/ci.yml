@@ -68,7 +68,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y \
-            google-chrome-stable libvips postgresql-client
+            google-chrome-stable postgresql-client
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1

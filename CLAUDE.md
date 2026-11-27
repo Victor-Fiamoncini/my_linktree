@@ -148,8 +148,9 @@ config/
   use the subclass's own namespace (`contact.*`, `job_match.*`). A new endpoint picks its parent
   by that question; never make a browser-form endpoint a `PublicController`, since that silently
   drops CSRF.
-- **Rate limiting**: Rails 8's declarative `rate_limit` macro in `Api::ContactsController`,
-  `Api::JobMatchesController` and `Api::McpController`, backed by `Rails.cache` (Solid Cache in dev/production, `MemoryStore` in
+- **Rate limiting**: Rails 8's declarative `rate_limit` macro on every `Api::` endpoint
+  (`Api::ContactsController`, `Api::HireController`, `Api::JobMatchesController`,
+  `Api::McpController`, `Api::TelemetryController`), backed by `Rails.cache` (Solid Cache in dev/production, `MemoryStore` in
   test). Limits key on the macro's default, `request.remote_ip`: kamal-proxy runs with
   `forward_headers: true` and `config/initializers/trusted_proxies.rb` trusts Cloudflare's ranges,
   so it resolves to the real visitor, and forged `X-Forwarded-For` values from a non-Cloudflare
@@ -302,7 +303,8 @@ There are **no view specs** and `config.infer_spec_type_from_file_location!` sta
 so a file under `spec/views/` wouldn't even get `type: :view` without saying so. Templates are
 covered through the layer that renders them: mailer views by `spec/mailers/*` (eyeball them at
 `/rails/mailers`, fed by `spec/mailers/previews/`), `sitemap.xml.erb`
-by `spec/requests/static_spec.rb`, the contact form and telemetry feed by `spec/system/*`, and the
+by `spec/requests/static_spec.rb`, the contact form, job matcher, telemetry feed and theme toggle by
+`spec/system/*`, and the
 `<head>` SEO block by `spec/requests/pages_spec.rb` (JSON-LD, hreflang and canonical fail silently
 — a broken one looks fine on the page). The rest of `app/views/` is smoke-covered only: it renders
 during `get /en`, so a raise fails the suite, but nothing pins its content, since markup

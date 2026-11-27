@@ -46,7 +46,7 @@ docker compose up -d                                          # if it's not list
 ```
 
 **System specs need the Tailwind build.** `app/assets/builds/` is gitignored, so a fresh clone or
-`git worktree` has no CSS and the five Cuprite system specs drive a headless browser against an
+`git worktree` has no CSS and the Cuprite system specs drive a headless browser against an
 unstyled page — failures like `expect(page).not_to have_button("Reach Out")` read like a broken
 feature but aren't. Fix with `bin/rails tailwindcss:build` (`bin/ci` and `bin/dev` handle it).
 
