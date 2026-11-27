@@ -1,8 +1,8 @@
 <%
-  input_class = "bg-ctp-mantle border-ink text-ctp-text field min-h-[52px] w-full border-[3px] px-[14px] py-3 text-base"
+  input_class = "bg-ctp-crust text-ctp-text px-field m-0.5 min-h-[50px] w-full px-[14px] py-3 text-base [--field-accent:var(--color-ctp-pink)]"
   field_error_class = "text-ctp-red hidden text-xs font-bold"
 %>
-<%= form_with url: api_contact_path, method: :post, class: "grid w-full gap-4",
+<%= form_with url: api_contact_path, method: :post, class: "bg-ctp-mantle px-panel m-1 grid w-full gap-5 p-5 min-[640px]:p-8",
   data: {
     controller: "contact-form", action: "submit->contact-form#submit",
     contact_form_sending_value: t("pages.contact_form.sending"),
@@ -10,16 +10,21 @@
     contact_form_generic_error_value: t("pages.contact_form.generic_error"),
     contact_form_locale_value: I18n.locale,
   } do |form| %>
-  <div class="grid grid-cols-1 gap-4 min-[500px]:grid-cols-2">
+  <p class="text-ctp-subtext0 flex items-center gap-3 font-mono text-[13px]">
+    <span class="text-ctp-pink block h-[21px] w-[27px] shrink-0"><%= svg_icon(:envelope) %></span>
+    <%= t("pages.contact_form.to_label") %>
+  </p>
+
+  <div class="grid grid-cols-1 gap-5 min-[500px]:grid-cols-2">
     <label class="grid gap-2">
-      <span class="text-ctp-text font-mono text-[13px] font-extrabold tracking-[0.08em] uppercase"><%= t("pages.contact_form.name_label") %></span>
+      <span class="text-ctp-subtext0 font-pixel text-[15px]"><%= t("pages.contact_form.name_label") %></span>
       <%= form.text_field :name, id: "name", class: input_class, required: true,
         data: { contact_form_target: "input", field: "name" } %>
       <p class="<%= field_error_class %>" data-contact-form-target="fieldError" data-field="name"></p>
     </label>
 
     <label class="grid gap-2">
-      <span class="text-ctp-text font-mono text-[13px] font-extrabold tracking-[0.08em] uppercase"><%= t("pages.contact_form.email_label") %></span>
+      <span class="text-ctp-subtext0 font-pixel text-[15px]"><%= t("pages.contact_form.email_label") %></span>
       <%= form.email_field :email, id: "email", class: input_class, required: true,
         data: { contact_form_target: "input", field: "email" } %>
       <p class="<%= field_error_class %>" data-contact-form-target="fieldError" data-field="email"></p>
@@ -27,18 +32,18 @@
   </div>
 
   <label class="grid gap-2">
-    <span class="text-ctp-text font-mono text-[13px] font-extrabold tracking-[0.08em] uppercase"><%= t("pages.contact_form.message_label") %></span>
+    <span class="text-ctp-subtext0 font-pixel text-[15px]"><%= t("pages.contact_form.message_label") %></span>
     <%= form.text_area :message, id: "message", rows: 5, class: "#{input_class} resize-y", required: true,
       data: { contact_form_target: "input", field: "message" } %>
     <p class="<%= field_error_class %>" data-contact-form-target="fieldError" data-field="message"></p>
   </label>
 
-  <div class="flex flex-wrap items-center gap-4">
+  <div class="flex flex-wrap items-center gap-5 p-1">
     <%= form.submit t("pages.contact_form.submit"),
       title: t("pages.contact_form.submit_title"),
       data: { contact_form_target: "submit" },
-      class: "bg-ctp-green text-on-accent border-ink shadow-brut press min-h-[54px] cursor-pointer border-[3px] px-[30px] text-[17px] font-bold disabled:cursor-not-allowed disabled:opacity-60 max-[531px]:w-full" %>
+      class: "bg-ctp-pink text-on-accent px-raised press min-h-[52px] cursor-pointer px-[26px] font-pixel text-lg font-semibold disabled:cursor-not-allowed disabled:opacity-60 max-[531px]:w-full" %>
 
-    <p class="bg-ctp-mantle border-ink hidden border-2 px-4 py-3 text-sm font-bold" data-contact-form-target="banner"></p>
+    <p class="bg-ctp-crust px-frame-sm m-0.5 hidden px-4 py-3 text-sm font-bold" data-contact-form-target="banner"></p>
   </div>
 <% end %>

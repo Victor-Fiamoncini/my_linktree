@@ -236,14 +236,23 @@ config/
   The Stimulus controller writes model output with `textContent` only, never `innerHTML`.
   `rescue_from` handlers run outside `switch_locale`, so `Api::FormController#localized`
   translates them via `request_locale`.
-- **Layout and theme**: neo-brutalist Tailwind on the Catppuccin palette. The theme is server-rendered
+- **Layout and theme**: a subtle pixel-art (RPG) take on the Catppuccin palette. Pixel lives only in
+  the frame: `font-pixel` (Pixelify Sans) for headings, labels and buttons, while running text stays in
+  `font-sans` (Atkinson Hyperlegible Next). Borders are the `px-*` utilities in
+  `app/assets/tailwind/application.css` — a box-shadow in four directions draws a border with notched
+  corners, plus a stepped drop shadow — tuned per element via `--px-line`/`--px-ink`/`--px-drop`/
+  `--px-step`. Shadows take no layout space, so framed elements need ~8px of room (`m-1`/`p-1` on
+  the parent) or `overflow` clips them. Nothing rotates, motion moves in `steps()`, and the blink
+  cursor stops under `prefers-reduced-motion`. Sprites are `svg_icon` entries drawn on a tiny grid
+  with `shape-rendering="crispEdges"`. The theme is server-rendered
   from a `theme` cookie (`ThemeHelper::DEFAULT_THEME` is `frappe`, the dark one, and the OS setting
   is deliberately ignored), so the first paint is already themed. Mobile is everything below
-  `min-[640px]`: a 20px gutter instead of 32px, and section copy left-aligned instead of justified.
-  The page is checked down to 320px. `main` is `overflow-x-clip`, so anything too wide is silently
-  cut off rather than scrolling the page: measure element rects, don't trust `scrollWidth`. Two
-  couplings: the stack marquee's `w-[calc(100%+…)]` must equal twice the gutter, and its
-  `animate-marquee` duration should scale with the item count, or the speed changes.
+  `min-[640px]`: a 20px gutter instead of 32px. Running text is left-aligned at every width, capped
+  near 68ch. The page is checked down to 320px. `main` is `overflow-x-clip`, so anything too wide is
+  silently cut off rather than scrolling the page: measure element rects, don't trust `scrollWidth`.
+  The stack grid under the hero (`ExperiencesHelper::STACK`) derives each item's category and
+  "used in" companies from `profile.yml`. The experience map and the MCP tool menu are WAI-ARIA
+  tablists sharing `tabs_controller.js`, styled off `aria-selected`.
 - **Edge WAF (Cloudflare)**: production sits behind Cloudflare with **Block AI bots** on site-wide,
   which would 403 agent traffic before it reaches this app. `/api/mcp` is exempted by a
   dashboard-only Custom Rule (Skip) that must have **both** "All managed rules" and "All Super Bot

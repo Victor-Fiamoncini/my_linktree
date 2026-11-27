@@ -1,3 +1,4 @@
+<%# Shows the flavor in use: the moon by night (Frappé), the sun by day (Latte) %>
 <button
   type="button"
   data-action="theme#toggle"
@@ -5,9 +6,9 @@
   aria-pressed="<%= current_theme == "latte" %>"
   aria-label="<%= t("shared.header.toggle_theme") %>"
   title="<%= t("shared.header.theme_title.#{current_theme}") %>"
-  class="bg-theme-accent text-on-accent border-ink shadow-brut-sm press focus-visible:outline-ink flex h-11 w-11 cursor-pointer items-center justify-center border-[3px] focus-visible:outline-2 focus-visible:outline-offset-4"
+  class="bg-ctp-crust text-theme-accent px-frame-sm press focus-visible:outline-ctp-text flex h-11 w-11 cursor-pointer items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-4"
 >
-  <span class="h-5 w-5 latte:hidden"><%= svg_icon(:sun) %></span>
+  <span class="block h-5 w-5 latte:hidden"><%= svg_icon(:moon) %></span>
 
-  <span class="hidden h-5 w-5 latte:block"><%= svg_icon(:moon) %></span>
+  <span class="hidden h-[22px] w-[22px] latte:block"><%= svg_icon(:sun) %></span>
 </button>

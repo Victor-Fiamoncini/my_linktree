@@ -1,14 +1,14 @@
 <section id="job-match" class="w-full max-w-[1080px] py-14">
-  <div class="bg-ctp-blue text-on-strong border-ink shadow-brut-lg border-4 selection:bg-ink selection:text-ctp-base p-[clamp(20px,4vw,48px)]">
-    <%= render "shared/section_heading", prompt: t("pages.job_match.prompt"), heading: t("pages.job_match.heading"), prompt_class: "bg-ctp-base text-ctp-text", heading_class: "text-on-strong", counter: "[03/04]", counter_class: "text-on-strong" %>
+  <div class="bg-ctp-lavender text-on-accent px-raised selection:bg-ctp-crust selection:text-ctp-text m-1 p-[clamp(20px,4vw,48px)] [--px-step:6px]">
+    <%= render "shared/section_heading", prompt: t("pages.job_match.prompt"), heading: t("pages.job_match.heading"), prompt_class: "bg-ctp-base text-ctp-text", heading_class: "text-on-accent", counter: "03/04", counter_class: "text-on-accent" %>
 
-    <% rag_link = link_to("RAG", "https://en.wikipedia.org/wiki/Retrieval-augmented_generation", target: "_blank", rel: "noreferrer", title: t("pages.job_match.rag_link_title"), class: "link-brut press inline-block px-0.5 [--link-color:var(--color-on-strong)] [--link-accent:var(--color-ctp-base)]") %>
+    <% rag_link = link_to("RAG", "https://en.wikipedia.org/wiki/Retrieval-augmented_generation", target: "_blank", rel: "noreferrer", title: t("pages.job_match.rag_link_title"), class: "link-px [--link-color:var(--color-on-accent)] [--link-accent:var(--color-on-accent)]") %>
 
-    <p class="mb-7 w-full text-lg leading-[1.65] font-medium text-pretty min-[640px]:text-justify">
+    <p class="mb-7 max-w-[72ch] text-lg leading-[1.65] font-medium text-pretty">
       <%= t("pages.job_match.intro_html", rag_link: rag_link) %>
     </p>
 
-    <%= form_with url: api_job_match_path, method: :post, class: "grid w-full gap-4",
+    <%= form_with url: api_job_match_path, method: :post, class: "grid w-full gap-5",
       data: {
         controller: "job-match", action: "submit->job-match#submit",
         job_match_submitting_value: t("pages.job_match.submitting"),
@@ -18,26 +18,28 @@
       } do |form| %>
 
       <label class="grid gap-2.5">
-        <span class="font-mono text-[13px] font-extrabold tracking-[0.08em] uppercase"><%= t("pages.job_match.label") %></span>
+        <span class="font-pixel text-[15px]"><%= t("pages.job_match.label") %></span>
 
         <%= form.text_area :job_description, id: "job_description", rows: 7, required: true,
           maxlength: MatchJobUseCase::MAX_LENGTH, placeholder: t("pages.job_match.placeholder"),
-          class: "bg-ctp-base text-ctp-text border-ink field w-full resize-y border-[3px] p-4 text-base leading-relaxed",
+          class: "bg-ctp-base text-ctp-text px-field m-0.5 w-full resize-y p-4 text-base leading-relaxed [--px-line:var(--color-ink)] [--field-accent:var(--color-ink)]",
           data: { job_match_target: "input" } %>
 
-        <p class="bg-ctp-base text-ctp-red border-ink hidden w-fit border-2 px-2.5 py-1 text-xs font-bold" data-job-match-target="fieldError"></p>
+        <p class="bg-ctp-base text-ctp-red px-frame-sm m-0.5 hidden w-fit px-2.5 py-1 text-sm font-bold" data-job-match-target="fieldError"></p>
       </label>
 
-      <div class="flex flex-wrap items-center gap-4">
+      <div class="flex flex-wrap items-center gap-5 p-1">
         <%= form.submit t("pages.job_match.submit"),
           data: { job_match_target: "submit" },
-          class: "bg-ctp-base text-ctp-text border-ink shadow-brut press min-h-[54px] cursor-pointer border-[3px] px-7 text-[17px] font-bold disabled:cursor-not-allowed disabled:opacity-60 max-[531px]:w-full" %>
+          class: "bg-ctp-base text-ctp-text px-raised press min-h-[54px] cursor-pointer px-7 font-pixel text-lg font-semibold disabled:cursor-not-allowed disabled:opacity-60 max-[531px]:w-full" %>
 
-        <p class="bg-ctp-base text-ctp-red border-ink hidden border-2 px-3 py-2 text-sm font-bold" data-job-match-target="banner"></p>
+        <p class="bg-ctp-base text-ctp-red px-frame-sm hidden px-3 py-2 text-sm font-bold" data-job-match-target="banner"></p>
       </div>
 
-      <div class="bg-term-bg border-ink shadow-brut hidden border-[3px] p-6" data-job-match-target="result" aria-live="polite">
-        <div class="text-term-text text-base leading-[1.7] whitespace-pre-line" data-job-match-target="summary"></div>
+      <div class="bg-term-bg px-dialog relative m-1 mt-5 hidden px-[26px] pt-7 pb-8 [--px-line:var(--color-ink)]" data-job-match-target="result" aria-live="polite">
+        <span class="bg-ctp-yellow text-on-accent px-raised-sm absolute -top-[18px] left-[18px] px-2.5 py-[3px] font-mono text-[13px] font-bold">match_job</span>
+        <div class="text-term-text text-[17px] leading-[1.7] whitespace-pre-line" data-job-match-target="summary"></div>
+        <span aria-hidden="true" class="text-ctp-yellow animate-blink absolute right-[18px] bottom-3 block h-2 w-3.5"><%= svg_icon(:caret_down) %></span>
       </div>
     <% end %>
   </div>

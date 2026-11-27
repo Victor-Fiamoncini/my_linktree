@@ -1,13 +1,13 @@
 <main class="flex flex-1 flex-col items-center overflow-x-clip px-5 min-[640px]:px-8">
-  <%= render "pages/hero", start_year_of_work: @start_year_of_work %>
+  <%= render "pages/hero", start_year_of_work: @start_year_of_work, xp_years: @xp_years %>
 
-  <%= render "pages/stack_marquee" %>
+  <%= render "pages/stack_inventory", experiences: @profile[:experiences] %>
 
   <%= render "pages/experiences", experiences: @profile[:experiences] %>
 
-	<%= render "pages/hire_from_agent" %>
+  <%= render "pages/hire_from_agent" %>
 
-	<%= render "pages/job_match" %>
+  <%= render "pages/job_match" %>
 
-	<%= render "pages/contact_form_section" %>
+  <%= render "pages/contact_form_section" %>
 </main>

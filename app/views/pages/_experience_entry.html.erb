@@ -1,5 +1,5 @@
 <article>
-  <h3 class="text-ctp-text mb-2 text-2xl font-bold tracking-[-0.02em]"><%= experience[:role] %></h3>
+  <h3 class="text-ctp-text mb-2 text-2xl leading-tight font-bold"><%= experience[:role] %></h3>
 
   <% if experience[:start_date].present? %>
     <p class="text-ctp-subtext0 mb-1 font-mono text-sm">
@@ -13,17 +13,17 @@
   </p>
 
   <% if experience[:description].present? %>
-    <p class="text-ctp-text mb-7 text-[17px] leading-[1.7] text-pretty min-[640px]:text-justify"><%= experience[:description] %></p>
+    <p class="text-ctp-text mb-7 max-w-[68ch] text-[17px] leading-[1.7] text-pretty"><%= experience[:description] %></p>
   <% end %>
 
   <div class="flex flex-col gap-4">
     <% ExperiencesHelper::TECH_CATEGORIES.each do |category| %>
       <% items = experience[category[:key]] %>
       <% if items.present? %>
-        <div class="flex flex-wrap items-center gap-2">
-          <p class="border-ink mr-1 min-w-[92px] border-2 px-2.5 py-1 text-center font-mono text-xs font-extrabold tracking-[0.08em] uppercase <%= category[:accent_class] %>"><%= t(category[:label_key]) %></p>
+        <div class="flex flex-wrap items-center gap-2.5">
+          <p class="mr-1 min-w-[84px] px-2 py-[3px] text-center font-pixel text-sm <%= category[:accent_class] %>"><%= t(category[:label_key]) %></p>
           <% items.each do |tech| %>
-            <span class="bg-ctp-base border-ink text-ctp-text border-2 px-2.5 py-1 font-mono text-[13px] font-semibold"><%= tech %></span>
+            <span class="bg-ctp-base text-ctp-text px-frame-sm m-0.5 px-[9px] py-[3px] font-mono text-[13px] font-bold [--px-line:var(--color-ctp-surface1)]"><%= tech %></span>
           <% end %>
         </div>
       <% end %>

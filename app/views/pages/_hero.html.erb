@@ -1,57 +1,49 @@
 <section id="about" class="flex w-full max-w-[1080px] flex-wrap items-center gap-14 pt-16 pb-12 min-[900px]:pt-20">
-  <div class="min-w-0 flex-[999_1_520px]">
-    <p class="bg-ctp-green text-on-accent border-ink shadow-brut-sm mb-4 inline-block -rotate-2 border-[3px] px-3 py-1.5 font-mono text-sm font-extrabold">$ whoami</p>
+  <div class="flex min-w-0 flex-[999_1_520px] flex-col items-start">
+    <p class="bg-ctp-green text-on-accent px-raised-sm m-0.5 mb-5 inline-block px-2.5 py-1 font-mono text-sm font-bold">$ whoami</p>
 
-    <h1 class="text-ctp-text mb-8 text-[clamp(48px,7.2vw,96px)] leading-[0.95] font-bold tracking-[-0.045em]">
+    <h1 class="text-ctp-text mb-9 font-pixel text-[clamp(48px,7.2vw,92px)] leading-[0.95] font-semibold">
       <span class="block">Victor</span>
-      <span class="bg-ctp-mauve text-on-strong border-ink shadow-brut mt-2.5 inline-block -rotate-[1.2deg] border-4 px-[18px] pt-0.5 pb-2.5">Fiamoncini</span>
+      <span class="bg-ctp-mauve text-on-strong px-raised mt-3.5 ml-1 inline-block px-[18px] pt-1 pb-2.5 [--px-step:6px]">Fiamoncini</span>
     </h1>
 
-    <p class="text-ctp-text mb-4 max-w-[34ch] text-2xl leading-[1.35] font-bold tracking-[-0.015em] text-pretty">
+    <p class="text-ctp-text mb-4 max-w-[34ch] text-2xl leading-[1.35] font-bold text-pretty">
       <%= t("pages.hero.lede", year: start_year_of_work) %>
     </p>
 
     <%
-      rails_link = link_to(
-        content_tag(:span, svg_icon(:gem), class: "text-ctp-red h-[13px] w-[13px]") + "Ruby on Rails",
-        "https://rubyonrails.org/", target: "_blank", rel: "noopener noreferrer", title: t("pages.hero.rails_link_title"),
-        class: "link-brut press group inline-flex items-center gap-1 px-0.5 [--link-accent:var(--color-ctp-red)]"
-      )
-      nextjs_link = link_to(
-        content_tag(:span, svg_icon(:nextjs), class: "h-[13px] w-[13px]") + "Next.js",
-        "https://nextjs.org/", target: "_blank", rel: "noopener noreferrer", title: t("pages.hero.nextjs_link_title"),
-        class: "link-brut press group inline-flex items-center gap-1 px-0.5 [--link-accent:var(--color-ctp-blue)]"
-      )
+      rails_link = link_to("Ruby on Rails", "https://rubyonrails.org/", target: "_blank", rel: "noopener noreferrer", title: t("pages.hero.rails_link_title"), class: "link-px [--link-accent:var(--color-ctp-red)]")
+      nextjs_link = link_to("Next.js", "https://nextjs.org/", target: "_blank", rel: "noopener noreferrer", title: t("pages.hero.nextjs_link_title"), class: "link-px [--link-accent:var(--color-ctp-blue)]")
     %>
-    <p class="text-ctp-subtext0 mb-7 max-w-[54ch] text-lg leading-[1.65] text-pretty">
+    <p class="text-ctp-subtext1 mb-8 max-w-[58ch] text-lg leading-[1.7] text-pretty">
       <%= t("pages.hero.intro_html", rails_link: rails_link, nextjs_link: nextjs_link) %>
     </p>
 
-    <blockquote class="bg-ctp-yellow text-on-accent border-ink shadow-brut mb-7 max-w-[46ch] rotate-[0.8deg] border-[3px] px-[22px] py-[18px] text-[19px] leading-[1.45] font-bold">
-      “<%= t("pages.hero.pull_quote") %>”
-    </blockquote>
+    <figure class="bg-ctp-crust px-dialog relative mx-1 mt-3.5 mb-9 max-w-[50ch] px-[26px] pt-[26px] pb-[30px]">
+      <figcaption class="bg-ctp-yellow text-on-accent px-raised-sm absolute -top-[18px] left-[18px] px-2.5 py-0.5 font-pixel text-[15px]">Victor</figcaption>
+      <blockquote class="text-ctp-text text-[19px] leading-normal font-bold">“<%= t("pages.hero.pull_quote") %>”</blockquote>
+      <span class="text-ctp-yellow animate-blink absolute right-[18px] bottom-3 block h-2 w-3.5"><%= svg_icon(:caret_down) %></span>
+    </figure>
 
-    <p class="text-ctp-subtext0 mb-9 max-w-[54ch] text-lg leading-[1.65] text-pretty">
+    <p class="text-ctp-subtext1 mb-9 max-w-[58ch] text-lg leading-[1.7] text-pretty">
       <%= t("pages.hero.agents_note") %>
     </p>
 
-    <div class="flex flex-wrap gap-4">
+    <div class="flex flex-wrap gap-6 p-1 max-[531px]:w-full">
       <%= render "shared/get_in_touch_button" %>
       <%= render "shared/external_link", icon: :github, link: SeoConfig::GITHUB_URL, label: "GitHub", variant: "outline", accent: "mauve" %>
       <%= render "shared/external_link", icon: :linkedin, link: SeoConfig::LINKEDIN_URL, label: "LinkedIn", variant: "outline", accent: "teal" %>
     </div>
   </div>
 
-  <div class="relative order-first mx-auto w-full max-w-[326px] pr-[18px] pb-[18px] min-[900px]:order-none min-[900px]:mr-0">
-    <div class="bg-ctp-blue border-ink absolute top-[18px] right-0 bottom-0 left-[18px] border-4"></div>
-
+  <div class="mx-auto flex w-full max-w-[326px] flex-col gap-7 p-2 min-[900px]:order-none min-[900px]:mr-0 order-first">
     <a
       href="<%= SeoConfig::LINKEDIN_URL %>"
       target="_blank"
       rel="noopener noreferrer"
       aria-label="<%= t("pages.hero.photo_link_title") %>"
       title="<%= t("pages.hero.photo_link_title") %>"
-      class="group relative block transition-transform duration-150 hover:-translate-x-1 hover:-translate-y-1"
+      class="group px-panel press relative block"
       data-controller="photo-pixelate"
       data-action="theme:change@window->photo-pixelate#render"
     >
@@ -61,7 +53,7 @@
         alt="<%= t("pages.hero.photo_alt") %>"
         width="300"
         height="350"
-        class="border-ink bg-ctp-mantle relative block aspect-[308/358] h-auto w-full border-4 object-cover"
+        class="bg-ctp-mantle relative block aspect-[308/358] h-auto w-full object-cover"
       >
 
       <canvas
@@ -69,12 +61,33 @@
         width="300"
         height="350"
         aria-hidden="true"
-        class="border-ink bg-ctp-mantle pointer-events-none absolute inset-0 block h-full w-full border-4 opacity-100 transition-opacity duration-500 ease-out group-hover:opacity-0"
+        class="bg-ctp-mantle pointer-events-none absolute inset-0 block h-full w-full opacity-100 transition-opacity duration-500 ease-out [image-rendering:pixelated] group-hover:opacity-0"
       ></canvas>
+
+      <span aria-hidden="true" class="bg-ctp-yellow text-on-accent px-raised-sm absolute -top-[26px] right-[18px] flex h-9 w-7 items-center justify-center font-pixel text-2xl font-bold">!</span>
     </a>
 
-    <span class="bg-ctp-peach text-on-accent border-ink shadow-brut-sm pointer-events-none absolute -top-[22px] -right-2 flex h-[118px] w-[118px] rotate-[10deg] items-center justify-center rounded-full border-[3px] p-3 text-center font-mono text-xs leading-tight font-extrabold uppercase">
-      <%= t("pages.hero.open_badge") %>
-    </span>
+    <dl class="bg-ctp-mantle px-panel grid grid-cols-[auto_1fr] items-center gap-x-[18px] gap-y-3 px-[22px] py-5">
+      <dt class="text-ctp-subtext0 font-pixel text-sm"><%= t("pages.hero.stats.role_label") %></dt>
+      <dd class="text-ctp-text font-bold"><%= t("seo.job_title") %></dd>
+
+      <dt class="text-ctp-subtext0 font-pixel text-sm"><%= t("pages.hero.stats.base_label") %></dt>
+      <dd class="text-ctp-text"><%= t("pages.hero.stats.base_value") %></dd>
+
+      <dt class="text-ctp-subtext0 font-pixel text-sm"><%= t("pages.hero.stats.xp_label") %></dt>
+      <dd class="flex items-center gap-2.5">
+        <span class="bg-ctp-crust flex flex-1 gap-[3px] p-[3px]" aria-hidden="true">
+          <% [ 10, xp_years ].max.times do |index| %>
+            <span class="h-2.5 flex-1 <%= index < xp_years ? "bg-ctp-green" : "bg-ctp-surface0" %>"></span>
+          <% end %>
+        </span>
+        <span class="text-ctp-text font-mono text-[13px] font-bold whitespace-nowrap"><%= t("pages.hero.stats.xp_value", count: xp_years) %></span>
+      </dd>
+
+      <dt class="text-ctp-subtext0 font-pixel text-sm"><%= t("pages.hero.stats.status_label") %></dt>
+      <dd class="text-ctp-text flex items-center gap-2 font-bold">
+        <span aria-hidden="true" class="bg-ctp-green h-2.5 w-2.5 shrink-0"></span><%= t("pages.hero.open_badge") %>
+      </dd>
+    </dl>
   </div>
 </section>
