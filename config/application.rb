@@ -43,6 +43,9 @@ module MyLinktree
     config.i18n.default_locale = :en
     config.i18n.fallbacks = true
 
+    # No attachment ever gets a variant, so there's no image_processing gem or libvips to drive one.
+    config.active_storage.variant_processor = :disabled
+
     # Only 404 gets the localized ERB page; every other status, or a failing 404 page, keeps public/*.html.
     config.exceptions_app = ->(env) do
       public_exceptions = ActionDispatch::PublicExceptions.new(Rails.public_path)
