@@ -17,6 +17,7 @@ export default class extends Controller {
     document
       .querySelectorAll('meta[name="theme-color"], meta[name="msapplication-navbutton-color"], meta[name="apple-mobile-web-app-status-bar-style"]')
       .forEach((meta) => meta.setAttribute("content", THEME_COLORS[theme]))
+    document.querySelector('link[rel="icon"][type="image/svg+xml"]')?.setAttribute("href", `/icon-${theme}.svg`)
 
     this.toggleTargets.forEach((button) => button.setAttribute("aria-pressed", String(theme === "latte")))
     this.switchTargets.forEach((button) => button.setAttribute("aria-checked", String(theme === "latte")))

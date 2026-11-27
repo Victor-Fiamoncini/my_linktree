@@ -1,40 +1,54 @@
 <%
   section_links = [
-    { label: t("shared.header.nav_about_label"), href: "#{root_path}#about", accent: "blue", title: t("shared.header.nav_about_title") },
-    { label: t("shared.header.nav_experience_label"), href: "#{root_path}#experience", accent: "mauve", title: t("shared.header.nav_experience_title") },
-    { label: t("shared.header.nav_hire_label"), href: "#{root_path}#agents", accent: "peach", title: t("shared.header.nav_hire_title") },
-    { label: t("shared.header.nav_job_match_label"), href: "#{root_path}#job-match", accent: "lavender", title: t("shared.header.nav_job_match_title") },
-    { label: t("shared.header.nav_contact_label"), href: "#{root_path}#contact", accent: "pink", title: t("shared.header.nav_contact_title") },
+    { label: t("shared.header.nav_about_label"), href: "#{root_path}#about", title: t("shared.header.nav_about_title") },
+    { label: t("shared.header.nav_experience_label"), href: "#{root_path}#experience", title: t("shared.header.nav_experience_title") },
+    { label: t("shared.header.nav_hire_label"), href: "#{root_path}#agents", title: t("shared.header.nav_hire_title") },
+    { label: t("shared.header.nav_job_match_label"), href: "#{root_path}#job-match", title: t("shared.header.nav_job_match_title") },
+    { label: t("shared.header.nav_contact_label"), href: "#{root_path}#contact", title: t("shared.header.nav_contact_title") },
   ]
   other_locale = I18n.locale == :en ? "pt-BR" : "en"
   other_language_name = t("shared.header.other_language_name")
   switch_label = I18n.locale == :en ? "PT-BR" : "EN"
   switch_path = (content_for(:canonical) || request.path).sub(%r{\A/(en|pt-BR)}, "/#{other_locale}")
-  nav_link_classes = {
-    "blue" => "text-ctp-text hover:text-ctp-blue press inline-block font-semibold",
-    "mauve" => "text-ctp-text hover:text-ctp-mauve press inline-block font-semibold",
-    "peach" => "text-ctp-text hover:text-ctp-peach press inline-block font-semibold",
-    "lavender" => "text-ctp-text hover:text-ctp-lavender press inline-block font-semibold",
-    "pink" => "text-ctp-text hover:text-ctp-pink press inline-block font-semibold",
-  }
-  telemetry_button_class = "bg-ctp-green text-on-accent hover:text-on-accent border-ink shadow-brut-sm press inline-flex min-h-11 items-center gap-1 border-[3px] px-3.5 font-extrabold"
-  switch_class = "text-ctp-text hover:text-ctp-mauve inline-flex min-h-11 items-center font-mono text-sm font-extrabold transition-colors"
+  xp_years = GetXpYearsUseCase.new.execute
+  xp_segments = [ 10, xp_years ].max
+  # The ▸ cursor shows on hover and keyboard focus, the way a menu marks the item it's on
+  nav_link_class = "group text-ctp-subtext1 hover:text-ctp-text focus-visible:text-ctp-text inline-flex min-h-11 items-center gap-1.5 font-pixel text-base transition-colors"
+  nav_cursor_class = "block h-[11px] w-1.5 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"
+  telemetry_button_class = "bg-ctp-green text-on-accent hover:text-on-accent px-raised-sm press inline-flex min-h-10 items-center gap-1 px-3.5 font-pixel text-base"
+  switch_class = "text-ctp-text hover:text-ctp-mauve inline-flex min-h-11 items-center font-mono text-sm font-bold transition-colors"
 %>
 
 <header
   data-controller="mobile-nav"
-  class="border-ink bg-ctp-mantle sticky top-0 z-20 w-full border-b-4"
+  class="bg-ctp-mantle sticky top-0 z-20 w-full shadow-[0_4px_0_0_var(--color-line)]"
 >
   <nav class="mx-auto flex max-w-[1080px] items-center justify-between gap-4 px-5 py-3.5 min-[640px]:px-8">
-    <%= link_to root_path, title: t("shared.header.home_title"), class: "flex items-center gap-3" do %>
-      <span aria-hidden="true" class="bg-ctp-mauve text-on-strong border-ink shadow-brut-sm flex h-11 w-11 items-center justify-center border-[3px] font-mono text-base font-extrabold">VF</span>
+    <%= link_to root_path, title: t("shared.header.home_title"), class: "text-ctp-text hover:text-ctp-text flex items-center gap-3.5" do %>
+      <span aria-hidden="true" class="bg-ctp-mauve text-on-strong px-raised-sm flex h-11 w-11 shrink-0 items-center justify-center font-pixel text-lg font-bold">VF</span>
 
-      <span class="text-ctp-text max-[424px]:hidden text-lg font-bold tracking-[-0.02em] whitespace-nowrap">Victor Fiamoncini</span>
+      <span class="flex flex-col gap-1 max-[424px]:hidden">
+        <span class="font-pixel text-lg leading-none whitespace-nowrap">Victor Fiamoncini</span>
+
+        <span class="flex items-center gap-1.5" title="<%= t("shared.header.xp_title", count: xp_years) %>">
+          <span class="text-ctp-subtext0 font-pixel text-[11px] leading-none"><%= t("shared.header.xp_label") %></span>
+          <span class="bg-ctp-crust flex gap-0.5 p-0.5" aria-hidden="true">
+            <% xp_segments.times do |index| %>
+              <span class="h-1.5 w-[7px] <%= index < xp_years ? "bg-ctp-green" : "bg-ctp-surface0" %>"></span>
+            <% end %>
+          </span>
+          <span class="sr-only"><%= t("shared.header.xp_title", count: xp_years) %></span>
+        </span>
+      </span>
     <% end %>
 
-    <ul class="hidden items-center gap-x-5 font-mono text-sm whitespace-nowrap min-[900px]:flex min-[1000px]:gap-x-6">
+    <ul class="hidden items-center gap-x-5 whitespace-nowrap min-[900px]:flex min-[1000px]:gap-x-6">
       <% section_links.each do |link| %>
-        <li><%= link_to link[:label], link[:href], title: link[:title], class: nav_link_classes.fetch(link[:accent]) %></li>
+        <li>
+          <%= link_to link[:href], title: link[:title], class: nav_link_class do %>
+            <span class="<%= nav_cursor_class %>"><%= svg_icon(:cursor) %></span><%= link[:label] %>
+          <% end %>
+        </li>
       <% end %>
 
 			<li><%= link_to telemetry_path, title: t("shared.header.telemetry_title"), class: telemetry_button_class do %><%= t("shared.header.telemetry_button_label") %> <span aria-hidden="true">↗</span><% end %></li>
@@ -56,22 +70,26 @@
         aria-expanded="false"
         aria-label="<%= t("shared.header.toggle_nav") %>"
         title="<%= t("shared.header.toggle_nav") %>"
-        class="bg-ctp-mantle text-ctp-text border-ink shadow-brut-sm press flex h-11 w-11 cursor-pointer items-center justify-center border-[3px]"
+        class="bg-ctp-crust text-ctp-text px-frame-sm press flex h-11 w-11 cursor-pointer items-center justify-center"
       >
-        <span data-mobile-nav-target="openIcon" class="h-4 w-4"><%= svg_icon(:bars) %></span>
+        <span data-mobile-nav-target="openIcon" class="block h-3.5 w-3.5"><%= svg_icon(:bars) %></span>
 
-        <span data-mobile-nav-target="closeIcon" class="hidden h-4 w-4"><%= svg_icon(:times) %></span>
+        <span data-mobile-nav-target="closeIcon" class="hidden h-3.5 w-3.5"><%= svg_icon(:times) %></span>
       </button>
     </div>
   </nav>
 
-  <div data-mobile-nav-target="menu" class="border-ink bg-ctp-mantle hidden border-t-4 px-5 py-5 min-[640px]:px-8 min-[900px]:hidden">
-    <ul class="flex flex-col items-start gap-4 font-mono text-sm">
+  <div data-mobile-nav-target="menu" class="bg-ctp-mantle hidden px-5 pt-5 pb-6 shadow-[inset_0_4px_0_0_var(--color-line)] min-[640px]:px-8 min-[900px]:hidden">
+    <ul class="flex flex-col items-start gap-2">
       <% section_links.each do |link| %>
-        <li><%= link_to link[:label], link[:href], title: link[:title], class: nav_link_classes.fetch(link[:accent]), data: { action: "mobile-nav#close" } %></li>
+        <li>
+          <%= link_to link[:href], title: link[:title], class: nav_link_class, data: { action: "mobile-nav#close" } do %>
+            <span class="<%= nav_cursor_class %>"><%= svg_icon(:cursor) %></span><%= link[:label] %>
+          <% end %>
+        </li>
       <% end %>
 
-			<li><%= link_to telemetry_path, title: t("shared.header.telemetry_title"), class: telemetry_button_class, data: { action: "mobile-nav#close" } do %><%= t("shared.header.telemetry_button_label") %> <span aria-hidden="true">↗</span><% end %></li>
+			<li class="mt-2 p-1"><%= link_to telemetry_path, title: t("shared.header.telemetry_title"), class: telemetry_button_class, data: { action: "mobile-nav#close" } do %><%= t("shared.header.telemetry_button_label") %> <span aria-hidden="true">↗</span><% end %></li>
     </ul>
   </div>
 </header>

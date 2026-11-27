@@ -1,30 +1,32 @@
 <%
-  # Literal class strings so Tailwind picks them up; each row shows its own flavor whatever the active theme.
+  # Literal class strings so Tailwind picks them up; each slot shows its own flavor whatever the active theme.
   flavors = [
     {
       name: "Catppuccin Frappé",
       theme: "frappe",
+      slot: t("shared.contact_aside.slot_label", number: 1, time: t("shared.contact_aside.night")),
       # Active unless Latte is on
-      row_classes: "bg-ctp-base border-ink shadow-brut-sm latte:border-transparent latte:bg-transparent latte:shadow-none latte:opacity-60 latte:hover:opacity-100 latte:cursor-pointer",
+      row_classes: "bg-ctp-base px-frame-sm latte:bg-transparent latte:[--px-line:transparent] latte:opacity-70 latte:hover:opacity-100 latte:cursor-pointer",
       active_badge_classes: "inline-flex latte:hidden",
       swatch_classes: %w[bg-[#8caaee] bg-[#ca9ee6] bg-[#a6d189] bg-[#e5c890] bg-[#ef9f76] bg-[#81c8be]]
     },
     {
       name: "Catppuccin Latte",
       theme: "latte",
-      row_classes: "border-transparent cursor-pointer opacity-60 hover:opacity-100 latte:cursor-default latte:border-ink latte:bg-ctp-base latte:shadow-brut-sm latte:opacity-100",
+      slot: t("shared.contact_aside.slot_label", number: 2, time: t("shared.contact_aside.day")),
+      row_classes: "px-frame-sm cursor-pointer opacity-70 [--px-line:transparent] hover:opacity-100 latte:cursor-default latte:bg-ctp-base latte:[--px-line:var(--color-line)] latte:opacity-100",
       active_badge_classes: "hidden latte:inline-flex",
       swatch_classes: %w[bg-[#1e66f5] bg-[#8839ef] bg-[#40a02b] bg-[#df8e1d] bg-[#fe640b] bg-[#179299]]
     }
   ]
 %>
-<div class="grid grid-cols-1 gap-[18px]">
+<div class="grid grid-cols-1 gap-[22px]">
   <%= render "shared/external_link", icon: :linkedin, link: SeoConfig::LINKEDIN_URL, label: "LinkedIn", handle: "/in/victor-fiamoncini", variant: "card", accent: "blue" %>
   <%= render "shared/external_link", icon: :github, link: SeoConfig::GITHUB_URL, label: "GitHub", handle: "Victor-Fiamoncini", variant: "card", accent: "mauve" %>
 
-  <div class="bg-ctp-mantle border-ink shadow-brut border-[3px] p-5">
+  <div class="bg-ctp-mantle px-panel m-1 p-5">
     <div class="mb-5 flex items-center justify-between gap-3">
-      <p class="text-ctp-subtext0 font-mono text-[13px] font-extrabold tracking-[0.08em] uppercase"><%= t("shared.contact_aside.theme_label") %></p>
+      <p class="text-ctp-subtext0 font-pixel text-[15px]"><%= t("shared.contact_aside.theme_label") %></p>
 
       <button
         type="button"
@@ -34,32 +36,30 @@
         aria-checked="<%= current_theme == "latte" %>"
         aria-label="<%= t("shared.header.toggle_theme") %>"
         title="<%= t("shared.header.theme_title.#{current_theme}") %>"
-        class="border-ink bg-ctp-crust shadow-brut-sm focus-visible:outline-ink relative flex h-8 w-14 shrink-0 cursor-pointer items-center border-[3px] p-0.5 focus-visible:outline-2 focus-visible:outline-offset-4"
+        class="bg-ctp-crust px-frame-sm focus-visible:outline-ctp-text relative m-0.5 flex h-8 w-14 shrink-0 cursor-pointer items-center p-1 focus-visible:outline-2 focus-visible:outline-offset-4"
       >
-        <span class="bg-theme-accent text-on-accent border-ink latte:translate-x-6 flex h-[22px] w-[22px] items-center justify-center border-2 transition-all duration-300 ease-[cubic-bezier(.5,1.6,.5,1)]">
-          <span class="h-3.5 w-3.5 latte:hidden"><%= svg_icon(:moon) %></span>
-
+        <span class="bg-theme-accent text-on-accent latte:translate-x-6 flex h-6 w-6 items-center justify-center transition-transform duration-200 ease-[steps(3)] motion-reduce:transition-none">
+          <span class="block h-3.5 w-3.5 latte:hidden"><%= svg_icon(:moon) %></span>
           <span class="hidden h-3.5 w-3.5 latte:block"><%= svg_icon(:sun) %></span>
         </span>
       </button>
     </div>
 
-    <div class="grid gap-4">
+    <div class="grid gap-3">
       <% flavors.each do |flavor| %>
         <div
           data-action="click->theme#select"
           data-theme-theme-param="<%= flavor[:theme] %>"
-          class="border-[3px] px-4 py-3.5 transition-all duration-300 <%= flavor[:row_classes] %>"
+          class="m-0.5 px-3.5 py-3 transition-opacity duration-200 <%= flavor[:row_classes] %>"
         >
+          <p class="text-ctp-subtext0 mb-0.5 font-pixel text-xs"><%= flavor[:slot] %></p>
           <div class="mb-3 flex items-center justify-between gap-3">
             <span class="text-ctp-text text-[15px] font-bold"><%= flavor[:name] %></span>
-
-            <span class="bg-ink text-ctp-base px-2 py-0.5 font-mono text-[11px] font-extrabold tracking-[0.08em] uppercase <%= flavor[:active_badge_classes] %>"><%= t("shared.contact_aside.theme_active") %></span>
+            <span class="bg-ctp-text text-ctp-base px-2 py-px font-pixel text-xs <%= flavor[:active_badge_classes] %>"><%= t("shared.contact_aside.theme_active") %></span>
           </div>
-
-          <div class="flex flex-wrap gap-2">
+          <div class="flex flex-wrap gap-2.5 p-0.5">
             <% flavor[:swatch_classes].each do |klass| %>
-              <span class="border-ink h-[26px] w-[26px] border-2 <%= klass %>"></span>
+              <span class="px-frame-sm h-[22px] w-[22px] [--px-line:var(--color-ink)] <%= klass %>"></span>
             <% end %>
           </div>
         </div>

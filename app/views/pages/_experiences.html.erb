@@ -3,49 +3,73 @@
     group = acc.find { |g| g[:company] == exp[:company] }
     group ? group[:entries] << exp : acc << { company: exp[:company], entries: [ exp ] }
   end
-  active_class = "shadow-brut-sm -translate-x-0.5 -translate-y-0.5"
-  inactive_class = "bg-ctp-mantle text-ctp-text"
-  base_tab_class = "border-ink press min-h-12 cursor-pointer border-[3px] px-3 py-2 font-mono text-[15px] leading-tight font-extrabold min-[640px]:px-5 min-[640px]:py-0 min-[640px]:whitespace-nowrap"
-%>
-<section id="experience" class="w-full max-w-[1080px] py-14" data-controller="experiences-tabs">
-  <%= render "shared/section_heading", prompt: t("pages.experiences.prompt"), heading: t("pages.experiences.heading"), prompt_class: "bg-ctp-yellow text-on-accent", counter: "[01/04]" %>
+  present = t("experiences_helper.present").downcase
+  # "2021 — 2024", or "2024 — present" while the newest entry is still running
+  span_for = lambda do |group|
+    first_year = group[:entries].filter_map { |e| e[:start_date]&.first(4) }.min
+    last_end = group[:entries].first[:end_date]
+    next present unless first_year
 
-  <div class="mb-7 grid grid-cols-2 gap-3.5 min-[640px]:flex min-[640px]:flex-wrap">
+    "#{first_year} — #{last_end.present? ? last_end.first(4) : present}"
+  end
+%>
+<section id="experience" class="w-full max-w-[1080px] py-14" data-controller="tabs">
+  <%= render "shared/section_heading", prompt: t("pages.experiences.prompt"), heading: t("pages.experiences.heading"), prompt_class: "bg-ctp-yellow text-on-accent", counter: "01/04" %>
+
+  <div class="flex flex-wrap items-start gap-10">
+    <div role="tablist" aria-orientation="vertical" aria-label="<%= t("pages.experiences.heading") %>" class="flex flex-[1_1_240px] flex-col min-[900px]:max-w-[300px]">
+      <% companies.each_with_index do |group, index| %>
+        <% accent = ExperiencesHelper::TAB_ACCENTS[index % ExperiencesHelper::TAB_ACCENTS.size] %>
+        <% key = group[:company].parameterize %>
+        <% if index > 0 %>
+          <span aria-hidden="true" class="ml-[18px] block h-[22px] w-1 bg-[repeating-linear-gradient(var(--color-ctp-surface1)_0_4px,transparent_4px_8px)]"></span>
+        <% end %>
+        <button
+          type="button"
+          role="tab"
+          id="experience-tab-<%= key %>"
+          aria-controls="experience-panel-<%= key %>"
+          aria-selected="<%= index.zero? %>"
+          tabindex="<%= index.zero? ? 0 : -1 %>"
+          data-tabs-target="tab"
+          data-tabs-key="<%= key %>"
+          data-action="tabs#select keydown->tabs#navigate"
+          class="group aria-selected:bg-ctp-mantle flex min-h-14 cursor-pointer items-center gap-3.5 px-2.5 py-1.5 text-left transition-colors <%= accent[:accent] %>"
+        >
+          <span aria-hidden="true" class="bg-ctp-base px-frame m-1 h-3 w-3 shrink-0 [--px-line:var(--color-ctp-surface1)] group-aria-selected:bg-(--tab-accent) group-aria-selected:[--px-line:var(--color-ink)]"></span>
+          <span class="flex min-w-0 flex-col gap-0.5">
+            <span class="text-ctp-subtext1 group-aria-selected:text-ctp-text font-pixel text-[19px] leading-tight"><%= group[:company] %></span>
+            <span class="text-ctp-subtext0 font-mono text-xs"><%= span_for.(group) %></span>
+          </span>
+          <span aria-hidden="true" class="ml-auto block h-[11px] w-1.5 text-(--tab-accent) opacity-0 group-aria-selected:opacity-100"><%= svg_icon(:cursor) %></span>
+        </button>
+      <% end %>
+    </div>
+
     <% companies.each_with_index do |group, index| %>
       <% accent = ExperiencesHelper::TAB_ACCENTS[index % ExperiencesHelper::TAB_ACCENTS.size] %>
-      <button
-        type="button"
-        title="<%= group[:company] %>"
-        data-experiences-tabs-target="tab"
-        data-company="<%= group[:company] %>"
-        data-base-class="<%= base_tab_class %>"
-        data-active-class="<%= active_class %> <%= accent[:fill] %>"
-        data-inactive-class="<%= inactive_class %>"
-        data-action="experiences-tabs#select"
-        class="<%= base_tab_class %> <%= index == 0 ? "#{active_class} #{accent[:fill]}" : inactive_class %>"
-      ><%= group[:company] %></button>
+      <% key = group[:company].parameterize %>
+      <% first = group[:entries].first %>
+      <div
+        role="tabpanel"
+        id="experience-panel-<%= key %>"
+        aria-labelledby="experience-tab-<%= key %>"
+        data-tabs-target="panel"
+        data-tabs-key="<%= key %>"
+        class="bg-ctp-mantle px-panel m-1 min-w-0 flex-[999_1_560px] animate-[fr-fade_0.28s_steps(3)_both] [--px-drop:var(--tab-accent)] [--px-step:5px] <%= accent[:accent] %> <%= "hidden" unless index.zero? %>"
+      >
+        <div class="<%= accent[:fill] %> flex flex-wrap items-center justify-between gap-x-5 gap-y-2.5 px-5 py-4 min-[640px]:px-7">
+          <span class="font-pixel text-[28px] leading-tight font-semibold"><%= group[:company] %></span>
+          <span class="font-mono text-[13px] font-bold uppercase"><%= [ (t("pages.experiences.remote") if first[:remote]), first[:country_name] ].compact_blank.join(" · ") %></span>
+        </div>
+
+        <div class="p-5 min-[640px]:p-7">
+          <% group[:entries].each_with_index do |exp, entry_index| %>
+            <% if entry_index > 0 %><hr class="border-ctp-surface1 my-8 border-t-4 border-dashed"><% end %>
+            <%= render "pages/experience_entry", experience: exp %>
+          <% end %>
+        </div>
+      </div>
     <% end %>
   </div>
-
-  <% companies.each_with_index do |group, index| %>
-    <% accent = ExperiencesHelper::TAB_ACCENTS[index % ExperiencesHelper::TAB_ACCENTS.size] %>
-    <% first = group[:entries].first %>
-    <div
-      data-experiences-tabs-target="panel"
-      data-company="<%= group[:company] %>"
-      class="bg-ctp-mantle border-ink shadow-brut-lg animate-[fr-fade_0.28s_ease_both] border-4 <%= accent[:shadow] %> <%= "hidden" unless index == 0 %>"
-    >
-      <div class="<%= accent[:fill] %> border-ink flex flex-wrap items-center justify-between gap-x-5 gap-y-2.5 border-b-4 px-5 py-4 min-[640px]:px-7">
-        <span class="text-[26px] font-bold tracking-[-0.02em]"><%= group[:company] %></span>
-        <span class="font-mono text-[13px] font-extrabold uppercase"><%= [ (t("pages.experiences.remote") if first[:remote]), first[:country_name] ].compact_blank.join(" · ") %></span>
-      </div>
-
-      <div class="p-5 min-[640px]:p-7">
-        <% group[:entries].each_with_index do |exp, entry_index| %>
-          <% if entry_index > 0 %><hr class="border-ink my-8 border-t-[3px] border-dashed"><% end %>
-          <%= render "pages/experience_entry", experience: exp %>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
 </section>

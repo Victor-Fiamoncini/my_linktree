@@ -19,6 +19,10 @@ en:
       nav_contact_title: "Go to Contact section"
       telemetry_button_label: "/telemetry"
       telemetry_title: "View live telemetry"
+      xp_label: "EXP"
+      xp_title:
+        one: "%{count} year of experience"
+        other: "%{count} years of experience"
       toggle_nav: "Toggle navigation menu"
       toggle_theme: "Toggle light theme"
       theme_title:
@@ -28,12 +32,16 @@ en:
     footer:
       copyright: "© %{year} Victor Fiamoncini"
       built_with: "built with"
+      back_to_top: "back to top"
     get_in_touch_button:
       label: "Get in touch"
       title: "Go to contact section"
     contact_aside:
       theme_label: "Theme"
       theme_active: "active"
+      slot_label: "SLOT %{number} · %{time}"
+      night: "night"
+      day: "day"
 
   pages:
     hero:
@@ -46,6 +54,22 @@ en:
       photo_alt: "Victor Fiamoncini"
       photo_link_title: "Victor Fiamoncini on LinkedIn"
       open_badge: "Open to remote roles"
+      stats:
+        role_label: "role"
+        base_label: "base"
+        base_value: "Rodeio · SC · Brazil"
+        xp_label: "exp"
+        xp_value:
+          one: "%{count} year"
+          other: "%{count} years"
+        status_label: "status"
+    stack:
+      heading: "Stack"
+      hint:
+        one: "%{count} item · pick it to see where I used it"
+        other: "%{count} items · pick one to see where I used it"
+      used_in: "used in:"
+      not_in_log: "— not in career.log"
     experiences:
       prompt: "$ cat career.log"
       heading: "Where I've worked"
@@ -62,6 +86,7 @@ en:
       submit_title: "Send Message"
       sending: "Sending..."
       generic_error: "Something went wrong. Please check your connection and try again."
+      to_label: "to: Victor Fiamoncini"
     hire_from_agent:
       prompt: "$ ./hire-me --no-human-required"
       heading: "Hire me from your agent"
@@ -79,6 +104,7 @@ en:
       copy: "Copy"
       copied: "Copied!"
       tool_label: "tool %{number}"
+      tools_label: "MCP tools"
       tools:
         get_resume: "Read my resume: experience, education and stack."
         list_services: "See the kinds of work I take on."

@@ -19,6 +19,10 @@ pt-BR:
       nav_contact_title: "Ir para a seção Contato"
       telemetry_button_label: "/telemetria"
       telemetry_title: "Ver telemetria ao vivo"
+      xp_label: "EXP"
+      xp_title:
+        one: "%{count} ano de experiência"
+        other: "%{count} anos de experiência"
       toggle_nav: "Abrir/fechar menu de navegação"
       toggle_theme: "Alternar tema claro"
       theme_title:
@@ -28,12 +32,16 @@ pt-BR:
     footer:
       copyright: "© %{year} Victor Fiamoncini"
       built_with: "feito com"
+      back_to_top: "voltar ao topo"
     get_in_touch_button:
       label: "Entre em contato"
       title: "Ir para a seção de contato"
     contact_aside:
       theme_label: "Tema"
       theme_active: "ativo"
+      slot_label: "SLOT %{number} · %{time}"
+      night: "noite"
+      day: "dia"
 
   pages:
     hero:
@@ -46,6 +54,22 @@ pt-BR:
       photo_alt: "Victor Fiamoncini"
       photo_link_title: "Victor Fiamoncini no LinkedIn"
       open_badge: "Aberto a vagas remotas"
+      stats:
+        role_label: "função"
+        base_label: "base"
+        base_value: "Rodeio · SC · Brasil"
+        xp_label: "exp"
+        xp_value:
+          one: "%{count} ano"
+          other: "%{count} anos"
+        status_label: "status"
+    stack:
+      heading: "Stack"
+      hint:
+        one: "%{count} item · toque nele para ver onde usei"
+        other: "%{count} itens · toque num item para ver onde usei"
+      used_in: "usado em:"
+      not_in_log: "— fora do career.log"
     experiences:
       prompt: "$ cat career.log"
       heading: "Onde eu trabalhei"
@@ -62,6 +86,7 @@ pt-BR:
       submit_title: "Enviar Mensagem"
       sending: "Enviando..."
       generic_error: "Algo deu errado. Verifique sua conexão e tente novamente."
+      to_label: "para: Victor Fiamoncini"
     hire_from_agent:
       prompt: "$ ./hire-me --no-human-required"
       heading: "Contrate-me pelo seu agente"
@@ -79,6 +104,7 @@ pt-BR:
       copy: "Copiar"
       copied: "Copiado!"
       tool_label: "ferramenta %{number}"
+      tools_label: "Ferramentas MCP"
       tools:
         get_resume: "Leia meu currículo: experiência, formação e stack."
         list_services: "Veja os tipos de trabalho que eu aceito."

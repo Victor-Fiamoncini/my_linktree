@@ -9,7 +9,9 @@ class PagesController < ApplicationController
 
   def home
     @profile = GetProfileUseCase.new.execute
-    @start_year_of_work = GetXpYearsUseCase.new.start_year_of_work
+    xp_years = GetXpYearsUseCase.new
+    @start_year_of_work = xp_years.start_year_of_work
+    @xp_years = xp_years.execute
   end
 
   private
