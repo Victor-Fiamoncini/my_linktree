@@ -4,10 +4,10 @@ shared: &shared
   experiences:
     - id: 6
       company: Freelance
-      backend: [Ruby, Ruby on Rails, Node.js, Express, Strapi, Postgres, pgvector, SQLite, Redis, Firebase, Solid Queue, Solid Cache, JWT, OAuth 2, OpenAI, RAG, MCP, Stripe, Resend, ClickSend, RSpec, Minitest, Jest]
+      backend: [Ruby, Ruby on Rails, Node.js, Express, Golang, Fiber, Strapi, Postgres, pgvector, SQLite, Redis, Firebase, Solid Queue, Solid Cache, JWT, OAuth 2, OpenAI, RAG, MCP, Stripe, Resend, ClickSend, RSpec, Minitest, Jest]
       frontend: [React, Next.js, React Native, Expo, Hotwire, TypeScript, JavaScript, Tailwind CSS, Material UI, shadcn/ui, Framer Motion, Zustand, TanStack Query, React Hook Form, Zod, Jest, React Testing Library]
       infra: [Hetzner, AWS, Neon, Netlify, Vercel, Docker, Docker Compose, Kamal, Kamal Proxy, Thruster, Nginx, PM2, Cloudflare, Let's Encrypt, GitHub Actions, EAS Build, Sentry, Better Stack, Datadog]
-      other_tools: [Linux, Ubuntu, Omarchy, Git, GitHub, Husky, Commitizen, Docker Hub, mise, Claude Code, Insomnia, ESLint, Prettier, RuboCop, Brakeman, Google Tag Manager, Google Search Console, Vercel Analytics]
+      other_tools: [Linux, Ubuntu, Omarchy, Git, GitHub, Husky, Commitizen, Docker Hub, Mise, Claude Code, OpenCode, RTK, Insomnia, ESLint, Prettier, RuboCop, Brakeman, Google Tag Manager, Google Search Console, Vercel Analytics]
       remote: true
       current: true
       translations:
@@ -42,7 +42,7 @@ shared: &shared
       backend: [PHP, Laravel, Postgres, MongoDB, Pusher, Auth0, Postmark, PHPUnit, Twilio, MailMason, Highway, FrontApp]
       frontend: [React, Next.js, Vue, Tailwind CSS, SCSS, TypeScript, Cypress, Jest, Mapbox]
       infra: [AWS, Render Cloud, Docker, Docker Compose, Nginx, Sentry, LogRocket, Jenkins]
-      other_tools: [Git, GitHub, Claude Code, Open Code, GitHub Copilot, CodeRabbit, Postman, Figma, Linear, Lambdatest, Mailosaur]
+      other_tools: [Git, GitHub, Claude Code, OpenCode, GitHub Copilot, CodeRabbit, Postman, Figma, Linear, Lambdatest, Mailosaur]
       remote: true
       start_date: "2024-12"
       end_date:

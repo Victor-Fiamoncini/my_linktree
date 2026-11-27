@@ -8,16 +8,11 @@
   <section class="w-full max-w-[1080px]">
     <%= render "shared/section_heading", tag_name: :h1, prompt: "$ cd #{@localized_path}", heading: t("errors.not_found.heading"), prompt_class: "bg-ctp-pink text-on-accent" %>
 
-    <p class="text-ctp-subtext0 mb-9 w-full text-lg leading-[1.7] text-pretty min-[640px]:text-justify"><%= t("errors.not_found.body") %></p>
+    <p class="text-ctp-subtext1 mb-9 text-lg leading-[1.7] text-pretty hyphens-auto min-[640px]:text-justify"><%= t("errors.not_found.body") %></p>
 
-    <div class="border-ink bg-term-bg shadow-brut-lg shadow-ctp-red mb-10 border-4">
-      <div class="border-ink bg-term-bar flex items-center gap-3 border-b-4 px-4 py-2.5">
-        <span class="flex gap-1.5" aria-hidden="true">
-          <span class="border-ink bg-term-red h-3.5 w-3.5 border-2"></span>
-          <span class="border-ink bg-term-yellow h-3.5 w-3.5 border-2"></span>
-          <span class="border-ink bg-term-green h-3.5 w-3.5 border-2"></span>
-        </span>
-        <span class="text-term-text font-mono text-[13px] font-extrabold tracking-[0.08em]">zsh</span>
+    <div class="bg-term-bg px-panel m-1 mb-10 [--px-drop:var(--color-ctp-red)] [--px-step:6px]">
+      <div class="bg-term-bar flex items-center gap-3 px-4 py-2.5 shadow-[0_4px_0_0_var(--color-line)]">
+        <span class="text-term-text font-mono text-[13px] font-bold">zsh</span>
       </div>
 
       <div class="px-5 py-4 font-mono text-sm font-bold">
@@ -25,9 +20,9 @@
       </div>
     </div>
 
-    <div class="flex flex-wrap items-center gap-4 font-mono text-[15px] font-bold">
-      <%= link_to t("errors.not_found.home_label"), root_path, title: t("errors.not_found.home_title"), class: "bg-ctp-blue text-on-strong hover:text-on-strong border-ink shadow-brut press inline-flex min-h-[54px] items-center border-[3px] px-[26px]" %>
-      <%= link_to t("errors.not_found.telemetry_label"), telemetry_path, title: t("errors.not_found.telemetry_title"), class: "bg-ctp-mantle text-ctp-text hover:text-ctp-text border-ink shadow-brut shadow-ctp-green press inline-flex min-h-[54px] items-center border-[3px] px-[22px]" %>
+    <div class="flex flex-wrap items-center gap-6 p-1 font-pixel text-lg">
+      <%= link_to t("errors.not_found.home_label"), root_path, title: t("errors.not_found.home_title"), class: "bg-ctp-blue text-on-strong hover:text-on-strong px-raised press inline-flex min-h-[52px] items-center px-[26px]" %>
+      <%= link_to t("errors.not_found.telemetry_label"), telemetry_path, title: t("errors.not_found.telemetry_title"), class: "bg-ctp-mantle text-ctp-text hover:text-ctp-text px-frame press inline-flex min-h-[52px] items-center px-[22px]" %>
     </div>
   </section>
 </main>

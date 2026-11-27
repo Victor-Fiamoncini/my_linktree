@@ -3,20 +3,22 @@
   accent ||= "blue"
   handle ||= nil
   title ||= label
-  shadow_class = { "blue" => "shadow-ctp-blue", "mauve" => "shadow-ctp-mauve", "teal" => "shadow-ctp-teal" }.fetch(accent)
-  card_icon_class = { "blue" => "text-ctp-blue", "mauve" => "text-ctp-mauve", "teal" => "text-ctp-teal" }.fetch(accent)
+  icon_class = { "blue" => "text-ctp-blue", "mauve" => "text-ctp-mauve", "teal" => "text-ctp-teal" }.fetch(accent)
 %>
 <% if variant == "card" %>
-  <a href="<%= link %>" target="_blank" rel="noopener noreferrer" title="<%= title %>" class="bg-ctp-mantle border-ink shadow-brut press flex min-h-16 items-center justify-between gap-3 border-[3px] px-4 min-[640px]:px-5 <%= shadow_class %>">
-    <span class="flex shrink-0 items-center gap-3">
-      <span class="<%= card_icon_class %> h-[18px] w-[18px]"><%= svg_icon(icon) %></span>
-      <% if label %><span class="text-ctp-text text-[17px] font-bold"><%= label %></span><% end %>
+  <a href="<%= link %>" target="_blank" rel="noopener noreferrer" title="<%= title %>" class="bg-ctp-mantle text-ctp-text hover:text-ctp-text px-panel press m-1 flex min-h-16 items-center justify-between gap-3 px-4 py-3 min-[640px]:px-5">
+    <span class="flex min-w-0 flex-col gap-1">
+      <% if label %><span class="font-pixel text-lg leading-none"><%= label %></span><% end %>
+      <% if handle %><span class="text-ctp-subtext0 truncate font-mono text-[13px]"><%= handle %></span><% end %>
     </span>
-    <% if handle %><span class="text-ctp-subtext0 min-w-0 truncate font-mono text-[13px]"><%= handle %> ↗</span><% end %>
+    <span class="<%= icon_class %> flex shrink-0 items-center gap-2">
+      <span class="block h-[18px] w-[18px]"><%= svg_icon(icon) %></span>
+      <span aria-hidden="true" class="text-xl">↗</span>
+    </span>
   </a>
 <% else %>
-  <a href="<%= link %>" target="_blank" rel="noopener noreferrer" title="<%= title %>" class="bg-ctp-mantle border-ink text-ctp-text hover:text-ctp-text shadow-brut press inline-flex min-h-[54px] items-center justify-center gap-[9px] border-[3px] px-[22px] max-[531px]:w-full <%= shadow_class %>">
-    <span class="h-[18px] w-[18px] text-current"><%= svg_icon(icon) %></span>
-    <% if label %><span class="font-mono text-[15px] font-bold"><%= label %> ↗</span><% end %>
+  <a href="<%= link %>" target="_blank" rel="noopener noreferrer" title="<%= title %>" class="bg-ctp-mantle text-ctp-text hover:text-ctp-text px-frame press inline-flex min-h-[52px] items-center justify-center gap-[9px] px-5 max-[531px]:w-full">
+    <span class="<%= icon_class %> block h-[18px] w-[18px]"><%= svg_icon(icon) %></span>
+    <% if label %><span class="font-pixel text-lg"><%= label %> ↗</span><% end %>
   </a>
 <% end %>

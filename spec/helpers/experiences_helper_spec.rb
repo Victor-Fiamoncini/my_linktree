@@ -32,4 +32,38 @@ RSpec.describe ExperiencesHelper, type: :helper do
       end
     end
   end
+
+  describe "#stack_inventory" do
+    let(:experiences) do
+      [
+        { company: "Acme", backend: [ "Ruby on Rails", "Postgres" ], frontend: [ "React" ], infra: [], other_tools: [] },
+        { company: "Initech", backend: [ "Postgres" ], frontend: [], infra: [ "Docker" ], other_tools: [] },
+        { company: "Acme", backend: [ "Postgres" ], frontend: [], infra: [], other_tools: [] }
+      ]
+    end
+
+    it "lists every stack item, in order" do
+      expect(helper.stack_inventory(experiences).map { |item| item[:name] }).to eq(described_class::STACK)
+    end
+
+    it "names each company that used an item once, in profile order" do
+      postgres = helper.stack_inventory(experiences).find { |item| item[:name] == "Postgres" }
+
+      expect(postgres[:companies]).to eq(%w[Acme Initech])
+    end
+
+    it "takes the category from the first list the item appears in" do
+      items = helper.stack_inventory(experiences).index_by { |item| item[:name] }
+
+      expect(items["Ruby on Rails"][:category][:key]).to eq(:backend)
+      expect(items["React"][:category][:key]).to eq(:frontend)
+      expect(items["Docker"][:category][:key]).to eq(:infra)
+    end
+
+    it "leaves an item no experience lists without a category or companies" do
+      golang = helper.stack_inventory(experiences).find { |item| item[:name] == "Golang" }
+
+      expect(golang).to include(category: nil, companies: [])
+    end
+  end
 end

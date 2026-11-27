@@ -6,44 +6,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="dark">
     <meta name="supported-color-schemes" content="dark">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700&family=JetBrains+Mono:wght@400;700&family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
     <title><%= message.subject %></title>
   </head>
 
-  <body style="margin:0;padding:0;background-color:<%= c[:crust] %>;">
+  <body style="margin:0;padding:0;background-color:<%= c[:base] %>;">
     <% if content_for?(:preheader) %>
-      <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:<%= c[:crust] %>;"><%= yield :preheader %></div>
+      <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:<%= c[:base] %>;"><%= yield :preheader %></div>
     <% end %>
 
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:<%= c[:crust] %>;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:<%= c[:base] %>;">
       <tr>
-        <td align="center" style="padding:32px 26px 42px 16px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background-color:<%= c[:base] %>;border:4px solid <%= c[:ink] %>;box-shadow:10px 10px 0 0 <%= c[:blue] %>;">
-            <tr>
-              <td style="padding:18px 28px;background-color:<%= c[:mantle] %>;border-bottom:4px solid <%= c[:ink] %>;">
-                <a href="<%= SeoConfig::SITE_URL %>" style="text-decoration:none;">
-                  <img src="<%= SeoConfig::SITE_URL %>/icon.png" alt="" width="32" height="32" style="display:inline-block;width:32px;height:32px;border:3px solid <%= c[:ink] %>;vertical-align:middle;">
-                  <span style="display:inline-block;padding-left:10px;vertical-align:middle;font-family:<%= MailerHelper::FONT_SANS %>;font-size:18px;font-weight:700;letter-spacing:-0.02em;color:<%= c[:text] %>;"><%= SeoConfig::AUTHOR_NAME %></span>
-                </a>
-              </td>
-            </tr>
+        <td align="center" style="padding:32px 16px 40px;">
+          <%# The page's px-panel: mantle on base, outlined in line, crust drop shadow, surface0 bevel on top %>
+          <%= mail_px_box fill: c[:mantle], line: c[:line], drop: c[:drop], full_width: true, table_style: "max-width:608px;", cell_style: "border-top:4px solid #{c[:surface0]};" do %>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="padding:16px 28px;border-bottom:4px solid <%= c[:line] %>;">
+                  <a href="<%= SeoConfig::SITE_URL %>" style="text-decoration:none;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="vertical-align:middle;">
+                          <%= mail_px_box fill: c[:mauve], line: c[:ink], drop: c[:ink], unit: 2 do %>
+                            <img src="<%= SeoConfig::SITE_URL %>/icon.png" alt="" width="36" height="36" style="display:block;width:36px;height:36px;">
+                          <% end %>
+                        </td>
+                        <td style="padding-left:14px;vertical-align:middle;<%= MailerHelper::PIXEL_TYPE %>font-size:20px;font-weight:600;color:<%= c[:text] %>;"><%= SeoConfig::AUTHOR_NAME %></td>
+                      </tr>
+                    </table>
+                  </a>
+                </td>
+              </tr>
 
-            <tr>
-              <td style="padding:32px 28px;font-family:<%= MailerHelper::FONT_SANS %>;font-size:15px;line-height:1.6;color:<%= c[:text] %>;">
-                <%= yield %>
-              </td>
-            </tr>
+              <tr>
+                <td style="padding:32px 28px;background-color:<%= c[:base] %>;font-family:<%= MailerHelper::FONT_SANS %>;font-size:16px;line-height:1.7;color:<%= c[:subtext1] %>;">
+                  <%= yield %>
+                </td>
+              </tr>
 
-            <tr>
-              <td style="padding:18px 28px;background-color:<%= c[:mantle] %>;border-top:4px solid <%= c[:ink] %>;font-family:<%= MailerHelper::FONT_MONO %>;font-size:12px;font-weight:700;line-height:1.8;color:<%= c[:overlay1] %>;">
-                <a href="<%= SeoConfig::SITE_URL %>" style="color:<%= c[:blue] %>;text-decoration:none;"><%= URI(SeoConfig::SITE_URL).host %></a>
-                &nbsp;·&nbsp;
-                <a href="<%= SeoConfig::GITHUB_URL %>" style="color:<%= c[:blue] %>;text-decoration:none;">GitHub</a>
-                &nbsp;·&nbsp;
-                <a href="<%= SeoConfig::LINKEDIN_URL %>" style="color:<%= c[:blue] %>;text-decoration:none;">LinkedIn</a>
-              </td>
-            </tr>
-          </table>
+              <tr>
+                <td style="padding:16px 28px;border-top:4px solid <%= c[:line] %>;<%= MailerHelper::PIXEL_TYPE %>font-size:14px;line-height:1.8;color:<%= c[:overlay1] %>;">
+                  <a href="<%= SeoConfig::SITE_URL %>" style="color:<%= c[:blue] %>;text-decoration:none;"><%= URI(SeoConfig::SITE_URL).host %></a>
+                  &nbsp;·&nbsp;
+                  <a href="<%= SeoConfig::GITHUB_URL %>" style="color:<%= c[:blue] %>;text-decoration:none;">GitHub</a>
+                  &nbsp;·&nbsp;
+                  <a href="<%= SeoConfig::LINKEDIN_URL %>" style="color:<%= c[:blue] %>;text-decoration:none;">LinkedIn</a>
+                </td>
+              </tr>
+            </table>
+          <% end %>
         </td>
       </tr>
     </table>
