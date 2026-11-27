@@ -246,7 +246,7 @@ config/
   cursor stops under `prefers-reduced-motion`. Sprites are `svg_icon` entries drawn on a tiny grid
   with `shape-rendering="crispEdges"`. The theme is server-rendered
   from a `theme` cookie (`ThemeHelper::DEFAULT_THEME` is `frappe`, the dark one, and the OS setting
-  is deliberately ignored), so the first paint is already themed. Mobile is everything below
+  is deliberately ignored), so the first paint is already themed. The favicon follows it too: `public/icon-frappe.svg` and `icon-latte.svg` are the header's VF badge drawn on a 16px grid, and `theme_controller.js` swaps the `<link>` on toggle. `favicon.ico`, the touch and manifest icons are Frappé only (static files can't follow the cookie), and `icon.png` is the badge without its frame, for the mailer header. Mobile is everything below
   `min-[640px]`: a 20px gutter instead of 32px. Section body paragraphs are justified from 640px up
   (`min-[640px]:text-justify`; narrower, justify opens rivers) with `hyphens-auto`, which relies on
   `<html lang>`. Body paragraphs span their container's full width; only the hero's

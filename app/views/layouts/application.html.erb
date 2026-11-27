@@ -40,8 +40,9 @@
     <%= csp_meta_tag %>
 
     <link rel="manifest" href="/site.webmanifest">
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" href="/icon.png" type="image/png">
+    <%# The SVG follows the site theme (theme_controller.js swaps it); the .ico is for browsers without SVG favicons %>
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" href="/icon-<%= current_theme %>.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
