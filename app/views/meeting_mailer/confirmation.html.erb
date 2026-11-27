@@ -7,12 +7,9 @@
 <p style="margin:0 0 20px;">Hi <%= @name %>,</p>
 <p style="margin:0 0 20px;">Your meeting with Victor Fiamoncini is confirmed for</p>
 
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr>
-    <td style="padding:16px 20px;background-color:<%= c[:mantle] %>;border:3px solid <%= c[:ink] %>;box-shadow:6px 6px 0 0 <%= c[:green] %>;font-family:<%= MailerHelper::FONT_MONO %>;font-size:15px;font-weight:800;line-height:1.6;color:<%= c[:green] %>;"><%= @slot_start %></td>
-  </tr>
-</table>
+<%# A terminal panel, like the page's %>
+<%= mail_px_box fill: c[:term_bg], line: c[:line], drop: c[:drop], full_width: true, cell_style: "padding:16px 20px;font-family:#{MailerHelper::FONT_MONO};font-size:15px;font-weight:700;line-height:1.6;color:#{c[:term_green]};" do %><%= @slot_start %><% end %>
 
-<p style="margin:20px 0 0;">Looking forward to talking. See you then!</p>
+<p style="margin:24px 0 0;">Looking forward to talking. See you then!</p>
 
 <%= mail_button "Visit #{URI(SeoConfig::SITE_URL).host}", SeoConfig::SITE_URL %>

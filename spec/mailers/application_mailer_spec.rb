@@ -28,7 +28,7 @@ RSpec.describe ApplicationMailer do
     expect(mail.html_part.body.decoded).to start_with("<!DOCTYPE html>")
     expect(html.at_css("img")["src"]).to eq("#{SeoConfig::SITE_URL}/icon.png")
     expect(html.css("a").map { it["href"] }).to include(SeoConfig::SITE_URL, SeoConfig::GITHUB_URL, SeoConfig::LINKEDIN_URL)
-    expect(html.at_css("body")["style"]).to include(MailerHelper::FRAPPE[:crust])
+    expect(html.at_css("body")["style"]).to include(MailerHelper::FRAPPE[:base])
   end
 
   it "signs the text part with a link back to the site" do
