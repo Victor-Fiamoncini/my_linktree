@@ -91,7 +91,7 @@ RSpec.describe "Theme toggle", type: :system do
   end
 
   it "toggles from the mobile header" do
-    page.driver.resize(375, 800)
+    page.current_window.resize_to(375, 800)
     visit root_path(locale: "en")
 
     expect(page).to have_no_css("header nav ul button[data-action='theme#toggle']")
@@ -101,6 +101,6 @@ RSpec.describe "Theme toggle", type: :system do
     expect(page).to have_css('html[data-theme="latte"]', visible: :all)
     expect(background_color).to eq("rgb(239, 241, 245)")
   ensure
-    page.driver.resize(1200, 800)
+    page.current_window.resize_to(1200, 800)
   end
 end
